@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自然科複習題庫</title>
+    <style>
+        /* 這裡是控制網頁長相的 (CSS) */
+        body { font-family: "微軟正黑體", sans-serif; background-color: #f4f4f9; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; }
+        .search-box { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #ddd; border-radius: 5px; box-sizing: border-box; margin-bottom: 20px; }
+        .card { border-bottom: 1px solid #eee; padding: 15px 0; }
+        .card:last-child { border-bottom: none; }
+        .question { font-size: 18px; font-weight: bold; color: #34495e; }
+        .answer { color: #e74c3c; font-weight: bold; margin-top: 5px; }
+        .tag { display: inline-block; background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>六年級自然科重點複習</h1>
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 輸入關鍵字搜尋 (例如：光合作用、槓桿)...">
+        
+        <div id="displayArea"></div>
+    </div>
+
+    <script>
+        // ★★★ 這裡是資料區，以後只要改這裡 ★★★
+        const db = [
+            { "單元": "生物", "題目": "光合作用的主要產物是什麼？", "答案": "葡萄糖、氧氣" },
+            { "單元": "物理", "題目": "槓桿原理中，施力臂大於抗力臂會如何？", "答案": "省力費時" },
+            { "單元": "物理", "題目": "定滑輪的功能是什麼？", "答案": "改變用力方向，但不省力" },
+            { "單元": "地球科學", "題目": "月球盈虧的變化週期大約是多久？", "答案": "約 29.5 天 (一個月)" },
+            { "單元": "化學", "題目": "燃燒的三要素是什麼？", "答案": "可燃物、助燃物(氧氣)、達到燃點" }
+        ];
+
+        // 這裡是控制邏輯的 (JavaScript)，不需要動
+        const displayArea = document.getElementById('displayArea');
+        const searchInput = document.getElementById('searchInput');
+
+        function render(data) {
+            if(data.length === 0) {
+                displayArea.innerHTML = '<div style="text-align:center; color:#999;">找不到相關題目</div>';
+                return;
+            }
+            displayArea.innerHTML = data.map(item => `
+                <div class="card">
+                    <span class="tag">${item.單元}</span>
+                    <div class="question">Q: ${item.題目}</div>
+                    <div class="answer">A: ${item.答案}</div>
+                </div>
+            `).join('');
+        }
+
+        // 一開始顯示全部
+        render(db);
+
+        // 當輸入文字時進行搜尋
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim();
+            const filtered = db.filter(item => 
+                item.題目.includes(term) || 
+                item.答案.includes(term) ||
+                item.單元.includes(term)
+            );
+            render(filtered);
+        });
+    </script>
+</body>
+</html>
