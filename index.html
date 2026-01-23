@@ -3,69 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自然科複習題庫</title>
+    <title>2026 沖繩 8 天 7 夜之旅</title>
     <style>
-        /* 這裡是控制網頁長相的 (CSS) */
-        body { font-family: "微軟正黑體", sans-serif; background-color: #f4f4f9; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2c3e50; }
-        .search-box { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #ddd; border-radius: 5px; box-sizing: border-box; margin-bottom: 20px; }
-        .card { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .card:last-child { border-bottom: none; }
-        .question { font-size: 18px; font-weight: bold; color: #34495e; }
-        .answer { color: #e74c3c; font-weight: bold; margin-top: 5px; }
-        .tag { display: inline-block; background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 5px; }
+        /* --- 網頁樣式設定 --- */
+        body { font-family: "微軟正黑體", sans-serif; background-color: #f0f4f8; margin: 0; padding: 0; color: #333; }
+        .header { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+
+        /* 搜尋框 */
+        .search-container { padding: 10px 20px; background: white; border-bottom: 1px solid #eee; }
+        .search-box { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 25px; outline: none; transition: border-color 0.3s; }
+        .search-box:focus { border-color: #4facfe; }
+
+        /* 行程卡片區 */
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        /* 每一天的標題 */
+        .day-header { margin-top: 30px; margin-bottom: 15px; padding-left: 10px; border-left: 5px solid #4facfe; }
+        .day-header h2 { margin: 0; font-size: 20px; color: #2c3e50; }
+        .day-header span { font-size: 14px; color: #7f8c8d; font-weight: normal; margin-left: 10px; }
+
+        /* 單個行程卡片 */
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-start; }
+        .time-box { background: #eef2f7; padding: 8px 12px; border-radius: 8px; text-align: center; min-width: 60px; flex-shrink: 0; }
+        .time-box .time { font-weight: bold; color: #2c3e50; display: block; }
+        .info-box { flex-grow: 1; }
+        .activity { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #333; }
+        .location { font-size: 14px; color: #007bff; margin-bottom: 8px; display: inline-block; text-decoration: none; }
+        .note { font-size: 14px; color: #666; background: #fff8e1; padding: 8px; border-radius: 6px; border-left: 3px solid #ffc107; display: block; margin-top: 5px; }
+        
+        /* 類別標籤 */
+        .tag { font-size: 12px; padding: 3px 8px; border-radius: 10px; color: white; display: inline-block; margin-right: 5px; vertical-align: middle; }
+        .tag.flight { background-color: #9b59b6; } /* 紫色-班機 */
+        .tag.hotel { background-color: #f1c40f; color: #333; } /* 黃色-住宿 */
+        .tag.food { background-color: #e74c3c; } /* 紅色-美食 */
+        .tag.play { background-color: #2ecc71; } /* 綠色-景點 */
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>六年級自然科重點複習</h1>
-        <input type="text" id="searchInput" class="search-box" placeholder="🔍 輸入關鍵字搜尋 (例如：光合作用、槓桿)...">
-        
-        <div id="displayArea"></div>
+    <div class="header">
+        <h1>✈️ 2026 沖繩 8 天 7 夜</h1>
+        <p>跟著行程吃喝玩樂</p>
     </div>
 
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 搜尋行程 (例如：燒肉、機場、住宿)...">
+    </div>
+
+    <div class="container" id="itineraryContainer">
+        </div>
+
     <script>
-        // ★★★ 這裡是資料區，以後只要改這裡 ★★★
-        const db = [
-            { "單元": "生物", "題目": "光合作用的主要產物是什麼？", "答案": "葡萄糖、氧氣" },
-            { "單元": "物理", "題目": "槓桿原理中，施力臂大於抗力臂會如何？", "答案": "省力費時" },
-            { "單元": "物理", "題目": "定滑輪的功能是什麼？", "答案": "改變用力方向，但不省力" },
-            { "單元": "地球科學", "題目": "月球盈虧的變化週期大約是多久？", "答案": "約 29.5 天 (一個月)" },
-            { "單元": "化學", "題目": "燃燒的三要素是什麼？", "答案": "可燃物、助燃物(氧氣)、達到燃點" }
+        // ★★★ 您的行程資料 ★★★
+        const itineraryData = [
+            // 第一天
+            { day: "Day 1", date: "2/09 (一)", time: "06:35", type: "flight", title: "起飛 🛫", location: "桃園機場 T1", note: "樂桃 MM922 | 記得提前 2 小時到機場" },
+            { day: "Day 1", date: "2/09 (一)", time: "08:50", type: "flight", title: "抵達沖繩", location: "那霸機場", note: "入境、領行李、搭接駁車去租車" },
+            { day: "Day 1", date: "2/09 (一)", time: "10:30", type: "play", title: "租車取車", location: "OTS 租車公司", note: "檢查車況、設定導航" },
+            { day: "Day 1", date: "2/09 (一)", time: "12:00", type: "food", title: "午餐：系滿魚市場", location: "糸満漁業協同組合 お魚センター", note: "推薦：海鮮丼、焗烤龍蝦" },
+            { day: "Day 1", date: "2/09 (一)", time: "14:00", type: "play", title: "前往飯店 Check-in", location: "那霸市區", note: "先放行李" },
+            { day: "Day 1", date: "2/09 (一)", time: "18:00", type: "food", title: "晚餐：傑克牛排", location: "Jack's Steak House", note: "人氣老店，可能要排隊" },
+            { day: "Day 1", date: "2/09 (一)", time: "20:00", type: "hotel", title: "入住飯店", location: "逸之彩飯店 (暫定)", note: "享受飯店設施、宵夜拉麵" },
+
+            // 第二天
+            { day: "Day 2", date: "2/10 (二)", time: "09:00", type: "play", title: "波上宮", location: "波上宮", note: "沖繩八社之首，可買御守" },
+            { day: "Day 2", date: "2/10 (二)", time: "11:30", type: "food", title: "午餐：蝦蝦飯", location: "古宇利島", note: "Kouri Shrimp" },
+            { day: "Day 2", date: "2/10 (二)", time: "14:00", type: "play", title: "美麗海水族館", location: "海洋博公園", note: "必看：黑潮之海餵食秀 (15:00 / 17:00)" },
+            
+            // 您可以在這裡依照格式繼續往下加...
+            // 格式： { day: "第幾天", date: "日期", time: "時間", type: "類別(flight/food/play/hotel)", title: "標題", location: "地點", note: "備註" },
         ];
 
-        // 這裡是控制邏輯的 (JavaScript)，不需要動
-        const displayArea = document.getElementById('displayArea');
+        const container = document.getElementById('itineraryContainer');
         const searchInput = document.getElementById('searchInput');
 
         function render(data) {
-            if(data.length === 0) {
-                displayArea.innerHTML = '<div style="text-align:center; color:#999;">找不到相關題目</div>';
-                return;
-            }
-            displayArea.innerHTML = data.map(item => `
-                <div class="card">
-                    <span class="tag">${item.單元}</span>
-                    <div class="question">Q: ${item.題目}</div>
-                    <div class="answer">A: ${item.答案}</div>
-                </div>
-            `).join('');
+            container.innerHTML = "";
+            let currentDay = "";
+
+            data.forEach(item => {
+                // 如果換了一天，就插入一個日期標題
+                if (item.day !== currentDay) {
+                    currentDay = item.day;
+                    const header = document.createElement('div');
+                    header.className = 'day-header';
+                    header.innerHTML = `<h2>${item.day} <span>${item.date}</span></h2>`;
+                    container.appendChild(header);
+                }
+
+                // 產生卡片
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                // 判斷連結：如果有地點，就自動產生 Google Maps 連結
+                const mapLink = item.location ? `<a href="https://www.google.com/maps/search/?api=1&query=${item.location}" target="_blank" class="location">📍 ${item.location}</a>` : "";
+                
+                // 判斷備註：如果有備註才顯示
+                const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
+
+                card.innerHTML = `
+                    <div class="time-box">
+                        <span class="time">${item.time}</span>
+                    </div>
+                    <div class="info-box">
+                        <div class="activity">
+                            <span class="tag ${item.type}">${getTypeName(item.type)}</span>
+                            ${item.title}
+                        </div>
+                        ${mapLink}
+                        ${noteBlock}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        // 一開始顯示全部
-        render(db);
+        function getTypeName(type) {
+            switch(type) {
+                case 'flight': return '交通';
+                case 'food': return '美食';
+                case 'play': return '景點';
+                case 'hotel': return '住宿';
+                default: return '行程';
+            }
+        }
 
-        // 當輸入文字時進行搜尋
+        // 初始渲染
+        render(itineraryData);
+
+        // 搜尋功能
         searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.trim();
-            const filtered = db.filter(item => 
-                item.題目.includes(term) || 
-                item.答案.includes(term) ||
-                item.單元.includes(term)
+            const term = e.target.value.toLowerCase();
+            const filtered = itineraryData.filter(item => 
+                item.title.toLowerCase().includes(term) || 
+                item.location.toLowerCase().includes(term) ||
+                item.note.toLowerCase().includes(term)
             );
-            render(filtered);
+            // 搜尋時不分天數顯示，直接列出結果
+            if(term) {
+                container.innerHTML = ""; // 清空
+                if(filtered.length === 0) container.innerHTML = "<p style='text-align:center'>找不到結果</p>";
+                
+                filtered.forEach(item => {
+                     const card = document.createElement('div');
+                    card.className = 'card';
+                    const mapLink = item.location ? `<a href="https://www.google.com/maps/search/?api=1&query=${item.location}" target="_blank" class="location">📍 ${item.location}</a>` : "";
+                    const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
+                    card.innerHTML = `
+                        <div class="time-box"><span class="time">${item.date}<br>${item.time}</span></div>
+                        <div class="info-box">
+                            <div class="activity"><span class="tag ${item.type}">${getTypeName(item.type)}</span>${item.title}</div>
+                            ${mapLink}
+                            ${noteBlock}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                render(itineraryData); // 沒搜尋時恢復原本分天顯示
+            }
         });
     </script>
 </body>
