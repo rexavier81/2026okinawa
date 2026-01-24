@@ -50,6 +50,7 @@
         .tag.hotel { background-color: #f1c40f; color: #333; }
         .tag.food { background-color: #e74c3c; }
         .tag.play { background-color: #2ecc71; }
+        .tag.snack { background-color: #cc2e89; }
     </style>
 </head>
 <body>
@@ -74,8 +75,8 @@
         const itineraryData = [
             // --- Day 1 ---
             { day: "Day 1", date: "2/8 (日)", time: "14:45", type: "flight", title: "飛機起飛 🛫", location: "泰國越捷航空 VZ568", note: "預計 17:05 抵達" },
-            { day: "Day 1", date: "2/8 (日)", time: "17:05", type: "play", title: "出關 / 機場炸午餐肉", location: "那霸機場", note: "出關取行李，或是逛逛機場，也可機場晚餐" },
-            { day: "Day 1", date: "2/8 (日)", time: "18:05", type: "flight", title: "搭乘單軌前往飯店", location: "小祿站", note: "入住：那霸小祿站前 ys 旅館" },
+            { day: "Day 1", date: "2/8 (日)", time: "17:05", type: "food", title: "出關 / 機場炸午餐肉", location: "那霸機場", note: "出關取行李，或是逛逛機場，也可機場晚餐" },
+            { day: "Day 1", date: "2/8 (日)", time: "18:05", type: "hotel", title: "搭乘單軌前往飯店", location: "那霸小祿站前ys旅館", note: "搭乘單軌前往飯店" },
             { day: "Day 1", date: "2/8 (日)", time: "18:40", type: "food", title: "晚餐：琉球新麵 通堂", location: "通堂 小祿本店", note: "男人麵/女人麵" },
             { day: "Day 1", date: "2/8 (日)", time: "19:40", type: "play", title: "晚餐、超市採買", location: "永旺 那霸店 (Aeon Naha)", note: "晚餐、隨意逛逛" },
 
@@ -90,7 +91,7 @@
             { day: "Day 2", date: "2/9 (一)", time: "18:30", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
 
             // --- Day 3 ---
-            { day: "Day 3", date: "2/10 (二)", time: "08:30", type: "food", title: "早餐", location: "名護 Resonex Nago", note: "" },
+            { day: "Day 3", date: "2/10 (二)", time: "08:30", type: "food", title: "早餐", location: "名護 Resonex Nago", note: "前一天先買好" },
             { day: "Day 3", date: "2/10 (二)", time: "10:00", type: "play", title: "美麗海水族館", location: "美麗海水族館", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "14:10", type: "food", title: "午餐：海景餐廳", location: "L LOTA", note: "古宇利島" },
             { day: "Day 3", date: "2/10 (二)", time: "15:00", type: "play", title: "古宇利島巡禮", location: "心形岩、海洋塔", note: "沙灘、橋頭拍照" },
@@ -221,9 +222,10 @@
         function getTypeName(type) {
             switch(type) {
                 case 'flight': return '交通';
-                case 'food': return '美食';
+                case 'food': return '三餐';
                 case 'play': return '景點/購物';
                 case 'hotel': return '住宿';
+                case 'snack': return '點心';    
                 default: return '行程';
             }
         }
