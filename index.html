@@ -36,7 +36,7 @@
         .day-header span { font-size: 14px; color: #7f8c8d; font-weight: normal; margin-left: 10px; }
 
         /* 單個行程卡片 */
-        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-start; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 0px; /* 改為0，為了讓車程顯示更緊湊 */ box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-start; z-index: 2; position: relative; }
         
         /* --- 新的時間樣式 (垂直排列) --- */
         .time-box { 
@@ -60,6 +60,28 @@
         .activity { font-size: 17px; font-weight: bold; margin-bottom: 6px; color: #333; line-height: 1.4; }
         .location { font-size: 13px; color: #007bff; margin-bottom: 6px; display: inline-block; text-decoration: none; }
         .note { font-size: 13px; color: #555; background: #fff8e1; padding: 8px; border-radius: 6px; border-left: 3px solid #ffc107; margin-top: 5px; line-height: 1.5; }
+        
+        /* --- 車程時間樣式 (新設計) --- */
+        .drive-info {
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        /* 加上上下虛線，增加連接感 */
+        .drive-info::before, .drive-info::after {
+            content: '';
+            display: block;
+            width: 1px;
+            height: 10px;
+            border-left: 2px dotted #ddd;
+        }
         
         /* 類別標籤 */
         .tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; color: white; display: inline-block; margin-right: 5px; vertical-align: text-top; transform: translateY(-1px); }
@@ -88,7 +110,8 @@
         </div>
 
     <script>
-        // ★★★ 您的完整行程資料 (含所有超連結) ★★★
+        // ★★★ 您的完整行程資料 (含所有超連結 + 車程時間) ★★★
+        // 使用方式：在需要顯示「前往此地車程」的項目，加上 driveTime: "XX分"
         const itineraryData = [
             // --- Day 1 ---
             { day: "Day 1", date: "2/8 (日)", time: "1445-1705", type: "flight", title: "飛機起飛 🛫", location: "桃園機場第一航廈", note: "泰國越捷航空 VZ568，預計 17:05 抵達" },
@@ -101,60 +124,61 @@
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "play", title: "取車", location: "大榮租車", note: "檢查車況、手續" },
-            { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", note: "推薦生魚片、焗烤龍蝦" },
-            { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", note: "象鼻岩景觀" },
-            { day: "Day 2", date: "2/9 (一)", time: "1700-1730", type: "play", title: "買票 & 休息", location: "許田休息站", note: "買美麗海水族館門票、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank'>吃炸物</a>" },
-            { day: "Day 2", date: "2/9 (一)", time: "1745-1815", type: "hotel", title: "飯店 Check-in", location: "名護 Resonex Nago", note: "私人海灘散步 (夕陽很美)" },
-            { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
-            { day: "Day 2", date: "2/9 (一)", time: "1745-1815", type: "hotel", title: "住宿：名護 Resonex Nago", location: "名護 Resonex Nago", note: "隔天有飯店早餐" },
+            // ★ 下面這裡開始示範 driveTime (車程) 的效果 ★
+            { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", driveTime: "20分", note: "推薦生魚片、焗烤龍蝦" },
+            { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", driveTime: "50分", note: "象鼻岩景觀" },
+            { day: "Day 2", date: "2/9 (一)", time: "1700-1730", type: "play", title: "買票 & 休息", location: "許田休息站", driveTime: "30分", note: "買美麗海水族館門票、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank'>吃炸物</a>" },
+            { day: "Day 2", date: "2/9 (一)", time: "1745-1815", type: "hotel", title: "飯店 Check-in", location: "名護 Resonex Nago", driveTime: "15分", note: "私人海灘散步 (夕陽很美)" },
+            { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", driveTime: "10分", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
+            { day: "Day 2", date: "2/9 (一)", time: "1745-1815", type: "hotel", title: "住宿：名護 Resonex Nago", location: "名護 Resonex Nago", driveTime: "10分", note: "隔天有飯店早餐" },
 
-            // --- Day 3 ---
+            // --- Day 3 (如果您想加車程，只要在該行補上 driveTime: "XX分" 即可) ---
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "名護 Resonex Nago", note: "" },
-            { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", note: "黑潮之海" },
-            { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", note: "古宇利島" },
+            { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
+            { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "15分", note: "古宇利島" },
             { day: "Day 3", date: "2/10 (二)", time: "1500-1545", type: "play", title: "古宇利島巡禮", location: "心形岩、海洋塔", note: "沙灘、橋頭拍照" },
-            { day: "Day 3", date: "2/10 (二)", time: "1800-1900", type: "food", title: "晚餐 / 下午茶", location: "BANTA CAFE", note: "看夜景。<a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank'>FB介紹</a>，若吃不飽回市區吃鳥貴族" },
-            { day: "Day 3", date: "2/10 (二)", time: "2020-", type: "hotel", title: "飯店 Check-in：刻の宿 那覇", location: "停車：沖縄県樋川立体駐車場", note: "買隔天早餐" },
+            { day: "Day 3", date: "2/10 (二)", time: "1800-1900", type: "food", title: "晚餐 / 下午茶", location: "BANTA CAFE", driveTime: "40分", note: "看夜景。<a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank'>FB介紹</a>，若吃不飽回市區吃鳥貴族" },
+            { day: "Day 3", date: "2/10 (二)", time: "2020-", type: "hotel", title: "飯店 Check-in：刻の宿 那覇", location: "停車：沖縄県樋川立体駐車場", driveTime: "60分", note: "買隔天早餐" },
 
             // --- Day 4 ---
             { day: "Day 4", date: "2/11 (三)", time: "0900-0930", type: "food", title: "早餐", location: "刻の宿 那覇", note: "" },
-            { day: "Day 4", date: "2/11 (三)", time: "0945-1130", type: "play", title: "古蹟巡禮", location: "首里城公園", note: "" },
-            { day: "Day 4", date: "2/11 (三)", time: "1150-1250", type: "food", title: "午餐", location: "永旺城 南城大里", note: "" },
-            { day: "Day 4", date: "2/11 (三)", time: "1300-1530", type: "play", title: "沖繩世界文化王國", location: "玉泉洞、王國村", note: "14:30 太鼓舞秀、波伯蛇園" },
-            { day: "Day 4", date: "2/11 (三)", time: "1600-1730", type: "play", title: "好市多採購", location: "Costco 沖繩南城倉庫店", note: "買草莓！" },
-            { day: "Day 4", date: "2/11 (三)", time: "1750-1845", type: "play", title: "機能服飾", location: "WORKMAN Yaese", note: "ワークマン 八重瀬店" },
-            { day: "Day 4", date: "2/11 (三)", time: "1915-2015", type: "food", title: "晚餐：咖哩飯", location: "CoCo Ichibanya Round 1 南風原店", note: "Round 1 南風原店" },
-            { day: "Day 4", date: "2/11 (三)", time: "2030-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "沖縄県樋川立体駐車場", note: "" },
+            { day: "Day 4", date: "2/11 (三)", time: "0945-1130", type: "play", title: "古蹟巡禮", location: "首里城公園", driveTime: "20分", note: "" },
+            { day: "Day 4", date: "2/11 (三)", time: "1150-1250", type: "food", title: "午餐", location: "永旺城 南城大里", driveTime: "20分", note: "" },
+            { day: "Day 4", date: "2/11 (三)", time: "1300-1530", type: "play", title: "沖繩世界文化王國", location: "玉泉洞、王國村", driveTime: "10分", note: "14:30 太鼓舞秀、波伯蛇園" },
+            { day: "Day 4", date: "2/11 (三)", time: "1600-1730", type: "play", title: "好市多採購", location: "Costco 沖繩南城倉庫店", driveTime: "10分", note: "買草莓！" },
+            { day: "Day 4", date: "2/11 (三)", time: "1750-1845", type: "play", title: "機能服飾", location: "WORKMAN Yaese", driveTime: "15分", note: "ワークマン 八重瀬店" },
+            { day: "Day 4", date: "2/11 (三)", time: "1915-2015", type: "food", title: "晚餐：咖哩飯", location: "CoCo Ichibanya Round 1 南風原店", driveTime: "15分", note: "Round 1 南風原店" },
+            { day: "Day 4", date: "2/11 (三)", time: "2030-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "沖縄県樋川立体駐車場", driveTime: "15分", note: "" },
 
             // --- Day 5 ---
             { day: "Day 5", date: "2/12 (四)", time: "0830-0930", type: "food", title: "早餐：沖繩麵", location: "STAND EIBUN", note: "必點：亞瑟麵 (Arthur Soba)、咖哩麵" },
-            { day: "Day 5", date: "2/12 (四)", time: "1040-1140", type: "play", title: "絕景兜風", location: "海中道路 & 果報懸崖", note: "參觀命御庭製鹽工廠" },
-            { day: "Day 5", date: "2/12 (四)", time: "1210-1240", type: "snack", title: "點心：章魚燒", location: "沖縄イイダコ屋太陽", note: "<a href='https://www.facebook.com/reel/1540297270440381' target='_blank'>連結介紹</a>" },
-            { day: "Day 5", date: "2/12 (四)", time: "1300-1600", type: "play", title: "午餐", location: "永旺夢樂城來客夢 (Rycom)", note: "Porter在SAC'S BAR Resort" },
-            { day: "Day 5", date: "2/12 (四)", time: "1630-1930", type: "play", title: "美國村 & 晚餐", location: "美國村 American Village", note: "停車：北谷町營或 Depot Island。吃：Taco Rice Cafe, 豬肉蛋飯糰" },
-            { day: "Day 5", date: "2/12 (四)", time: "2100-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "沖縄県樋川立体駐車場", note: "" },
+            { day: "Day 5", date: "2/12 (四)", time: "1040-1140", type: "play", title: "絕景兜風", location: "海中道路 & 果報懸崖", driveTime: "50分", note: "參觀命御庭製鹽工廠" },
+            { day: "Day 5", date: "2/12 (四)", time: "1210-1240", type: "snack", title: "點心：章魚燒", location: "沖縄イイダコ屋太陽", driveTime: "10分", note: "<a href='https://www.facebook.com/reel/1540297270440381' target='_blank'>連結介紹</a>" },
+            { day: "Day 5", date: "2/12 (四)", time: "1300-1600", type: "play", title: "午餐", location: "永旺夢樂城來客夢 (Rycom)", driveTime: "20分", note: "Porter在SAC'S BAR Resort" },
+            { day: "Day 5", date: "2/12 (四)", time: "1630-1930", type: "play", title: "美國村 & 晚餐", location: "美國村 American Village", driveTime: "15分", note: "停車：北谷町營或 Depot Island。吃：Taco Rice Cafe, 豬肉蛋飯糰" },
+            { day: "Day 5", date: "2/12 (四)", time: "2100-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "" },
 
             // --- Day 6 ---
             { day: "Day 6", date: "2/13 (五)", time: "0930-1000", type: "play", title: "賞櫻", location: "與儀公園", note: "步行 6 分鐘" },
-            { day: "Day 6", date: "2/13 (五)", time: "1015-1115", type: "food", title: "早餐：海鮮", location: "泊港漁市場", note: "" },
-            { day: "Day 6", date: "2/13 (五)", time: "1130-1230", type: "play", title: "參拜", location: "波上宮", note: "停波之上海灘旁付費停車場" },
-            { day: "Day 6", date: "2/13 (五)", time: "1250-1320", type: "snack", title: "甜點", location: "Cream D Omoromachi", note: "<a href='https://www.facebook.com/reel/845741431632238' target='_blank'>FB介紹</a>：生甜甜圈" },
-            { day: "Day 6", date: "2/13 (五)", time: "1340-1440", type: "play", title: "拍照逛街", location: "港川外人住宅", note: "" },
-            { day: "Day 6", date: "2/13 (五)", time: "1430-1930", type: "food", title: "午餐+購物大戰", location: "PARCO CITY", note: "敘敘苑(3F)、漢堡排(2F)、Porter(1F HANDS內)、鳥玉" },
-            { day: "Day 6", date: "2/13 (五)", time: "1950-2050", type: "play", title: "運動用品", location: "Sports Depo 天久店", note: "運動鞋" },
-            { day: "Day 6", date: "2/13 (五)", time: "2100-", type: "food", title: "晚餐：烈火ラーメン暖暮", location: "沖縄県樋川立体駐車場", note: "在購物中心吃或開車回去吃拉麵(營業到2:00a.m.)" },
+            { day: "Day 6", date: "2/13 (五)", time: "1015-1115", type: "food", title: "早餐：海鮮", location: "泊港漁市場", driveTime: "15分", note: "" },
+            { day: "Day 6", date: "2/13 (五)", time: "1130-1230", type: "play", title: "參拜", location: "波上宮", driveTime: "10分", note: "停波之上海灘旁付費停車場" },
+            { day: "Day 6", date: "2/13 (五)", time: "1250-1320", type: "snack", title: "甜點", location: "Cream D Omoromachi", driveTime: "15分", note: "<a href='https://www.facebook.com/reel/845741431632238' target='_blank'>FB介紹</a>：生甜甜圈" },
+            { day: "Day 6", date: "2/13 (五)", time: "1340-1440", type: "play", title: "拍照逛街", location: "港川外人住宅", driveTime: "15分", note: "" },
+            { day: "Day 6", date: "2/13 (五)", time: "1430-1930", type: "food", title: "午餐+購物大戰", location: "PARCO CITY", driveTime: "10分", note: "敘敘苑(3F)、漢堡排(2F)、Porter(1F HANDS內)、鳥玉" },
+            { day: "Day 6", date: "2/13 (五)", time: "1950-2050", type: "play", title: "運動用品", location: "Sports Depo 天久店", driveTime: "10分", note: "運動鞋" },
+            { day: "Day 6", date: "2/13 (五)", time: "2100-", type: "food", title: "晚餐：烈火ラーメン暖暮", location: "沖縄県樋川立体駐車場", driveTime: "10分", note: "在購物中心吃或開車回去吃拉麵(營業到2:00a.m.)" },
 
             // --- Day 7 ---
             { day: "Day 7", date: "2/14 (六)", time: "0900-1010", type: "food", title: "早餐：市場巡禮", location: "牧志公設市場", note: "步行 10 分鐘" },
-            { day: "Day 7", date: "2/14 (六)", time: "1040-1140", type: "play", title: "看飛機/海景", location: "瀨長島 Umikaji Terrace", note: "" },
-            { day: "Day 7", date: "2/14 (六)", time: "1200-1340", type: "play", title: "Outlet 購物(Ashibinaa Outlet+iias 沖繩豐崎)", location: "Ashibinaa Outlet", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)" },
+            { day: "Day 7", date: "2/14 (六)", time: "1040-1140", type: "play", title: "看飛機/海景", location: "瀨長島 Umikaji Terrace", driveTime: "20分", note: "" },
+            { day: "Day 7", date: "2/14 (六)", time: "1200-1340", type: "play", title: "Outlet 購物(Ashibinaa Outlet+iias 沖繩豐崎)", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)" },
             { day: "Day 7", date: "2/14 (六)", time: "1340-1700", type: "food", title: "午餐(Ashibinaa Outlet)", location: "沖繩菜園 Karakara", note: "<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>：沖繩道地美食吃到飽" },
-            { day: "Day 7", date: "2/14 (六)", time: "1800-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", note: "車先停回停車場。晚餐：阿古豬火鍋 (TRITON) 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった 国際通り店</a>" },
+            { day: "Day 7", date: "2/14 (六)", time: "1800-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "25分", note: "車先停回停車場。晚餐：阿古豬火鍋 (TRITON) 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった 国際通り店</a>" },
 
             // --- Day 8 ---
             { day: "Day 8", date: "2/15 (日)", time: "0745-0815", type: "food", title: "早餐 / 退房", location: "超商 / 飯店", note: "檢查行李" },
-            { day: "Day 8", date: "2/15 (日)", time: "0815-0900", type: "flight", title: "前往大榮租車", location: "大榮租車", note: "加油 & 還車" },
-            { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場", note: "" },
+            { day: "Day 8", date: "2/15 (日)", time: "0815-0900", type: "flight", title: "前往大榮租車", location: "大榮租車", driveTime: "15分", note: "加油 & 還車" },
+            { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場", driveTime: "15分", note: "" },
             { day: "Day 8", date: "2/15 (日)", time: "1155-1235", type: "flight", title: "飛機起飛 🛫", location: "華航 CI121", note: "再見沖繩！" }
         ];
 
@@ -204,18 +228,23 @@
                     container.appendChild(header);
                 }
 
+                // ★★★ 車程時間顯示邏輯 (插入在卡片上方) ★★★
+                if (item.driveTime) {
+                    const driveDiv = document.createElement('div');
+                    driveDiv.className = 'drive-info';
+                    driveDiv.innerHTML = `🚗 車程約 ${item.driveTime}`;
+                    container.appendChild(driveDiv);
+                }
+
                 const card = document.createElement('div');
                 card.className = 'card';
                 
                 // --- 自動處理時間格式的邏輯 ---
-                // 1. 自動把 1445 變成 14:45
                 let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
                 
                 let timeHtml = "";
-                // 2. 判斷是否為區間 (例如 14:45-17:05)
                 if (cleanTime.includes('-') && cleanTime.length > 5) {
                     const times = cleanTime.split('-');
-                    // 確保有結束時間才垂直顯示
                     if(times[1] && times[1].length > 1) {
                         timeHtml = `
                             <div class="t-start">${times[0]}</div>
@@ -223,11 +252,9 @@
                             <div class="t-end">${times[1]}</div>
                         `;
                     } else {
-                        // 如果是 "19:40-" 這種，就單行顯示
                         timeHtml = `<div class="t-single">${times[0]}</div>`;
                     }
                 } else {
-                    // 一般單一時間
                     timeHtml = `<div class="t-single">${cleanTime}</div>`;
                 }
                 
