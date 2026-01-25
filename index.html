@@ -20,17 +20,18 @@
         .search-box { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #eee; border-radius: 20px; outline: none; box-sizing: border-box; background: #f9f9f9; }
         .search-box:focus { border-color: #4facfe; background: white; }
 
-        /* 日期按鈕 (可左右滑動) */
+        /* 日期按鈕區 (可左右滑動) */
         .filter-container { overflow-x: auto; white-space: nowrap; padding: 10px 15px; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* 隱藏捲軸 */ }
         .filter-container::-webkit-scrollbar { display: none; }
         
+        /* --- 按鈕樣式優化 (統一視覺結構) --- */
         .filter-btn { 
             display: inline-flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center;
-            padding: 6px 14px; 
-            margin-right: 8px; 
+            padding: 5px 12px; /* 調整內距 */
+            margin-right: 6px; 
             border-radius: 12px; 
             border: 1px solid #ddd; 
             background: white; 
@@ -38,12 +39,32 @@
             cursor: pointer; 
             transition: all 0.2s; 
             vertical-align: middle;
-            min-width: 70px; 
+            min-width: 75px; /* 固定最小寬度，讓按鈕看起來整齊 */
+            height: 48px;    /* 固定高度，確保整排對齊 */
         }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
         
-        .btn-main { font-size: 15px; font-weight: 800; line-height: 1.2; }
-        .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1.2; margin-top: 1px; }
+        /* 按鈕內的主標題 (Day 1, Emoji) */
+        .btn-main { 
+            font-size: 15px; 
+            font-weight: 800; 
+            line-height: 1.1; 
+            margin-bottom: 2px;
+        }
+        /* 針對 Emoji 的微調，讓它跟文字看起來一樣大 */
+        .btn-emoji {
+            font-size: 18px; 
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        /* 按鈕內的副標題 (日期, 說明文字) */
+        .btn-sub { 
+            font-size: 11px; 
+            opacity: 0.85; 
+            line-height: 1; 
+            white-space: nowrap;
+        }
 
         /* 行程卡片區 */
         .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 80px; }
@@ -268,7 +289,7 @@
             { day: "Day 1", date: "2/8 (日)", time: "1940-", type: "food play", title: "晚餐、超市採買", location: "永旺 那霸店 (Aeon Naha)", note: "晚餐、隨意逛逛" },
             { day: "Day 1", date: "2/8 (日)", time: "1805-1840", type: "hotel", title: "住宿：那霸小祿站前ys旅館", location: "那霸小祿站前ys旅館", note: "退房時間為12:00" },
 
-            // --- Day 2 ---
+            // --- Day 2 (租車日) ---
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "car", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
@@ -279,7 +300,7 @@
             { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", driveTime: "10分", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
             { day: "Day 2", date: "2/9 (一)", time: "2040-", type: "hotel", title: "住宿：名護 Resonex Nago", location: "ホテルリゾネックス名護", driveTime: "10分", note: "隔天有飯店早餐" },
 
-            // --- Day 3 ---
+            // --- Day 3 (古宇利島) ---
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "ホテルリゾネックス名護", note: "飯店早餐" },
             { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "35分", note: "古宇利島" },
@@ -318,8 +339,8 @@
             // --- Day 7 ---
             { day: "Day 7", date: "2/14 (六)", time: "0900-1010", type: "food", title: "早餐：市場巡禮", location: "牧志公設市場", note: "步行 10 分鐘" },
             { day: "Day 7", date: "2/14 (六)", time: "1040-1140", type: "play", title: "看飛機/海景", location: "瀨長島 Umikaji Terrace", driveTime: "25分", note: "" },
-            { day: "Day 7", date: "2/14 (六)", time: "1200-1700", type: "food play", title: "Outlet 購物 & 午餐", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter<br>午餐：沖繩菜園 Karakara (<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>)" },
-            { day: "Day 7", date: "2/14 (六)", time: "1745-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "車先停回停車場。晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋</a>" },
+            { day: "Day 7", date: "2/14 (六)", time: "1200-1700", type: "food play", title: "Outlet 購物 & 午餐 (iias 沖繩豐崎)", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：沖繩菜園 Karakara (<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a> 沖繩道地美食吃到飽)" },
+            { day: "Day 7", date: "2/14 (六)", time: "1745-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "車先停回停車場。晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった 国際通り店</a>" },
             { day: "Day 7", date: "2/14 (六)", time: "2100-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "刻の宿 那覇", note: "收行李" },
 
             // --- Day 8 ---
@@ -328,7 +349,8 @@
             { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場國際線航廈", driveTime: "15分", note: "搭乘接駁車" },
             { day: "Day 8", date: "2/15 (日)", time: "1155-1235", type: "flight", title: "飛機起飛 🛫", location: "那霸機場國際線航廈", note: "華航 CI121，抵達桃園機場第二航廈" },
 
-            // ★★★ 沖繩推薦區 ★★★
+            // ★★★ 沖繩推薦區 (圖片版) ★★★
+            // 請確保圖片已上傳到 GitHub，檔名要對應：pic_souvenir.jpg, pic_food.jpg, pic_iias.jpg, pic_parco.jpg, pic_aeon.jpg
             { day: "沖繩推薦", type: "recommendation", title: "🎁 沖繩限定伴手禮", image: "pic_souvenir.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🥗 素食 / 精選餐廳", image: "pic_food.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🛍️ iias 沖繩豐崎 攻略", image: "pic_iias.jpg" },
@@ -350,13 +372,12 @@
                 const data = await res.json();
                 currentRate = data.rates.TWD;
                 document.getElementById('rateDisplay').innerText = `1 日幣 ≈ ${currentRate.toFixed(3)} 台幣 (即時)`;
-                renderExpenses(); // 更新分帳表匯率計算
+                renderExpenses(); 
             } catch (e) {
                 document.getElementById('rateDisplay').innerText = `預設匯率: 0.22 (網路異常)`;
             }
         }
 
-        // 讀取/儲存 分帳資料
         let expenses = JSON.parse(localStorage.getItem('okinawa_expenses')) || [];
 
         function addExpense() {
@@ -374,7 +395,6 @@
             expenses.push({ date, item, payer, amount, currency });
             localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
             
-            // 清空輸入框
             document.getElementById('billItem').value = '';
             document.getElementById('billAmount').value = '';
             renderExpenses();
@@ -401,14 +421,12 @@
             tbody.innerHTML = '';
             
             let totalTWD = 0;
-            let paidByA = 0; // 啟翔付的總額(換算台幣)
-            let paidByB = 0; // 胖蜜蜂付的總額(換算台幣)
+            let paidByA = 0; 
+            let paidByB = 0; 
 
             expenses.forEach((ex, index) => {
-                // 計算該筆金額折合台幣
                 let amountInTWD = ex.currency === 'TWD' ? ex.amount : (ex.amount * currentRate);
                 
-                // 累加
                 if (ex.payer === '啟翔') paidByA += amountInTWD;
                 else paidByB += amountInTWD;
                 
@@ -428,12 +446,8 @@
                 tbody.appendChild(tr);
             });
 
-            // 結算邏輯
             const perPerson = totalTWD / 2;
             const diff = paidByA - paidByB; 
-            // 啟翔付 A，胖蜜蜂付 B。總共 A+B。每人應付 (A+B)/2。
-            // 啟翔多付了 A - (A+B)/2 = (A-B)/2。若正數，代表胖蜜蜂要給啟翔錢。
-
             const settlementAmount = Math.abs(diff / 2).toFixed(0);
             
             document.getElementById('totalDisplay').innerHTML = `
@@ -452,7 +466,6 @@
             document.getElementById('finalSettlement').innerHTML = finalMsg;
         }
 
-        // 匯率視窗開關
         function toggleRateModal() {
             const modal = document.getElementById('rateModal');
             if (modal.style.display === 'block') {
@@ -463,7 +476,6 @@
             }
         }
 
-        // 匯率換算
         function convert(type) {
             const jpyInput = document.getElementById('inputJPY');
             const twdInput = document.getElementById('inputTWD');
@@ -478,7 +490,7 @@
             }
         }
 
-        // --- 行程表渲染 ---
+        // --- 行程表渲染邏輯 (優化版：統一視覺結構) ---
 
         function initFilters() {
             const dayMap = new Map();
@@ -495,17 +507,34 @@
             dayMap.forEach((date, day) => {
                 const activeClass = isFirst ? "active" : "";
                 if(isFirst) { firstDay = day; isFirst = false; }
-                let innerHtml = date ? `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>` : `<span class="btn-main">${day}</span>`;
+
+                // ★★★ 統一為 上下層結構：Day/Icon + Date/Text ★★★
+                let innerHtml = "";
+                if (day === "沖繩推薦") {
+                    // 沖繩推薦：上層 ❤️，下層 沖繩推薦
+                    innerHtml = `<span class="btn-emoji">❤️</span><span class="btn-sub">沖繩推薦</span>`;
+                } else if (date) {
+                    // 一般行程：上層 Day X，下層 日期
+                    innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
+                } else {
+                    innerHtml = `<span class="btn-main">${day}</span>`;
+                }
+
                 buttonsHtml += `<button class="filter-btn ${activeClass}" onclick="filterByDay('${day}', this)">${innerHtml}</button>`;
             });
             
-            // ★★★ 加入分帳表按鈕 ★★★
-            buttonsHtml += `<button class="filter-btn" onclick="showSplitBill(this)"><span class="btn-main" style="color:#e74c3c;">💰</span><span class="btn-sub">分帳表</span></button>`;
+            // ★★★ 分帳表按鈕：上層 💰，下層 分帳表 ★★★
+            buttonsHtml += `<button class="filter-btn" onclick="showSplitBill(this)">
+                <span class="btn-emoji">💰</span>
+                <span class="btn-sub">分帳表</span>
+            </button>`;
 
             filterContainer.innerHTML = buttonsHtml;
+            
+            // 預設渲染第一天的資料
             filterByDay(firstDay, filterContainer.querySelector('.filter-btn'));
             
-            // 設定日期輸入框預設為第一天
+            // 設定記帳日期預設為第一天
             document.getElementById('billDate').value = "2026-02-08";
         }
 
@@ -516,7 +545,6 @@
             }
             searchInput.value = ''; 
             
-            // 切換顯示
             container.style.display = 'block';
             splitContainer.style.display = 'none';
 
@@ -524,14 +552,13 @@
             render(filtered);
         };
 
-        // ★★★ 顯示分帳表邏輯 ★★★
         window.showSplitBill = function(btnElement) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
             
             container.style.display = 'none';
             splitContainer.style.display = 'block';
-            fetchRate(); // 進入分帳表時更新匯率
+            fetchRate(); 
             renderExpenses();
         };
 
@@ -604,7 +631,6 @@
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            // 搜尋模式下隱藏分帳表，顯示行程
             container.style.display = 'block';
             splitContainer.style.display = 'none';
             const filtered = itineraryData.filter(item => 
