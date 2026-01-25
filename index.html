@@ -73,13 +73,13 @@
         .tag.car { background-color: #5352ed; } 
         .tag.recommendation { background-color: #ff6b81; } 
 
-        /* ★★★ 底部導覽列樣式 (Mobile Bottom Bar) ★★★ */
+        /* ★★★ 底部導覽列樣式 (新增) ★★★ */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 65px; /* 高度 */
+            height: 65px;
             background: white;
             border-top: 1px solid #eee;
             display: flex;
@@ -87,7 +87,7 @@
             align-items: center;
             z-index: 2000;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            padding-bottom: env(safe-area-inset-bottom); /* 適配 iPhone 底部橫條 */
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .nav-item {
             flex: 1;
@@ -101,12 +101,34 @@
         .nav-item.active { color: #4facfe; font-weight: bold; }
         .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
 
+        /* ★★★ 班機與住宿卡片樣式 (新增) ★★★ */
+        .info-card-container { display: none; padding: 10px 20px 100px; }
+        .static-card {
+            background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; overflow: hidden;
+        }
+        .static-card h3 { margin: 0 0 10px; color: #2c3e50; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .static-card .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+        .static-card .label { color: #888; font-weight: bold; }
+        .static-card .val { color: #333; text-align: right; font-weight: 500; }
+        .static-card .highlight { color: #4facfe; font-weight: bold; }
+        .static-card .sub-text { font-size: 12px; color: #999; margin-top: 5px; }
+        
+        /* 班機裝飾線 */
+        .flight-line { 
+            position: relative; height: 1px; background: #ddd; margin: 15px 0; width: 100%; 
+        }
+        .flight-icon { 
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%); 
+            background: white; padding: 0 10px; color: #4facfe; font-size: 16px; 
+        }
+
         /* ★★★ 匯率計算機懸浮鈕 (位置調整) ★★★ */
         .fab-btn {
             position: fixed;
             bottom: 85px; /* 往上移，避開底部導覽列 */
             right: 20px;
-            width: 50px; /* 稍微改小一點 */
+            width: 50px;
             height: 50px;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
             border-radius: 50%;
@@ -123,7 +145,7 @@
         .fab-btn::after { content: "匯率"; position: absolute; bottom: 8px; font-size: 8px; color: #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
         .rate-modal {
-            position: fixed; bottom: 150px; right: 20px; /* 配合按鈕上移 */
+            position: fixed; bottom: 150px; right: 20px;
             width: 280px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); padding: 20px; z-index: 999;
             display: none; animation: popUp 0.3s ease;
         }
@@ -137,7 +159,7 @@
         .rate-info { font-size: 11px; color: #888; text-align: right; margin-top: 5px; }
 
         /* 分帳表樣式 */
-        .split-container { display: none; padding: 10px 0; }
+        .split-container { display: none; padding: 10px 0 100px; }
         .split-input-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .split-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .split-row input, .split-row select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; flex: 1; box-sizing: border-box; }
@@ -170,6 +192,102 @@
     </div>
 
     <div class="container" id="itineraryContainer"></div>
+
+    <div class="container info-card-container" id="flightsContainer">
+        <div class="static-card" style="border-left: 5px solid #4facfe;">
+            <h3>🛫 去程航班 (2/8)</h3>
+            <div class="row">
+                <span class="label">航空公司</span>
+                <span class="val">泰國越捷航空 (VZ568)</span>
+            </div>
+            <div class="row">
+                <span class="label">起飛</span>
+                <span class="val">14:45 桃園機場 (T1)</span>
+            </div>
+            <div class="flight-line"><span class="flight-icon">✈️</span></div>
+            <div class="row">
+                <span class="label">抵達</span>
+                <span class="val">17:05 那霸機場 (T1)</span>
+            </div>
+            <div class="sub-text">飛行時間約 1 小時 20 分</div>
+        </div>
+
+        <div class="static-card" style="border-left: 5px solid #ff9a9e;">
+            <h3>🛬 回程航班 (2/15)</h3>
+            <div class="row">
+                <span class="label">航空公司</span>
+                <span class="val">中華航空 (CI121)</span>
+            </div>
+            <div class="row">
+                <span class="label">起飛</span>
+                <span class="val">11:55 那霸機場 (T1)</span>
+            </div>
+            <div class="flight-line"><span class="flight-icon">✈️</span></div>
+            <div class="row">
+                <span class="label">抵達</span>
+                <span class="val">12:35 桃園機場 (T2)</span>
+            </div>
+            <div class="sub-text">飛行時間約 1 小時 40 分</div>
+        </div>
+    </div>
+
+    <div class="container info-card-container" id="hotelsContainer">
+        <div class="static-card">
+            <h3>🏨 Day 1 (2/8)</h3>
+            <div class="row">
+                <span class="label">飯店名稱</span>
+                <span class="val highlight">那霸小祿站前ys旅館</span>
+            </div>
+            <div class="row">
+                <span class="label">入住日期</span>
+                <span class="val">2/8 (日) - 2/9 (一)</span>
+            </div>
+            <div class="row">
+                <span class="label">備註</span>
+                <span class="val">單軌小祿站旁，交通方便</span>
+            </div>
+        </div>
+
+        <div class="static-card">
+            <h3>🏨 Day 2 (2/9)</h3>
+            <div class="row">
+                <span class="label">飯店名稱</span>
+                <span class="val highlight">Hotel Resonex Nago</span>
+            </div>
+            <div class="row">
+                <span class="label">中文名稱</span>
+                <span class="val">名護雷索納克斯飯店</span>
+            </div>
+            <div class="row">
+                <span class="label">入住日期</span>
+                <span class="val">2/9 (一) - 2/10 (二)</span>
+            </div>
+            <div class="row">
+                <span class="label">特色</span>
+                <span class="val">私人沙灘，所有房間面海</span>
+            </div>
+        </div>
+
+        <div class="static-card">
+            <h3>🏨 Day 3 ~ Day 7 (2/10-2/15)</h3>
+            <div class="row">
+                <span class="label">飯店名稱</span>
+                <span class="val highlight">刻の宿 那覇</span>
+            </div>
+            <div class="row">
+                <span class="label">入住日期</span>
+                <span class="val">2/10 (二) - 2/15 (日)</span>
+            </div>
+            <div class="row">
+                <span class="label">天數</span>
+                <span class="val">連住 5 晚</span>
+            </div>
+            <div class="row">
+                <span class="label">備註</span>
+                <span class="val">含簡易廚房，適合採買自煮</span>
+            </div>
+        </div>
+    </div>
 
     <div class="container split-container" id="splitBillContainer">
         <div style="background:#fff3e0; color:#e65100; padding:10px; border-radius:8px; font-size:13px; margin-bottom:15px; text-align:center;">
@@ -262,7 +380,7 @@
             { day: "Day 1", date: "2/8 (日)", time: "1940-", type: "food play", title: "晚餐、超市採買", location: "永旺 那霸店 (Aeon Naha)", note: "晚餐、隨意逛逛" },
             { day: "Day 1", date: "2/8 (日)", time: "1805-1840", type: "hotel", title: "住宿：那霸小祿站前ys旅館", location: "那霸小祿站前ys旅館", note: "退房時間為12:00" },
 
-            // --- Day 2 ---
+            // --- Day 2 (租車日) ---
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "car", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
@@ -273,7 +391,7 @@
             { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", driveTime: "10分", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
             { day: "Day 2", date: "2/9 (一)", time: "2040-", type: "hotel", title: "住宿：名護 Resonex Nago", location: "ホテルリゾネックス名護", driveTime: "10分", note: "隔天有飯店早餐" },
 
-            // --- Day 3 ---
+            // --- Day 3 (古宇利島) ---
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "ホテルリゾネックス名護", note: "飯店早餐" },
             { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "35分", note: "古宇利島" },
@@ -480,9 +598,12 @@
 
             // 頁面內容切換
             splitContainer.style.display = 'none'; // 隱藏分帳表
-            container.style.display = 'block'; // 顯示行程卡片區
+            container.style.display = 'none'; // 先隱藏行程容器
+            document.getElementById('flightsContainer').style.display = 'none'; // 隱藏班機
+            document.getElementById('hotelsContainer').style.display = 'none'; // 隱藏住宿
 
             if (tabName === 'itinerary') {
+                container.style.display = 'block'; // 顯示行程
                 topControls.style.display = 'block'; // 顯示上方篩選區
                 if (day) renderByDay(day); // 如果有指定天數 (點擊上方按鈕)
                 else {
@@ -492,11 +613,11 @@
                     if(firstBtn) firstBtn.click();
                 }
             } else if (tabName === 'flights') {
+                document.getElementById('flightsContainer').style.display = 'block'; // 顯示班機
                 topControls.style.display = 'none'; // 隱藏上方篩選區
-                renderFlights();
             } else if (tabName === 'hotels') {
+                document.getElementById('hotelsContainer').style.display = 'block'; // 顯示住宿
                 topControls.style.display = 'none'; // 隱藏上方篩選區
-                renderHotels();
             }
         };
 
@@ -504,7 +625,12 @@
         window.showSplitBill = function(btnElement) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
+            
+            // 隱藏其他所有容器
             container.style.display = 'none';
+            document.getElementById('flightsContainer').style.display = 'none';
+            document.getElementById('hotelsContainer').style.display = 'none';
+            
             splitContainer.style.display = 'block';
             topControls.style.display = 'block'; // 保持上方顯示，因為分帳表按鈕在上方
             fetchRate(); renderExpenses();
@@ -516,19 +642,7 @@
             render(filtered);
         }
 
-        // 渲染所有班機
-        function renderFlights() {
-            const filtered = itineraryData.filter(item => item.type.includes('flight'));
-            render(filtered, true); // true 表示不顯示 Day Header，直接顯示列表
-        }
-
-        // 渲染所有住宿
-        function renderHotels() {
-            const filtered = itineraryData.filter(item => item.type.includes('hotel'));
-            render(filtered, true);
-        }
-
-        function render(data, hideDayHeader = false) {
+        function render(data) {
             container.innerHTML = "";
             let currentDay = "";
 
@@ -539,7 +653,7 @@
 
             data.forEach(item => {
                 // 如果是依照日期檢視，才顯示 Day Header
-                if (!hideDayHeader && item.day !== currentDay) {
+                if (item.day !== currentDay) {
                     currentDay = item.day;
                     const header = document.createElement('div');
                     header.className = 'day-header';
@@ -556,7 +670,6 @@
                     return; 
                 }
 
-                // 班機和住宿模式下，若沒有 driveTime 不顯示
                 if (item.driveTime) {
                     const driveDiv = document.createElement('div');
                     driveDiv.className = 'drive-info';
@@ -579,13 +692,7 @@
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
                 const tagsHtml = item.type.split(' ').map(t => `<span class="tag ${t}">${getTypeName(t)}</span>`).join('');
 
-                // 在班機/住宿總覽模式下，顯示日期會比較清楚
-                let titleHtml = item.title;
-                if(hideDayHeader) {
-                    titleHtml = `<span style="font-size:12px; color:#999; display:block; margin-bottom:2px;">${item.date}</span>` + item.title;
-                }
-
-                card.innerHTML = `<div class="time-box">${timeHtml}</div><div class="info-box"><div class="activity">${tagsHtml} ${titleHtml}</div><div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>${noteBlock}</div>`;
+                card.innerHTML = `<div class="time-box">${timeHtml}</div><div class="info-box"><div class="activity">${tagsHtml} ${item.title}</div><div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>${noteBlock}</div>`;
                 container.appendChild(card);
             });
         }
@@ -605,8 +712,12 @@
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // 搜尋模式下：顯示行程，隱藏其他
             container.style.display = 'block';
             splitContainer.style.display = 'none';
+            document.getElementById('flightsContainer').style.display = 'none';
+            document.getElementById('hotelsContainer').style.display = 'none';
+            
             const filtered = itineraryData.filter(item => 
                 item.title.toLowerCase().includes(term) || 
                 (item.location && item.location.toLowerCase().includes(term)) ||
