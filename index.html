@@ -103,7 +103,7 @@
         .tag.food { background-color: #e74c3c; }
         .tag.play { background-color: #2ecc71; }
         .tag.snack { background-color: #cc2e89; }
-        .tag.recommendation { background-color: #ff6b81; } /* 推薦標籤顏色 */
+        .tag.recommendation { background-color: #ff6b81; } 
     </style>
 </head>
 <body>
@@ -124,7 +124,7 @@
         </div>
 
     <script>
-        // ★★★ 您的完整行程資料 (修復語法錯誤版) ★★★
+        // ★★★ 您的完整行程資料 (Day 7 已整合優化) ★★★
         const itineraryData = [
             // --- Day 1 ---
             { day: "Day 1", date: "2/8 (日)", time: "1100-1130", type: "flight", title: "開車去停車場 🛫", location: "Times 大園高鐵北路二段停車場", note: "停車1天100元，轉捷運領航站" },
@@ -144,7 +144,6 @@
             
             { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", driveTime: "5分", note: "推薦生魚片、焗烤龍蝦" },
             { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", driveTime: "80分", note: "象鼻岩景觀 (這段路較長)" },
-            // ★★★ 修正點：這裡原本的引號位置錯了，我已修正 ★★★
             { day: "Day 2", date: "2/9 (一)", time: "1700-1730", type: "play", title: "買票 & 休息", location: "許田休息站", driveTime: "30分", note: "<span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 買水族館門票</span>、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank'>吃炸物</a>" },
             
             { day: "Day 2", date: "2/9 (一)", time: "1755-1815", type: "hotel", title: "飯店 Check-in", location: "ホテルリゾネックス名護", driveTime: "20分", note: "私人海灘散步 (夕陽很美)" },
@@ -190,8 +189,10 @@
             // --- Day 7 ---
             { day: "Day 7", date: "2/14 (六)", time: "0900-1010", type: "food", title: "早餐：市場巡禮", location: "牧志公設市場", note: "步行 10 分鐘" },
             { day: "Day 7", date: "2/14 (六)", time: "1040-1140", type: "play", title: "看飛機/海景", location: "瀨長島 Umikaji Terrace", driveTime: "25分", note: "" },
-            { day: "Day 7", date: "2/14 (六)", time: "1200-1340", type: "food play", title: "Outlet 購物", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)" },
-            { day: "Day 7", date: "2/14 (六)", time: "1340-1700", type: "food", title: "午餐(Ashibinaa Outlet)", location: "沖繩菜園 Karakara", note: "<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>：沖繩道地美食吃到飽" },
+            
+            // ★★★ Day 7 整合修改處 ★★★
+            { day: "Day 7", date: "2/14 (六)", time: "1200-1700", type: "food play", title: "Outlet 購物 & 午餐 (iias 沖繩豐崎)", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：沖繩菜園 Karakara (<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a> 沖繩道地美食吃到飽)" },
+            
             { day: "Day 7", date: "2/14 (六)", time: "1745-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "車先停回停車場。晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった 国際通り店</a>" },
             { day: "Day 7", date: "2/14 (六)", time: "2100-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "刻の宿 那覇", note: "收行李" },
 
@@ -308,9 +309,13 @@
                 }
                 
                 // 連結邏輯
-                // ★★★ 這裡就是另一個小錯誤，原本的 0{...} 已經修正為 ${...} ★★★
                 const mapLink = item.location ? `<a href="http://googleusercontent.com/maps.google.com/${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
+
+                // ★★★ 支援多標籤邏輯 ★★★
+                const tagsHtml = item.type.split(' ').map(t => 
+                    `<span class="tag ${t}">${getTypeName(t)}</span>`
+                ).join('');
 
                 card.innerHTML = `
                     <div class="time-box">
@@ -318,7 +323,7 @@
                     </div>
                     <div class="info-box">
                         <div class="activity">
-                            <span class="tag ${item.type}">${getTypeName(item.type)}</span>
+                            ${tagsHtml}
                             ${item.title}
                         </div>
                         <div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>
