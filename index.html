@@ -83,6 +83,18 @@
             height: 12px;
             border-left: 2px dotted #ddd;
         }
+
+        /* --- 推薦圖片卡片樣式 (新增) --- */
+        .img-card {
+            display: block; 
+        }
+        .responsive-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
         
         /* 類別標籤 */
         .tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; color: white; display: inline-block; margin-right: 5px; vertical-align: text-top; transform: translateY(-1px); }
@@ -91,6 +103,7 @@
         .tag.food { background-color: #e74c3c; }
         .tag.play { background-color: #2ecc71; }
         .tag.snack { background-color: #cc2e89; }
+        .tag.recommendation { background-color: #ff6b81; } /* 推薦標籤顏色 */
     </style>
 </head>
 <body>
@@ -111,7 +124,7 @@
         </div>
 
     <script>
-        // ★★★ 您的完整行程資料 (含精算車程 & 雙地點連結) ★★★
+        // ★★★ 您的完整行程資料 (含精算車程 & 雙地點連結 & 推薦圖片) ★★★
         const itineraryData = [
             // --- Day 1 ---
             { day: "Day 1", date: "2/8 (日)", time: "1445-1705", type: "flight", title: "飛機起飛 🛫", location: "桃園機場第一航廈", note: "泰國越捷航空 VZ568，預計 17:05 抵達" },
@@ -135,7 +148,6 @@
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "ホテルリゾネックス名護", note: "飯店早餐" },
             { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "35分", note: "古宇利島" },
-            // ★ 這裡加入了心形岩和海洋塔的雙連結 ★
             { day: "Day 3", date: "2/10 (二)", time: "1500-1630", type: "play", title: "古宇利島巡禮", location: "<a href='https://www.google.com/maps/search/?api=1&query=Heart+Rock+Kouri+Island' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=Kouri+Ocean+Tower+Parking' target='_blank'>古宇利海洋塔-停車場</a>", driveTime: "10分", note: "沙灘、橋頭拍照" },
             { day: "Day 3", date: "2/10 (二)", time: "1800-1900", type: "food", title: "晚餐 / 下午茶", location: "BANTA CAFE", driveTime: "80分", note: "看夜景。<a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank'>FB介紹</a> (回程較遠，預抓1.5hr)" },
             { day: "Day 3", date: "2/10 (二)", time: "2020-", type: "hotel", title: "飯店 Check-in：刻の宿 那覇", location: "停車：沖縄県樋川立体駐車場", driveTime: "50分", note: "買隔天早餐" },
@@ -166,146 +178,4 @@
             { day: "Day 6", date: "2/13 (五)", time: "1340-1440", type: "play", title: "拍照逛街", location: "港川外人住宅", driveTime: "20分", note: "" },
             { day: "Day 6", date: "2/13 (五)", time: "1450-1930", type: "food", title: "午餐+購物大戰", location: "PARCO CITY", driveTime: "10分", note: "敘敘苑(3F)、漢堡排(2F)、Porter(1F HANDS內)、鳥玉" },
             { day: "Day 6", date: "2/13 (五)", time: "1945-2045", type: "play", title: "運動用品", location: "Sports Depo 天久店", driveTime: "10分", note: "運動鞋" },
-            { day: "Day 6", date: "2/13 (五)", time: "2100-", type: "food", title: "晚餐：烈火ラーメン暖暮", location: "沖縄県樋川立体駐車場", driveTime: "15分", note: "在購物中心吃或開車回去吃拉麵(營業到2:00a.m.)" },
-
-            // --- Day 7 ---
-            { day: "Day 7", date: "2/14 (六)", time: "0900-1010", type: "food", title: "早餐：市場巡禮", location: "牧志公設市場", note: "步行 10 分鐘" },
-            { day: "Day 7", date: "2/14 (六)", time: "1040-1140", type: "play", title: "看飛機/海景", location: "瀨長島 Umikaji Terrace", driveTime: "25分", note: "" },
-            { day: "Day 7", date: "2/14 (六)", time: "1200-1340", type: "play", title: "Outlet 購物", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)" },
-            { day: "Day 7", date: "2/14 (六)", time: "1340-1700", type: "food", title: "午餐(Ashibinaa Outlet)", location: "沖繩菜園 Karakara", note: "<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>：沖繩道地美食吃到飽" },
-            { day: "Day 7", date: "2/14 (六)", time: "1745-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "車先停回停車場。晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった 国際通り店</a>" },
-            { day: "Day 7", date: "2/14 (六)", time: "2100-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "刻の宿 那覇", note: "收行李" },
-            
-            // --- Day 8 ---
-            { day: "Day 8", date: "2/15 (日)", time: "0730-0800", type: "food", title: "早餐 / 退房", location: "超商 / 飯店", note: "檢查行李" },
-            { day: "Day 8", date: "2/15 (日)", time: "0800-0900", type: "flight", title: "前往大榮租車", location: "大榮租車", driveTime: "20分", note: "加油 & 還車" },
-            { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場國際線航廈", driveTime: "15分", note: "搭乘接駁車" },
-            { day: "Day 8", date: "2/15 (日)", time: "1155-1235", type: "flight", title: "飛機起飛 🛫", location: "那霸機場國際線航廈", note: "華航 CI121，再見沖繩！" }
-        ];
-
-        const container = document.getElementById('itineraryContainer');
-        const filterContainer = document.getElementById('dayFilter');
-        const searchInput = document.getElementById('searchInput');
-
-        // 1. 初始化：產生日期按鈕
-        function initFilters() {
-            const days = [...new Set(itineraryData.map(item => item.day))];
-            let buttonsHtml = `<button class="filter-btn active" onclick="filterByDay('all', this)">全部</button>`;
-            days.forEach(day => {
-                buttonsHtml += `<button class="filter-btn" onclick="filterByDay('${day}', this)">${day}</button>`;
-            });
-            filterContainer.innerHTML = buttonsHtml;
-        }
-
-        // 2. 篩選功能 logic
-        window.filterByDay = function(day, btnElement) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
-            searchInput.value = '';
-            if (day === 'all') {
-                render(itineraryData);
-            } else {
-                const filtered = itineraryData.filter(item => item.day === day);
-                render(filtered);
-            }
-        };
-
-        // 3. 渲染畫面
-        function render(data) {
-            container.innerHTML = "";
-            let currentDay = "";
-
-            if(data.length === 0) {
-                container.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>沒有相關行程</div>";
-                return;
-            }
-
-            data.forEach(item => {
-                if (item.day !== currentDay) {
-                    currentDay = item.day;
-                    const header = document.createElement('div');
-                    header.className = 'day-header';
-                    header.innerHTML = `<h2>${item.day} <span>${item.date}</span></h2>`;
-                    container.appendChild(header);
-                }
-
-                // ★★★ 車程時間顯示邏輯 ★★★
-                if (item.driveTime) {
-                    const driveDiv = document.createElement('div');
-                    driveDiv.className = 'drive-info';
-                    driveDiv.innerHTML = `🚗 車程約 ${item.driveTime}`;
-                    container.appendChild(driveDiv);
-                }
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                // --- 自動處理時間格式 ---
-                let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
-                
-                let timeHtml = "";
-                if (cleanTime.includes('-') && cleanTime.length > 5) {
-                    const times = cleanTime.split('-');
-                    if(times[1] && times[1].length > 1) {
-                        timeHtml = `
-                            <div class="t-start">${times[0]}</div>
-                            <div class="t-arrow">▼</div>
-                            <div class="t-end">${times[1]}</div>
-                        `;
-                    } else {
-                        timeHtml = `<div class="t-single">${times[0]}</div>`;
-                    }
-                } else {
-                    timeHtml = `<div class="t-single">${cleanTime}</div>`;
-                }
-                
-                // 連結邏輯
-                const mapLink = item.location ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
-                const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
-
-                card.innerHTML = `
-                    <div class="time-box">
-                        ${timeHtml}
-                    </div>
-                    <div class="info-box">
-                        <div class="activity">
-                            <span class="tag ${item.type}">${getTypeName(item.type)}</span>
-                            ${item.title}
-                        </div>
-                        <div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>
-                        ${noteBlock}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function getTypeName(type) {
-            switch(type) {
-                case 'flight': return '交通';
-                case 'food': return '用餐';
-                case 'play': return '景點/購物';
-                case 'hotel': return '住宿';
-                case 'snack': return '點心';    
-                default: return '行程';
-            }
-        }
-
-        // 搜尋功能
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const filtered = itineraryData.filter(item => 
-                item.title.toLowerCase().includes(term) || 
-                item.location.toLowerCase().includes(term) ||
-                item.note.toLowerCase().includes(term)
-            );
-            render(filtered);
-        });
-
-        // 程式開始
-        initFilters();
-        render(itineraryData);
-    </script>
-</body>
-</html>
+            { day: "Day 6", date: "2/13 (五)", time: "2100-", type: "food", title: "晚餐：烈火ラーメン暖暮
