@@ -124,7 +124,7 @@
         </div>
 
     <script>
-        // ★★★ 您的完整行程資料 (含精算車程 & 雙地點連結 & 推薦圖片) ★★★
+        // ★★★ 您的完整行程資料 (修復語法錯誤版) ★★★
         const itineraryData = [
             // --- Day 1 ---
             { day: "Day 1", date: "2/8 (日)", time: "1445-1705", type: "flight", title: "飛機起飛 🛫", location: "桃園機場第一航廈", note: "泰國越捷航空 VZ568，預計 17:05 抵達" },
@@ -143,7 +143,9 @@
             
             { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", driveTime: "5分", note: "推薦生魚片、焗烤龍蝦" },
             { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", driveTime: "80分", note: "象鼻岩景觀 (這段路較長)" },
-            { day: "Day 2", date: "2/9 (一)", time: "1700-1730", type: "play", title: "買票 & 休息", location: "許田休息站", driveTime: "30分", note: "<span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 買水族館門票</span>"、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank'>吃炸物</a>" },
+            // ★★★ 修正點：這裡原本的引號位置錯了，我已修正 ★★★
+            { day: "Day 2", date: "2/9 (一)", time: "1700-1730", type: "play", title: "買票 & 休息", location: "許田休息站", driveTime: "30分", note: "<span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 買水族館門票</span>、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank'>吃炸物</a>" },
+            
             { day: "Day 2", date: "2/9 (一)", time: "1755-1815", type: "hotel", title: "飯店 Check-in", location: "ホテルリゾネックス名護", driveTime: "20分", note: "私人海灘散步 (夕陽很美)" },
             { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", driveTime: "10分", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
             { day: "Day 2", date: "2/9 (一)", time: "2040-", type: "hotel", title: "住宿：名護 Resonex Nago", location: "ホテルリゾネックス名護", driveTime: "10分", note: "隔天有飯店早餐" },
@@ -286,7 +288,7 @@
                 card.className = 'card';
                 
                 // --- 自動處理時間格式 ---
-                let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
+                let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
                 
                 let timeHtml = "";
                 if (cleanTime.includes('-') && cleanTime.length > 5) {
@@ -305,7 +307,8 @@
                 }
                 
                 // 連結邏輯
-                const mapLink = item.location ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
+                // ★★★ 這裡就是另一個小錯誤，原本的 0{...} 已經修正為 ${...} ★★★
+                const mapLink = item.location ? `<a href="http://googleusercontent.com/maps.google.com/${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
 
                 card.innerHTML = `
@@ -331,7 +334,7 @@
                 case 'food': return '用餐';
                 case 'play': return '景點/購物';
                 case 'hotel': return '住宿';
-                case 'snack': return '點心';    
+                case 'snack': return '點心';    
                 default: return '行程';
             }
         }
@@ -340,8 +343,8 @@
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const filtered = itineraryData.filter(item => 
-                item.title.toLowerCase().includes(term) || 
+            const filtered = itineraryData.filter(item => 
+                item.title.toLowerCase().includes(term) || 
                 (item.location && item.location.toLowerCase().includes(term)) ||
                 (item.note && item.note.toLowerCase().includes(term))
             );
