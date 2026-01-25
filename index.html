@@ -21,11 +21,31 @@
         .search-box:focus { border-color: #4facfe; background: white; }
 
         /* 日期按鈕 (可左右滑動) */
-        .filter-container { overflow-x: auto; white-space: nowrap; padding: 0 15px 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* 隱藏捲軸 */ }
+        .filter-container { overflow-x: auto; white-space: nowrap; padding: 10px 15px; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* 隱藏捲軸 */ }
         .filter-container::-webkit-scrollbar { display: none; }
         
-        .filter-btn { display: inline-block; padding: 6px 16px; margin-right: 8px; border-radius: 20px; border: 1px solid #ddd; background: white; color: #555; cursor: pointer; transition: all 0.2s; font-size: 14px; font-weight: bold; }
+        /* --- 按鈕樣式優化 (上下層設計) --- */
+        .filter-btn { 
+            display: inline-flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            padding: 6px 14px; 
+            margin-right: 8px; 
+            border-radius: 12px; /* 稍微圓一點 */
+            border: 1px solid #ddd; 
+            background: white; 
+            color: #555; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            vertical-align: middle;
+            min-width: 70px; /* 確保按鈕寬度一致 */
+        }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
+        
+        /* 按鈕內的文字樣式 */
+        .btn-main { font-size: 15px; font-weight: 800; line-height: 1.2; } /* Day X 加強視覺 */
+        .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1.2; margin-top: 1px; } /* 日期 變小 */
 
         /* 行程卡片區 */
         .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 40px; }
@@ -103,7 +123,7 @@
         .tag.food { background-color: #e74c3c; }
         .tag.play { background-color: #2ecc71; }
         .tag.snack { background-color: #cc2e89; }
-        .tag.car { background-color: #5352ed; } /* 新增：租還車標籤 (藍紫色) */
+        .tag.car { background-color: #5352ed; } 
         .tag.recommendation { background-color: #ff6b81; } 
     </style>
 </head>
@@ -125,7 +145,7 @@
         </div>
 
     <script>
-        // ★★★ 您的完整行程資料 (含租還車標籤 & 圖片區) ★★★
+        // ★★★ 您的完整行程資料 ★★★
         const itineraryData = [
             // --- Day 1 ---
             { day: "Day 1", date: "2/8 (日)", time: "1100-1130", type: "flight", title: "開車去停車場", location: "Times 大園高鐵北路二段停車場", note: "停車1天100元，轉捷運領航站" },
@@ -140,10 +160,7 @@
             // --- Day 2 (租車日) ---
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
-            
-            // ★★★ 將 type 改為 "car"，顯示專屬的「租還車」標籤 ★★★
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "car", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
-            
             { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", driveTime: "5分", note: "推薦生魚片、焗烤龍蝦" },
             { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", driveTime: "80分", note: "象鼻岩景觀 (這段路較長)" },
             { day: "Day 2", date: "2/9 (一)", time: "1700-1730", type: "play", title: "買票 & 休息", location: "許田休息站", driveTime: "30分", note: "<span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 買水族館門票</span>、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank'>吃炸物</a>" },
@@ -200,8 +217,7 @@
             { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場國際線航廈", driveTime: "15分", note: "搭乘接駁車" },
             { day: "Day 8", date: "2/15 (日)", time: "1155-1235", type: "flight", title: "飛機起飛 🛫", location: "那霸機場國際線航廈", note: "華航 CI121，抵達桃園機場第二航廈" },
 
-            // ★★★ 沖繩推薦區 (圖片版) ★★★
-            // 請確認已上傳對應的圖片檔名：pic_souvenir.jpg, pic_food.jpg, pic_iias.jpg, pic_parco.jpg, pic_aeon.jpg
+            // ★★★ 沖繩推薦區 ★★★
             { day: "沖繩推薦", type: "recommendation", title: "🎁 沖繩限定伴手禮", image: "pic_souvenir.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🥗 素食 / 精選餐廳", image: "pic_food.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🛍️ iias 沖繩豐崎 攻略", image: "pic_iias.jpg" },
@@ -213,27 +229,54 @@
         const filterContainer = document.getElementById('dayFilter');
         const searchInput = document.getElementById('searchInput');
 
-        // 1. 初始化：產生日期按鈕
+        // 1. 初始化：產生日期按鈕 (移除"全部"，並預設選取第一天)
         function initFilters() {
-            const days = [...new Set(itineraryData.map(item => item.day))];
-            let buttonsHtml = `<button class="filter-btn active" onclick="filterByDay('all', this)">全部</button>`;
-            days.forEach(day => {
-                buttonsHtml += `<button class="filter-btn" onclick="filterByDay('${day}', this)">${day}</button>`;
+            const dayMap = new Map();
+            itineraryData.forEach(item => {
+                if (!dayMap.has(item.day)) {
+                    // 若無日期 (如沖繩推薦)，存為 undefined
+                    dayMap.set(item.day, item.date);
+                }
             });
+
+            let buttonsHtml = "";
+            let isFirst = true;
+            let firstDay = "";
+
+            dayMap.forEach((date, day) => {
+                const activeClass = isFirst ? "active" : "";
+                if(isFirst) { firstDay = day; isFirst = false; }
+
+                // 按鈕內部 HTML：有日期就顯示日期，沒日期(沖繩推薦)就只顯示標題
+                let innerHtml = "";
+                if (date) {
+                    innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
+                } else {
+                    innerHtml = `<span class="btn-main">${day}</span>`;
+                }
+
+                buttonsHtml += `<button class="filter-btn ${activeClass}" onclick="filterByDay('${day}', this)">${innerHtml}</button>`;
+            });
+            
             filterContainer.innerHTML = buttonsHtml;
+            
+            // 預設渲染第一天的資料
+            filterByDay(firstDay, filterContainer.querySelector('.filter-btn'));
         }
 
         // 2. 篩選功能 logic
         window.filterByDay = function(day, btnElement) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
-            searchInput.value = '';
-            if (day === 'all') {
-                render(itineraryData);
-            } else {
-                const filtered = itineraryData.filter(item => item.day === day);
-                render(filtered);
+            // 更新按鈕狀態
+            if(btnElement) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btnElement.classList.add('active');
             }
+            
+            searchInput.value = ''; // 切換日期時清空搜尋
+            
+            // 篩選資料
+            const filtered = itineraryData.filter(item => item.day === day);
+            render(filtered);
         };
 
         // 3. 渲染畫面
@@ -247,11 +290,12 @@
             }
 
             data.forEach(item => {
+                // 顯示 Day Header (僅在搜尋結果跨天時，或第一次渲染該天時顯示)
+                // 這裡稍微簡化：因為現在主要是單日檢視，每次都會顯示該天的 Header
                 if (item.day !== currentDay) {
                     currentDay = item.day;
                     const header = document.createElement('div');
                     header.className = 'day-header';
-                    // 如果是「沖繩推薦」，就不顯示日期
                     if(item.day === '沖繩推薦') {
                         header.innerHTML = `<h2>❤️ ${item.day}</h2>`;
                     } else {
@@ -263,7 +307,7 @@
                 // ★ 處理推薦圖片卡片 ★
                 if (item.type === 'recommendation') {
                     const card = document.createElement('div');
-                    card.className = 'card img-card'; // 加上 img-card 樣式
+                    card.className = 'card img-card';
                     card.innerHTML = `
                         <div class="info-box" style="text-align:center;">
                             <div class="activity" style="font-size: 18px; margin-bottom: 10px;">
@@ -273,7 +317,7 @@
                         </div>
                     `;
                     container.appendChild(card);
-                    return; // 圖片卡片處理完就結束，不執行下面的時間軸邏輯
+                    return; 
                 }
 
                 // ★★★ 車程時間顯示邏輯 ★★★
@@ -289,7 +333,6 @@
                 
                 // --- 自動處理時間格式 ---
                 let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
-                
                 let timeHtml = "";
                 if (cleanTime.includes('-') && cleanTime.length > 5) {
                     const times = cleanTime.split('-');
@@ -339,7 +382,7 @@
                 case 'play': return '景點/購物';
                 case 'hotel': return '住宿';
                 case 'snack': return '點心';
-                case 'car': return '租還車';  // 新增租還車名稱
+                case 'car': return '租還車';
                 default: return '行程';
             }
         }
@@ -348,6 +391,7 @@
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // 搜尋時不分日期，搜尋全部資料
             const filtered = itineraryData.filter(item => 
                 item.title.toLowerCase().includes(term) || 
                 (item.location && item.location.toLowerCase().includes(term)) ||
@@ -358,7 +402,6 @@
 
         // 程式開始
         initFilters();
-        render(itineraryData);
     </script>
 </body>
 </html>
