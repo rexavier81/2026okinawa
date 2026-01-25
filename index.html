@@ -24,7 +24,6 @@
         .filter-container { overflow-x: auto; white-space: nowrap; padding: 10px 15px; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* 隱藏捲軸 */ }
         .filter-container::-webkit-scrollbar { display: none; }
         
-        /* --- 按鈕樣式優化 (上下層設計) --- */
         .filter-btn { 
             display: inline-flex; 
             flex-direction: column; 
@@ -47,7 +46,7 @@
         .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1.2; margin-top: 1px; }
 
         /* 行程卡片區 */
-        .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 80px; /* 底部留白給懸浮按鈕 */ }
+        .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 80px; }
         
         .day-header { margin-top: 25px; margin-bottom: 15px; padding-left: 10px; border-left: 5px solid #4facfe; display: flex; align-items: baseline; }
         .day-header h2 { margin: 0; font-size: 20px; color: #2c3e50; }
@@ -110,7 +109,7 @@
         .tag.car { background-color: #5352ed; } 
         .tag.recommendation { background-color: #ff6b81; } 
 
-        /* ★★★ 匯率計算機樣式 (新增) ★★★ */
+        /* ★★★ 匯率計算機懸浮鈕 ★★★ */
         .fab-btn {
             position: fixed;
             bottom: 20px;
@@ -141,20 +140,35 @@
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             padding: 20px;
             z-index: 999;
-            display: none; /* 預設隱藏 */
+            display: none;
             animation: popUp 0.3s ease;
         }
         @keyframes popUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
         .rate-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         .close-rate { color: #999; cursor: pointer; font-size: 20px; }
-        
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
         .input-group input { width: 100%; padding: 10px; font-size: 18px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; text-align: right; }
-        .input-group input:focus { border-color: #ff9a9e; outline: none; }
-        
         .rate-info { font-size: 11px; color: #888; text-align: right; margin-top: 5px; }
+
+        /* ★★★ 分帳表專用樣式 ★★★ */
+        .split-container { display: none; padding: 10px 0; }
+        .split-input-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .split-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .split-row input, .split-row select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; flex: 1; box-sizing: border-box; }
+        .btn-add { width: 100%; background: #4facfe; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .split-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .split-table th { background: #f0f4f8; padding: 10px; font-size: 13px; color: #555; text-align: left; }
+        .split-table td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
+        .btn-del { color: #ff6b81; cursor: pointer; font-weight: bold; border: none; background: none; }
+        .summary-card { background: #2c3e50; color: white; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .summary-total { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+        .summary-final { font-size: 18px; font-weight: bold; color: #f1c40f; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.3); }
+        .currency-tag { font-size: 10px; padding: 2px 4px; border-radius: 3px; margin-left: 5px; }
+        .curr-twd { background: #e1f5fe; color: #0288d1; }
+        .curr-jpy { background: #fff3e0; color: #ef6c00; }
+
     </style>
 </head>
 <body>
@@ -173,6 +187,55 @@
 
     <div class="container" id="itineraryContainer">
         </div>
+
+    <div class="container split-container" id="splitBillContainer">
+        <div class="split-input-card">
+            <h3 style="margin-top:0; color:#2c3e50;">📝 新增帳目</h3>
+            <div class="split-row">
+                <input type="date" id="billDate">
+                <input type="text" id="billItem" placeholder="項目名稱 (如: 晚餐)">
+            </div>
+            <div class="split-row">
+                <select id="billPayer">
+                    <option value="啟翔">先墊錢：啟翔</option>
+                    <option value="胖蜜蜂">先墊錢：胖蜜蜂</option>
+                </select>
+            </div>
+            <div class="split-row">
+                <input type="number" id="billAmount" placeholder="金額">
+                <select id="billCurrency">
+                    <option value="TWD">TWD (台幣)</option>
+                    <option value="JPY">JPY (日幣)</option>
+                </select>
+            </div>
+            <button class="btn-add" onclick="addExpense()">＋ 加入清單</button>
+        </div>
+
+        <h3 style="color:#2c3e50; margin-bottom:10px;">📋 帳目列表</h3>
+        <table class="split-table">
+            <thead>
+                <tr>
+                    <th width="20%">日期</th>
+                    <th>項目</th>
+                    <th width="25%">金額</th>
+                    <th width="15%">墊付</th>
+                    <th width="10%">刪</th>
+                </tr>
+            </thead>
+            <tbody id="expenseListBody">
+                </tbody>
+        </table>
+
+        <div class="summary-card" id="splitSummary">
+            <div style="margin-bottom:10px;">📊 統計資訊 (匯率依右下角即時計算)</div>
+            <div class="summary-total" id="totalDisplay">計算中...</div>
+            <div class="summary-final" id="finalSettlement">請新增帳目以開始計算</div>
+        </div>
+        
+        <div style="text-align:center; margin-top:20px;">
+            <button onclick="clearAllExpenses()" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer;">⚠️ 清除所有帳目</button>
+        </div>
+    </div>
 
     <div class="fab-btn" onclick="toggleRateModal()">💰</div>
     
@@ -205,7 +268,7 @@
             { day: "Day 1", date: "2/8 (日)", time: "1940-", type: "food play", title: "晚餐、超市採買", location: "永旺 那霸店 (Aeon Naha)", note: "晚餐、隨意逛逛" },
             { day: "Day 1", date: "2/8 (日)", time: "1805-1840", type: "hotel", title: "住宿：那霸小祿站前ys旅館", location: "那霸小祿站前ys旅館", note: "退房時間為12:00" },
 
-            // --- Day 2 (租車日) ---
+            // --- Day 2 ---
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "car", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
@@ -216,7 +279,7 @@
             { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", driveTime: "10分", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
             { day: "Day 2", date: "2/9 (一)", time: "2040-", type: "hotel", title: "住宿：名護 Resonex Nago", location: "ホテルリゾネックス名護", driveTime: "10分", note: "隔天有飯店早餐" },
 
-            // --- Day 3 (古宇利島) ---
+            // --- Day 3 ---
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "ホテルリゾネックス名護", note: "飯店早餐" },
             { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "35分", note: "古宇利島" },
@@ -255,8 +318,8 @@
             // --- Day 7 ---
             { day: "Day 7", date: "2/14 (六)", time: "0900-1010", type: "food", title: "早餐：市場巡禮", location: "牧志公設市場", note: "步行 10 分鐘" },
             { day: "Day 7", date: "2/14 (六)", time: "1040-1140", type: "play", title: "看飛機/海景", location: "瀨長島 Umikaji Terrace", driveTime: "25分", note: "" },
-            { day: "Day 7", date: "2/14 (六)", time: "1200-1700", type: "food play", title: "Outlet 購物 & 午餐 (iias 沖繩豐崎)", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：沖繩菜園 Karakara (<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a> 沖繩道地美食吃到飽)" },
-            { day: "Day 7", date: "2/14 (六)", time: "1745-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "車先停回停車場。晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった 国際通り店</a>" },
+            { day: "Day 7", date: "2/14 (六)", time: "1200-1700", type: "food play", title: "Outlet 購物 & 午餐", location: "Ashibinaa Outlet", driveTime: "15分", note: "逛：BEAMS, United Arrows, Porter<br>午餐：沖繩菜園 Karakara (<a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>)" },
+            { day: "Day 7", date: "2/14 (六)", time: "1745-2030", type: "food", title: "國際通", location: "沖縄県樋川立体駐車場", driveTime: "30分", note: "車先停回停車場。晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋</a>" },
             { day: "Day 7", date: "2/14 (六)", time: "2100-", type: "hotel", title: "返回住宿：刻の宿 那覇", location: "刻の宿 那覇", note: "收行李" },
 
             // --- Day 8 ---
@@ -274,58 +337,148 @@
         ];
 
         const container = document.getElementById('itineraryContainer');
+        const splitContainer = document.getElementById('splitBillContainer');
         const filterContainer = document.getElementById('dayFilter');
         const searchInput = document.getElementById('searchInput');
 
-        // ★★★ 匯率計算機邏輯 ★★★
-        let currentRate = 0.22; // 預設匯率 (萬一 API 失敗)
-
-        // 取得即時匯率
+        // ★★★ 匯率與分帳邏輯 ★★★
+        let currentRate = 0.22; 
+        
         async function fetchRate() {
             try {
                 const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
                 const data = await res.json();
                 currentRate = data.rates.TWD;
-                document.getElementById('rateDisplay').innerText = `1 日幣 ≈ ${currentRate} 台幣 (即時更新)`;
+                document.getElementById('rateDisplay').innerText = `1 日幣 ≈ ${currentRate.toFixed(3)} 台幣 (即時)`;
+                renderExpenses(); // 更新分帳表匯率計算
             } catch (e) {
-                document.getElementById('rateDisplay').innerText = `目前使用預設匯率: 0.22 (網路異常)`;
+                document.getElementById('rateDisplay').innerText = `預設匯率: 0.22 (網路異常)`;
             }
         }
 
-        // 開關視窗
+        // 讀取/儲存 分帳資料
+        let expenses = JSON.parse(localStorage.getItem('okinawa_expenses')) || [];
+
+        function addExpense() {
+            const date = document.getElementById('billDate').value;
+            const item = document.getElementById('billItem').value;
+            const payer = document.getElementById('billPayer').value;
+            const amount = parseFloat(document.getElementById('billAmount').value);
+            const currency = document.getElementById('billCurrency').value;
+
+            if (!date || !item || !amount) {
+                alert("請填寫完整資訊喔！");
+                return;
+            }
+
+            expenses.push({ date, item, payer, amount, currency });
+            localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
+            
+            // 清空輸入框
+            document.getElementById('billItem').value = '';
+            document.getElementById('billAmount').value = '';
+            renderExpenses();
+        }
+
+        function deleteExpense(index) {
+            if(confirm("確定要刪除這筆帳目嗎？")) {
+                expenses.splice(index, 1);
+                localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
+                renderExpenses();
+            }
+        }
+
+        function clearAllExpenses() {
+            if(confirm("⚠️ 確定要清空所有記帳資料嗎？無法復原喔！")) {
+                expenses = [];
+                localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
+                renderExpenses();
+            }
+        }
+
+        function renderExpenses() {
+            const tbody = document.getElementById('expenseListBody');
+            tbody.innerHTML = '';
+            
+            let totalTWD = 0;
+            let paidByA = 0; // 啟翔付的總額(換算台幣)
+            let paidByB = 0; // 胖蜜蜂付的總額(換算台幣)
+
+            expenses.forEach((ex, index) => {
+                // 計算該筆金額折合台幣
+                let amountInTWD = ex.currency === 'TWD' ? ex.amount : (ex.amount * currentRate);
+                
+                // 累加
+                if (ex.payer === '啟翔') paidByA += amountInTWD;
+                else paidByB += amountInTWD;
+                
+                totalTWD += amountInTWD;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${ex.date.slice(5)}</td>
+                    <td>${ex.item}</td>
+                    <td>
+                        ${ex.amount.toLocaleString()} 
+                        <span class="currency-tag ${ex.currency === 'TWD' ? 'curr-twd' : 'curr-jpy'}">${ex.currency}</span>
+                    </td>
+                    <td>${ex.payer}</td>
+                    <td><button class="btn-del" onclick="deleteExpense(${index})">×</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 結算邏輯
+            const perPerson = totalTWD / 2;
+            const diff = paidByA - paidByB; 
+            // 啟翔付 A，胖蜜蜂付 B。總共 A+B。每人應付 (A+B)/2。
+            // 啟翔多付了 A - (A+B)/2 = (A-B)/2。若正數，代表胖蜜蜂要給啟翔錢。
+
+            const settlementAmount = Math.abs(diff / 2).toFixed(0);
+            
+            document.getElementById('totalDisplay').innerHTML = `
+                總花費：<b>$${totalTWD.toFixed(0)}</b> (每人分攤 $${perPerson.toFixed(0)})<br>
+                啟翔已付：$${paidByA.toFixed(0)} | 胖蜜蜂已付：$${paidByB.toFixed(0)}
+            `;
+
+            let finalMsg = "";
+            if (Math.abs(diff) < 1) {
+                finalMsg = "🎉 兩位付得剛剛好，不用給錢！";
+            } else if (diff > 0) {
+                finalMsg = `👉 胖蜜蜂 要給 啟翔 <span style="color:#ff6b81">$${settlementAmount}</span>`;
+            } else {
+                finalMsg = `👉 啟翔 要給 胖蜜蜂 <span style="color:#ff6b81">$${settlementAmount}</span>`;
+            }
+            document.getElementById('finalSettlement').innerHTML = finalMsg;
+        }
+
+        // 匯率視窗開關
         function toggleRateModal() {
             const modal = document.getElementById('rateModal');
             if (modal.style.display === 'block') {
                 modal.style.display = 'none';
             } else {
                 modal.style.display = 'block';
-                fetchRate(); // 打開時順便更新匯率
+                fetchRate(); 
             }
         }
 
-        // 計算邏輯
+        // 匯率換算
         function convert(type) {
             const jpyInput = document.getElementById('inputJPY');
             const twdInput = document.getElementById('inputTWD');
-
             if (type === 'JPY') {
                 const jpy = parseFloat(jpyInput.value);
-                if (!isNaN(jpy)) {
-                    twdInput.value = Math.round(jpy * currentRate);
-                } else {
-                    twdInput.value = '';
-                }
+                if (!isNaN(jpy)) twdInput.value = Math.round(jpy * currentRate);
+                else twdInput.value = '';
             } else {
                 const twd = parseFloat(twdInput.value);
-                if (!isNaN(twd)) {
-                    jpyInput.value = Math.round(twd / currentRate);
-                } else {
-                    jpyInput.value = '';
-                }
+                if (!isNaN(twd)) jpyInput.value = Math.round(twd / currentRate);
+                else jpyInput.value = '';
             }
         }
 
-        // --- 以下是原本的行程表渲染邏輯 ---
+        // --- 行程表渲染 ---
 
         function initFilters() {
             const dayMap = new Map();
@@ -342,19 +495,18 @@
             dayMap.forEach((date, day) => {
                 const activeClass = isFirst ? "active" : "";
                 if(isFirst) { firstDay = day; isFirst = false; }
-
-                let innerHtml = "";
-                if (date) {
-                    innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
-                } else {
-                    innerHtml = `<span class="btn-main">${day}</span>`;
-                }
-
+                let innerHtml = date ? `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>` : `<span class="btn-main">${day}</span>`;
                 buttonsHtml += `<button class="filter-btn ${activeClass}" onclick="filterByDay('${day}', this)">${innerHtml}</button>`;
             });
             
+            // ★★★ 加入分帳表按鈕 ★★★
+            buttonsHtml += `<button class="filter-btn" onclick="showSplitBill(this)"><span class="btn-main" style="color:#e74c3c;">💰</span><span class="btn-sub">分帳表</span></button>`;
+
             filterContainer.innerHTML = buttonsHtml;
             filterByDay(firstDay, filterContainer.querySelector('.filter-btn'));
+            
+            // 設定日期輸入框預設為第一天
+            document.getElementById('billDate').value = "2026-02-08";
         }
 
         window.filterByDay = function(day, btnElement) {
@@ -363,8 +515,24 @@
                 btnElement.classList.add('active');
             }
             searchInput.value = ''; 
+            
+            // 切換顯示
+            container.style.display = 'block';
+            splitContainer.style.display = 'none';
+
             const filtered = itineraryData.filter(item => item.day === day);
             render(filtered);
+        };
+
+        // ★★★ 顯示分帳表邏輯 ★★★
+        window.showSplitBill = function(btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            container.style.display = 'none';
+            splitContainer.style.display = 'block';
+            fetchRate(); // 進入分帳表時更新匯率
+            renderExpenses();
         };
 
         function render(data) {
@@ -381,25 +549,15 @@
                     currentDay = item.day;
                     const header = document.createElement('div');
                     header.className = 'day-header';
-                    if(item.day === '沖繩推薦') {
-                        header.innerHTML = `<h2>❤️ ${item.day}</h2>`;
-                    } else {
-                        header.innerHTML = `<h2>${item.day} <span>${item.date}</span></h2>`;
-                    }
+                    if(item.day === '沖繩推薦') header.innerHTML = `<h2>❤️ ${item.day}</h2>`;
+                    else header.innerHTML = `<h2>${item.day} <span>${item.date}</span></h2>`;
                     container.appendChild(header);
                 }
 
                 if (item.type === 'recommendation') {
                     const card = document.createElement('div');
                     card.className = 'card img-card';
-                    card.innerHTML = `
-                        <div class="info-box" style="text-align:center;">
-                            <div class="activity" style="font-size: 18px; margin-bottom: 10px;">
-                                <span class="tag recommendation">必看</span>${item.title}
-                            </div>
-                            <img src="${item.image}" class="responsive-img" alt="${item.title}" loading="lazy">
-                        </div>
-                    `;
+                    card.innerHTML = `<div class="info-box" style="text-align:center;"><div class="activity" style="font-size:18px;margin-bottom:10px;"><span class="tag recommendation">必看</span>${item.title}</div><img src="${item.image}" class="responsive-img" loading="lazy"></div>`;
                     container.appendChild(card);
                     return; 
                 }
@@ -413,44 +571,20 @@
 
                 const card = document.createElement('div');
                 card.className = 'card';
-                
                 let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
                 let timeHtml = "";
                 if (cleanTime.includes('-') && cleanTime.length > 5) {
                     const times = cleanTime.split('-');
                     if(times[1] && times[1].length > 1) {
-                        timeHtml = `
-                            <div class="t-start">${times[0]}</div>
-                            <div class="t-arrow">▼</div>
-                            <div class="t-end">${times[1]}</div>
-                        `;
-                    } else {
-                        timeHtml = `<div class="t-single">${times[0]}</div>`;
-                    }
-                } else {
-                    timeHtml = `<div class="t-single">${cleanTime}</div>`;
-                }
+                        timeHtml = `<div class="t-start">${times[0]}</div><div class="t-arrow">▼</div><div class="t-end">${times[1]}</div>`;
+                    } else { timeHtml = `<div class="t-single">${times[0]}</div>`; }
+                } else { timeHtml = `<div class="t-single">${cleanTime}</div>`; }
                 
                 const mapLink = item.location ? `<a href="http://googleusercontent.com/maps.google.com/${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
+                const tagsHtml = item.type.split(' ').map(t => `<span class="tag ${t}">${getTypeName(t)}</span>`).join('');
 
-                const tagsHtml = item.type.split(' ').map(t => 
-                    `<span class="tag ${t}">${getTypeName(t)}</span>`
-                ).join('');
-
-                card.innerHTML = `
-                    <div class="time-box">
-                        ${timeHtml}
-                    </div>
-                    <div class="info-box">
-                        <div class="activity">
-                            ${tagsHtml}
-                            ${item.title}
-                        </div>
-                        <div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>
-                        ${noteBlock}
-                    </div>
-                `;
+                card.innerHTML = `<div class="time-box">${timeHtml}</div><div class="info-box"><div class="activity">${tagsHtml} ${item.title}</div><div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>${noteBlock}</div>`;
                 container.appendChild(card);
             });
         }
@@ -470,6 +604,9 @@
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // 搜尋模式下隱藏分帳表，顯示行程
+            container.style.display = 'block';
+            splitContainer.style.display = 'none';
             const filtered = itineraryData.filter(item => 
                 item.title.toLowerCase().includes(term) || 
                 (item.location && item.location.toLowerCase().includes(term)) ||
