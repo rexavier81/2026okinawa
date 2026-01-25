@@ -20,17 +20,17 @@
         .search-box { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #eee; border-radius: 20px; outline: none; box-sizing: border-box; background: #f9f9f9; }
         .search-box:focus { border-color: #4facfe; background: white; }
 
-        /* 日期按鈕區 (可左右滑動) */
+        /* 日期按鈕 (可左右滑動) */
         .filter-container { overflow-x: auto; white-space: nowrap; padding: 10px 15px; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* 隱藏捲軸 */ }
         .filter-container::-webkit-scrollbar { display: none; }
         
-        /* --- 按鈕樣式優化 (統一視覺結構) --- */
+        /* --- 按鈕樣式 --- */
         .filter-btn { 
             display: inline-flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center;
-            padding: 5px 12px; /* 調整內距 */
+            padding: 5px 12px; 
             margin-right: 6px; 
             border-radius: 12px; 
             border: 1px solid #ddd; 
@@ -39,32 +39,14 @@
             cursor: pointer; 
             transition: all 0.2s; 
             vertical-align: middle;
-            min-width: 75px; /* 固定最小寬度，讓按鈕看起來整齊 */
-            height: 48px;    /* 固定高度，確保整排對齊 */
+            min-width: 75px; 
+            height: 48px;    
         }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
         
-        /* 按鈕內的主標題 (Day 1, Emoji) */
-        .btn-main { 
-            font-size: 15px; 
-            font-weight: 800; 
-            line-height: 1.1; 
-            margin-bottom: 2px;
-        }
-        /* 針對 Emoji 的微調，讓它跟文字看起來一樣大 */
-        .btn-emoji {
-            font-size: 18px; 
-            line-height: 1;
-            margin-bottom: 2px;
-        }
-
-        /* 按鈕內的副標題 (日期, 說明文字) */
-        .btn-sub { 
-            font-size: 11px; 
-            opacity: 0.85; 
-            line-height: 1; 
-            white-space: nowrap;
-        }
+        .btn-main { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; }
+        .btn-emoji { font-size: 18px; line-height: 1; margin-bottom: 2px; }
+        .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1; white-space: nowrap; }
 
         /* 行程卡片區 */
         .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 80px; }
@@ -189,6 +171,10 @@
         .currency-tag { font-size: 10px; padding: 2px 4px; border-radius: 3px; margin-left: 5px; }
         .curr-twd { background: #e1f5fe; color: #0288d1; }
         .curr-jpy { background: #fff3e0; color: #ef6c00; }
+        
+        /* 匯出匯入按鈕區 */
+        .sync-area { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
+        .btn-sync { background: #666; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; }
 
     </style>
 </head>
@@ -210,6 +196,12 @@
         </div>
 
     <div class="container split-container" id="splitBillContainer">
+        
+        <div style="background:#fff3e0; color:#e65100; padding:10px; border-radius:8px; font-size:13px; margin-bottom:15px; text-align:center;">
+            ⚠️ 注意：這是靜態網頁，資料只存在您的手機/電腦上，不會自動雲端同步。<br>
+            若要換裝置查看，請使用下方的「匯出/匯入」功能。
+        </div>
+
         <div class="split-input-card">
             <h3 style="margin-top:0; color:#2c3e50;">📝 新增帳目</h3>
             <div class="split-row">
@@ -253,8 +245,13 @@
             <div class="summary-final" id="finalSettlement">請新增帳目以開始計算</div>
         </div>
         
-        <div style="text-align:center; margin-top:20px;">
-            <button onclick="clearAllExpenses()" style="background:#e74c3c; color:white; border:none; padding:8px 15px; border-radius:20px; cursor:pointer;">⚠️ 清除所有帳目</button>
+        <div class="sync-area">
+            <button class="btn-sync" onclick="exportData()">📤 匯出資料 (複製代碼)</button>
+            <button class="btn-sync" onclick="importData()">📥 匯入資料 (貼上代碼)</button>
+        </div>
+
+        <div style="text-align:center; margin-top:15px;">
+            <button onclick="clearAllExpenses()" style="background:none; color:#e74c3c; border:none; padding:5px; cursor:pointer; text-decoration:underline; font-size:12px;">清除所有帳目</button>
         </div>
     </div>
 
@@ -349,8 +346,7 @@
             { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場國際線航廈", driveTime: "15分", note: "搭乘接駁車" },
             { day: "Day 8", date: "2/15 (日)", time: "1155-1235", type: "flight", title: "飛機起飛 🛫", location: "那霸機場國際線航廈", note: "華航 CI121，抵達桃園機場第二航廈" },
 
-            // ★★★ 沖繩推薦區 (圖片版) ★★★
-            // 請確保圖片已上傳到 GitHub，檔名要對應：pic_souvenir.jpg, pic_food.jpg, pic_iias.jpg, pic_parco.jpg, pic_aeon.jpg
+            // ★★★ 沖繩推薦區 ★★★
             { day: "沖繩推薦", type: "recommendation", title: "🎁 沖繩限定伴手禮", image: "pic_souvenir.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🥗 素食 / 精選餐廳", image: "pic_food.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🛍️ iias 沖繩豐崎 攻略", image: "pic_iias.jpg" },
@@ -380,6 +376,7 @@
 
         let expenses = JSON.parse(localStorage.getItem('okinawa_expenses')) || [];
 
+        // ★★★ 修正1：新增資料後，自動依照日期排序 ★★★
         function addExpense() {
             const date = document.getElementById('billDate').value;
             const item = document.getElementById('billItem').value;
@@ -393,6 +390,10 @@
             }
 
             expenses.push({ date, item, payer, amount, currency });
+            
+            // 排序 (日期舊 -> 新)
+            expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
+
             localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
             
             document.getElementById('billItem').value = '';
@@ -413,6 +414,43 @@
                 expenses = [];
                 localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
                 renderExpenses();
+            }
+        }
+
+        // ★★★ 修正2：匯出資料 (複製 JSON 字串) ★★★
+        function exportData() {
+            if(expenses.length === 0) {
+                alert("目前沒有帳目資料可匯出喔！");
+                return;
+            }
+            const dataStr = JSON.stringify(expenses);
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert("✅ 資料代碼已複製！\n請傳送給另一台裝置，並使用「匯入資料」按鈕。");
+            }).catch(err => {
+                prompt("請手動複製以下代碼：", dataStr);
+            });
+        }
+
+        // ★★★ 修正2：匯入資料 (貼上 JSON 字串) ★★★
+        function importData() {
+            const dataStr = prompt("請貼上匯出的資料代碼：");
+            if (dataStr) {
+                try {
+                    const parsedData = JSON.parse(dataStr);
+                    if (Array.isArray(parsedData)) {
+                        expenses = parsedData;
+                        // 確保匯入後也有排序
+                        expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        
+                        localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
+                        renderExpenses();
+                        alert("✅ 匯入成功！");
+                    } else {
+                        alert("❌ 格式錯誤，這不是正確的帳目代碼。");
+                    }
+                } catch (e) {
+                    alert("❌ 匯入失敗，請確認代碼是否完整複製。");
+                }
             }
         }
 
@@ -490,7 +528,7 @@
             }
         }
 
-        // --- 行程表渲染邏輯 (優化版：統一視覺結構) ---
+        // --- 行程表渲染邏輯 ---
 
         function initFilters() {
             const dayMap = new Map();
@@ -508,13 +546,10 @@
                 const activeClass = isFirst ? "active" : "";
                 if(isFirst) { firstDay = day; isFirst = false; }
 
-                // ★★★ 統一為 上下層結構：Day/Icon + Date/Text ★★★
                 let innerHtml = "";
                 if (day === "沖繩推薦") {
-                    // 沖繩推薦：上層 ❤️，下層 沖繩推薦
                     innerHtml = `<span class="btn-emoji">❤️</span><span class="btn-sub">沖繩推薦</span>`;
                 } else if (date) {
-                    // 一般行程：上層 Day X，下層 日期
                     innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
                 } else {
                     innerHtml = `<span class="btn-main">${day}</span>`;
@@ -523,19 +558,18 @@
                 buttonsHtml += `<button class="filter-btn ${activeClass}" onclick="filterByDay('${day}', this)">${innerHtml}</button>`;
             });
             
-            // ★★★ 分帳表按鈕：上層 💰，下層 分帳表 ★★★
             buttonsHtml += `<button class="filter-btn" onclick="showSplitBill(this)">
                 <span class="btn-emoji">💰</span>
                 <span class="btn-sub">分帳表</span>
             </button>`;
 
             filterContainer.innerHTML = buttonsHtml;
-            
-            // 預設渲染第一天的資料
             filterByDay(firstDay, filterContainer.querySelector('.filter-btn'));
             
-            // 設定記帳日期預設為第一天
             document.getElementById('billDate').value = "2026-02-08";
+            
+            // 初始化也要排序一次，避免舊資料順序不對
+            expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
 
         window.filterByDay = function(day, btnElement) {
