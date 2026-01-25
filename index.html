@@ -39,11 +39,10 @@
         /* 行程卡片區 */
         .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 100px; }
         
-        /* ★★★ Day Header 樣式優化 (新增重點標題) ★★★ */
         .day-header { 
             margin-top: 25px; margin-bottom: 15px; padding-left: 10px; 
             border-left: 5px solid #4facfe; 
-            display: flex; flex-direction: column; /* 改為垂直排列，以容納標題 */
+            display: flex; flex-direction: column; 
             justify-content: center;
         }
         .day-header-top { display: flex; align-items: baseline; }
@@ -51,8 +50,8 @@
         .day-header span.date { font-size: 14px; color: #7f8c8d; font-weight: normal; margin-left: 10px; }
         .day-summary { 
             font-size: 16px; font-weight: bold; color: #333; 
-            margin-top: 5px; /* 與 Day 分開一點 */
-            background: linear-gradient(transparent 60%, #fff3cd 60%); /* 黃色螢光筆效果 */
+            margin-top: 5px; 
+            background: linear-gradient(transparent 60%, #fff3cd 60%); 
             display: inline-block; width: fit-content;
         }
 
@@ -263,13 +262,13 @@
         // ★★★ 每一天的重點標題對照表 ★★★
         const dayHighlights = {
             "Day 1": "抵達沖繩 & 永旺那霸",
-            "Day 2": "系滿魚市場 & 萬座毛 & 燒肉五苑",
+            "Day 2": "萬座毛 & 名護海灘",
             "Day 3": "美麗海水族館 & 古宇利島",
-            "Day 4": "首里城 & 永旺夢樂城來客夢 (Rycom)沖繩世界 & 好市多",
-            "Day 5": "命御庭製鹽工廠 & AEON Rycom & 美國村",
-            "Day 6": "波上宮 & PARCO CITY",
+            "Day 4": "文化王國 & 好市多採購",
+            "Day 5": "海中道路 & 美國村",
+            "Day 6": "波上宮 & 購物血拼",
             "Day 7": "瀨長島 & Outlet & 國際通",
-            "Day 8": "回家"
+            "Day 8": "收心回國"
         };
 
         const itineraryData = [
@@ -283,6 +282,7 @@
             { day: "Day 1", date: "2/8 (日)", time: "1805-1840", type: "hotel", title: "住宿：那霸小祿站前ys旅館", location: "那霸小祿站前ys旅館", note: "退房時間為12:00" },
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
+            // ★★★ 修正 Google Maps 連結格式 ★★★
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "car", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
             { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", driveTime: "5分", note: "推薦生魚片、焗烤龍蝦" },
             { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", driveTime: "80分", note: "象鼻岩景觀 (這段路較長)" },
@@ -293,7 +293,7 @@
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "ホテルリゾネックス名護", note: "飯店早餐" },
             { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "35分", note: "古宇利島" },
-            { day: "Day 3", date: "2/10 (二)", time: "1500-1630", type: "play", title: "古宇利島巡禮", location: "<a href='https://www.google.com/maps/search/?api=1&query=Heart+Rock+Kouri+Island' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=Kouri+Ocean+Tower+Parking' target='_blank'>古宇利海洋塔-停車場</a>", driveTime: "10分", note: "沙灘、橋頭拍照" },
+            { day: "Day 3", date: "2/10 (二)", time: "1500-1630", type: "play", title: "古宇利島巡禮", location: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a>", driveTime: "10分", note: "沙灘、橋頭拍照" },
             { day: "Day 3", date: "2/10 (二)", time: "1800-1900", type: "food", title: "晚餐 / 下午茶", location: "BANTA CAFE", driveTime: "80分", note: "看夜景。<a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank'>FB介紹</a> (回程較遠，預抓1.5hr)" },
             { day: "Day 3", date: "2/10 (二)", time: "2020-", type: "hotel", title: "飯店 Check-in：刻の宿 那覇", location: "停車：沖縄県樋川立体駐車場", driveTime: "50分", note: "入住代碼：［代收］、買隔天早餐" },
             { day: "Day 4", date: "2/11 (三)", time: "0900-0930", type: "food", title: "早餐", location: "刻の宿 那覇", note: "" },
@@ -501,7 +501,6 @@
             let currentDay = "";
             if(data.length === 0) { container.innerHTML = "<div style='text-align:center; padding:20px; color:#999;'>沒有相關行程</div>"; return; }
             data.forEach(item => {
-                // ★★★ 這裡將重點標題加入到 Day Header 裡面 ★★★
                 if (item.day !== currentDay) {
                     currentDay = item.day;
                     const header = document.createElement('div');
@@ -512,9 +511,7 @@
                     if (item.day === '沖繩推薦') {
                          headerContent = `<h2>❤️ ${item.day}</h2>`;
                     } else {
-                         // Day X + Date
                          headerContent += `<div class="day-header-top"><h2>${item.day} <span class="date">${item.date}</span></h2></div>`;
-                         // 取得重點標題
                          if(dayHighlights[item.day]) {
                             headerContent += `<div class="day-summary">${dayHighlights[item.day]}</div>`;
                          }
@@ -549,7 +546,8 @@
                     } else { timeHtml = `<div class="t-single">${times[0]}</div>`; }
                 } else { timeHtml = `<div class="t-single">${cleanTime}</div>`; }
                 
-                const mapLink = item.location ? `<a href="http://googleusercontent.com/maps.google.com/${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
+                // ★★★ 修正點：使用正確的 Google Maps 搜尋連結格式 ★★★
+                const mapLink = item.location ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
                 const tagsHtml = item.type.split(' ').map(t => `<span class="tag ${t}">${getTypeName(t)}</span>`).join('');
 
