@@ -137,8 +137,9 @@
             // --- Day 2 (租車日) ---
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
-            // ★★★ 優化後的租車資訊顯示 ★★★
-            { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "play", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811" },
+            
+            // ★★★ 優化後的租車資訊顯示 (已加入紅字提醒) ★★★
+            { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "play", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
             
             { day: "Day 2", date: "2/9 (一)", time: "1340-1430", type: "food", title: "午餐：海鮮吃爆", location: "系滿魚市場", driveTime: "5分", note: "推薦生魚片、焗烤龍蝦" },
             { day: "Day 2", date: "2/9 (一)", time: "1550-1630", type: "play", title: "萬座毛", location: "萬座毛", driveTime: "80分", note: "象鼻岩景觀 (這段路較長)" },
@@ -285,7 +286,7 @@
                 card.className = 'card';
                 
                 // --- 自動處理時間格式 ---
-                let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
+                let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
                 
                 let timeHtml = "";
                 if (cleanTime.includes('-') && cleanTime.length > 5) {
@@ -330,7 +331,7 @@
                 case 'food': return '用餐';
                 case 'play': return '景點/購物';
                 case 'hotel': return '住宿';
-                case 'snack': return '點心';    
+                case 'snack': return '點心';    
                 default: return '行程';
             }
         }
@@ -339,8 +340,8 @@
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const filtered = itineraryData.filter(item => 
-                item.title.toLowerCase().includes(term) || 
+            const filtered = itineraryData.filter(item => 
+                item.title.toLowerCase().includes(term) || 
                 (item.location && item.location.toLowerCase().includes(term)) ||
                 (item.note && item.note.toLowerCase().includes(term))
             );
