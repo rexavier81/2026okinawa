@@ -32,33 +32,29 @@
             justify-content: center;
             padding: 6px 14px; 
             margin-right: 8px; 
-            border-radius: 12px; /* 稍微圓一點 */
+            border-radius: 12px; 
             border: 1px solid #ddd; 
             background: white; 
             color: #555; 
             cursor: pointer; 
             transition: all 0.2s; 
             vertical-align: middle;
-            min-width: 70px; /* 確保按鈕寬度一致 */
+            min-width: 70px; 
         }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
         
-        /* 按鈕內的文字樣式 */
-        .btn-main { font-size: 15px; font-weight: 800; line-height: 1.2; } /* Day X 加強視覺 */
-        .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1.2; margin-top: 1px; } /* 日期 變小 */
+        .btn-main { font-size: 15px; font-weight: 800; line-height: 1.2; }
+        .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1.2; margin-top: 1px; }
 
         /* 行程卡片區 */
-        .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 40px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 80px; /* 底部留白給懸浮按鈕 */ }
         
-        /* 每一天的標題 */
         .day-header { margin-top: 25px; margin-bottom: 15px; padding-left: 10px; border-left: 5px solid #4facfe; display: flex; align-items: baseline; }
         .day-header h2 { margin: 0; font-size: 20px; color: #2c3e50; }
         .day-header span { font-size: 14px; color: #7f8c8d; font-weight: normal; margin-left: 10px; }
 
-        /* 單個行程卡片 */
         .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 0px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-start; z-index: 2; position: relative; }
         
-        /* --- 時間樣式 (垂直排列) --- */
         .time-box { 
             background: #eef2f7; 
             padding: 8px 4px; 
@@ -79,11 +75,9 @@
         .info-box { flex-grow: 1; }
         .activity { font-size: 17px; font-weight: bold; margin-bottom: 6px; color: #333; line-height: 1.4; }
         .location { font-size: 13px; color: #007bff; margin-bottom: 6px; display: inline-block; text-decoration: none; }
-        /* 讓 location 裡的 a 連結也保持樣式 */
         .location a { color: #007bff; text-decoration: none; border-bottom: 1px dotted #007bff; }
         .note { font-size: 13px; color: #555; background: #fff8e1; padding: 8px; border-radius: 6px; border-left: 3px solid #ffc107; margin-top: 5px; line-height: 1.5; }
         
-        /* --- 車程時間樣式 --- */
         .drive-info {
             text-align: center;
             font-size: 12px;
@@ -104,19 +98,9 @@
             border-left: 2px dotted #ddd;
         }
 
-        /* --- 推薦圖片卡片樣式 --- */
-        .img-card {
-            display: block; 
-        }
-        .responsive-img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+        .img-card { display: block; }
+        .responsive-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* 類別標籤設定 */
         .tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; color: white; display: inline-block; margin-right: 5px; vertical-align: text-top; transform: translateY(-1px); }
         .tag.flight { background-color: #9b59b6; } 
         .tag.hotel { background-color: #f1c40f; color: #333; }
@@ -125,6 +109,52 @@
         .tag.snack { background-color: #cc2e89; }
         .tag.car { background-color: #5352ed; } 
         .tag.recommendation { background-color: #ff6b81; } 
+
+        /* ★★★ 匯率計算機樣式 (新增) ★★★ */
+        .fab-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .fab-btn:active { transform: scale(0.9); }
+        .fab-btn::after { content: "匯率"; position: absolute; bottom: 12px; font-size: 10px; color: #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+        .rate-modal {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 280px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 20px;
+            z-index: 999;
+            display: none; /* 預設隱藏 */
+            animation: popUp 0.3s ease;
+        }
+        @keyframes popUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .rate-title { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .close-rate { color: #999; cursor: pointer; font-size: 20px; }
+        
+        .input-group { margin-bottom: 12px; }
+        .input-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+        .input-group input { width: 100%; padding: 10px; font-size: 18px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; text-align: right; }
+        .input-group input:focus { border-color: #ff9a9e; outline: none; }
+        
+        .rate-info { font-size: 11px; color: #888; text-align: right; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -143,6 +173,24 @@
 
     <div class="container" id="itineraryContainer">
         </div>
+
+    <div class="fab-btn" onclick="toggleRateModal()">💰</div>
+    
+    <div class="rate-modal" id="rateModal">
+        <div class="rate-title">
+            💱 即時匯率換算
+            <span class="close-rate" onclick="toggleRateModal()">×</span>
+        </div>
+        <div class="input-group">
+            <label>🇯🇵 日幣 (JPY)</label>
+            <input type="number" id="inputJPY" placeholder="輸入日幣" oninput="convert('JPY')">
+        </div>
+        <div class="input-group">
+            <label>🇹🇼 台幣 (TWD)</label>
+            <input type="number" id="inputTWD" placeholder="輸入台幣" oninput="convert('TWD')">
+        </div>
+        <div class="rate-info" id="rateDisplay">正在載入匯率...</div>
+    </div>
 
     <script>
         // ★★★ 您的完整行程資料 ★★★
@@ -229,12 +277,60 @@
         const filterContainer = document.getElementById('dayFilter');
         const searchInput = document.getElementById('searchInput');
 
-        // 1. 初始化：產生日期按鈕 (移除"全部"，並預設選取第一天)
+        // ★★★ 匯率計算機邏輯 ★★★
+        let currentRate = 0.22; // 預設匯率 (萬一 API 失敗)
+
+        // 取得即時匯率
+        async function fetchRate() {
+            try {
+                const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+                const data = await res.json();
+                currentRate = data.rates.TWD;
+                document.getElementById('rateDisplay').innerText = `1 日幣 ≈ ${currentRate} 台幣 (即時更新)`;
+            } catch (e) {
+                document.getElementById('rateDisplay').innerText = `目前使用預設匯率: 0.22 (網路異常)`;
+            }
+        }
+
+        // 開關視窗
+        function toggleRateModal() {
+            const modal = document.getElementById('rateModal');
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'block';
+                fetchRate(); // 打開時順便更新匯率
+            }
+        }
+
+        // 計算邏輯
+        function convert(type) {
+            const jpyInput = document.getElementById('inputJPY');
+            const twdInput = document.getElementById('inputTWD');
+
+            if (type === 'JPY') {
+                const jpy = parseFloat(jpyInput.value);
+                if (!isNaN(jpy)) {
+                    twdInput.value = Math.round(jpy * currentRate);
+                } else {
+                    twdInput.value = '';
+                }
+            } else {
+                const twd = parseFloat(twdInput.value);
+                if (!isNaN(twd)) {
+                    jpyInput.value = Math.round(twd / currentRate);
+                } else {
+                    jpyInput.value = '';
+                }
+            }
+        }
+
+        // --- 以下是原本的行程表渲染邏輯 ---
+
         function initFilters() {
             const dayMap = new Map();
             itineraryData.forEach(item => {
                 if (!dayMap.has(item.day)) {
-                    // 若無日期 (如沖繩推薦)，存為 undefined
                     dayMap.set(item.day, item.date);
                 }
             });
@@ -247,7 +343,6 @@
                 const activeClass = isFirst ? "active" : "";
                 if(isFirst) { firstDay = day; isFirst = false; }
 
-                // 按鈕內部 HTML：有日期就顯示日期，沒日期(沖繩推薦)就只顯示標題
                 let innerHtml = "";
                 if (date) {
                     innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
@@ -259,27 +354,19 @@
             });
             
             filterContainer.innerHTML = buttonsHtml;
-            
-            // 預設渲染第一天的資料
             filterByDay(firstDay, filterContainer.querySelector('.filter-btn'));
         }
 
-        // 2. 篩選功能 logic
         window.filterByDay = function(day, btnElement) {
-            // 更新按鈕狀態
             if(btnElement) {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btnElement.classList.add('active');
             }
-            
-            searchInput.value = ''; // 切換日期時清空搜尋
-            
-            // 篩選資料
+            searchInput.value = ''; 
             const filtered = itineraryData.filter(item => item.day === day);
             render(filtered);
         };
 
-        // 3. 渲染畫面
         function render(data) {
             container.innerHTML = "";
             let currentDay = "";
@@ -290,8 +377,6 @@
             }
 
             data.forEach(item => {
-                // 顯示 Day Header (僅在搜尋結果跨天時，或第一次渲染該天時顯示)
-                // 這裡稍微簡化：因為現在主要是單日檢視，每次都會顯示該天的 Header
                 if (item.day !== currentDay) {
                     currentDay = item.day;
                     const header = document.createElement('div');
@@ -304,7 +389,6 @@
                     container.appendChild(header);
                 }
 
-                // ★ 處理推薦圖片卡片 ★
                 if (item.type === 'recommendation') {
                     const card = document.createElement('div');
                     card.className = 'card img-card';
@@ -320,7 +404,6 @@
                     return; 
                 }
 
-                // ★★★ 車程時間顯示邏輯 ★★★
                 if (item.driveTime) {
                     const driveDiv = document.createElement('div');
                     driveDiv.className = 'drive-info';
@@ -331,7 +414,6 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 
-                // --- 自動處理時間格式 ---
                 let cleanTime = item.time.replace(/(\d{2})(\d{2})/g, '$1:$2').replace('::', ':'); 
                 let timeHtml = "";
                 if (cleanTime.includes('-') && cleanTime.length > 5) {
@@ -349,11 +431,9 @@
                     timeHtml = `<div class="t-single">${cleanTime}</div>`;
                 }
                 
-                // 連結邏輯
                 const mapLink = item.location ? `<a href="http://googleusercontent.com/maps.google.com/${encodeURIComponent(item.location)}" target="_blank" class="location">📍 ${item.location}</a>` : "";
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
 
-                // ★★★ 支援多標籤邏輯 ★★★
                 const tagsHtml = item.type.split(' ').map(t => 
                     `<span class="tag ${t}">${getTypeName(t)}</span>`
                 ).join('');
@@ -387,11 +467,9 @@
             }
         }
 
-        // 搜尋功能
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            // 搜尋時不分日期，搜尋全部資料
             const filtered = itineraryData.filter(item => 
                 item.title.toLowerCase().includes(term) || 
                 (item.location && item.location.toLowerCase().includes(term)) ||
@@ -400,7 +478,6 @@
             render(filtered);
         });
 
-        // 程式開始
         initFilters();
     </script>
 </body>
