@@ -37,7 +37,6 @@
         .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1; white-space: nowrap; }
 
         /* 行程卡片區 */
-        /* ★★★ 底部 padding 加大，避免被底部導覽列擋住 ★★★ */
         .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 100px; }
         
         .day-header { margin-top: 25px; margin-bottom: 15px; padding-left: 10px; border-left: 5px solid #4facfe; display: flex; align-items: baseline; }
@@ -73,80 +72,48 @@
         .tag.car { background-color: #5352ed; } 
         .tag.recommendation { background-color: #ff6b81; } 
 
-        /* ★★★ 底部導覽列樣式 (新增) ★★★ */
+        /* ★★★ 底部導覽列樣式 ★★★ */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
-            background: white;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 2000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-            padding-bottom: env(safe-area-inset-bottom);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: white; border-top: 1px solid #eee;
+            display: flex; justify-content: space-around; align-items: center; z-index: 2000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item {
-            flex: 1;
-            text-align: center;
-            color: #999;
-            font-size: 10px;
-            cursor: pointer;
-            padding: 5px 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        .nav-item { flex: 1; text-align: center; color: #999; font-size: 10px; cursor: pointer; padding: 5px 0; -webkit-tap-highlight-color: transparent; }
         .nav-item.active { color: #4facfe; font-weight: bold; }
         .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
 
-        /* ★★★ 班機與住宿卡片樣式 (新增) ★★★ */
+        /* ★★★ 班機與住宿卡片樣式 ★★★ */
         .info-card-container { display: none; padding: 10px 20px 100px; }
-        .static-card {
-            background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; overflow: hidden;
-        }
+        .static-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
         .static-card h3 { margin: 0 0 10px; color: #2c3e50; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
         .static-card .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
         .static-card .label { color: #888; font-weight: bold; }
         .static-card .val { color: #333; text-align: right; font-weight: 500; }
         .static-card .highlight { color: #4facfe; font-weight: bold; }
         .static-card .sub-text { font-size: 12px; color: #999; margin-top: 5px; }
+        .flight-line { position: relative; height: 1px; background: #ddd; margin: 15px 0; width: 100%; }
+        .flight-icon { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 10px; color: #4facfe; font-size: 16px; }
         
-        /* 班機裝飾線 */
-        .flight-line { 
-            position: relative; height: 1px; background: #ddd; margin: 15px 0; width: 100%; 
+        /* PDF 按鈕樣式 */
+        .pdf-btn {
+            display: block; width: 100%; text-align: center; background-color: #ff6b81; color: white; 
+            padding: 10px 0; margin-top: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;
+            box-shadow: 0 2px 5px rgba(255, 107, 129, 0.3); transition: background 0.2s;
         }
-        .flight-icon { 
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%); 
-            background: white; padding: 0 10px; color: #4facfe; font-size: 16px; 
-        }
+        .pdf-btn:active { transform: scale(0.98); background-color: #ff4757; }
 
-        /* ★★★ 匯率計算機懸浮鈕 (位置調整) ★★★ */
+        /* 匯率計算機懸浮鈕 */
         .fab-btn {
-            position: fixed;
-            bottom: 85px; /* 往上移，避開底部導覽列 */
-            right: 20px;
-            width: 50px;
-            height: 50px;
+            position: fixed; bottom: 85px; right: 20px; width: 50px; height: 50px;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1000;
-            transition: transform 0.2s;
+            border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; z-index: 1000; transition: transform 0.2s;
         }
         .fab-btn:active { transform: scale(0.9); }
         .fab-btn::after { content: "匯率"; position: absolute; bottom: 8px; font-size: 8px; color: #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
         .rate-modal {
-            position: fixed; bottom: 150px; right: 20px;
-            width: 280px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); padding: 20px; z-index: 999;
+            position: fixed; bottom: 150px; right: 20px; width: 280px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); padding: 20px; z-index: 999;
             display: none; animation: popUp 0.3s ease;
         }
         @keyframes popUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -239,6 +206,14 @@
                 <span class="val highlight">那霸小祿站前ys旅館</span>
             </div>
             <div class="row">
+                <span class="label">英文</span>
+                <span class="val">Ys Inn Naha Oroku Station</span>
+            </div>
+            <div class="row">
+                <span class="label">Booking ID</span>
+                <span class="val">1679344054</span>
+            </div>
+            <div class="row">
                 <span class="label">入住日期</span>
                 <span class="val">2/8 (日) - 2/9 (一)</span>
             </div>
@@ -246,6 +221,7 @@
                 <span class="label">備註</span>
                 <span class="val">單軌小祿站旁，交通方便</span>
             </div>
+            <a href="hotel_ys.pdf" target="_blank" class="pdf-btn">📄 查看訂房憑證 (PDF)</a>
         </div>
 
         <div class="static-card">
@@ -259,6 +235,10 @@
                 <span class="val">名護雷索納克斯飯店</span>
             </div>
             <div class="row">
+                <span class="label">訂單編號</span>
+                <span class="val">H2512173939348054</span>
+            </div>
+            <div class="row">
                 <span class="label">入住日期</span>
                 <span class="val">2/9 (一) - 2/10 (二)</span>
             </div>
@@ -266,6 +246,7 @@
                 <span class="label">特色</span>
                 <span class="val">私人沙灘，所有房間面海</span>
             </div>
+            <a href="hotel_resonex.pdf" target="_blank" class="pdf-btn">📄 查看訂房憑證 (PDF)</a>
         </div>
 
         <div class="static-card">
@@ -284,7 +265,7 @@
             </div>
             <div class="row">
                 <span class="label">備註</span>
-                <span class="val">含簡易廚房，適合採買自煮</span>
+                <span class="val">入住代碼：［代收］<br>含簡易廚房，適合採買自煮</span>
             </div>
         </div>
     </div>
@@ -625,12 +606,7 @@
         window.showSplitBill = function(btnElement) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
-            
-            // 隱藏其他所有容器
             container.style.display = 'none';
-            document.getElementById('flightsContainer').style.display = 'none';
-            document.getElementById('hotelsContainer').style.display = 'none';
-            
             splitContainer.style.display = 'block';
             topControls.style.display = 'block'; // 保持上方顯示，因為分帳表按鈕在上方
             fetchRate(); renderExpenses();
