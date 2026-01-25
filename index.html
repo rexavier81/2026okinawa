@@ -14,42 +14,31 @@
         .header p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
 
         /* 搜尋與篩選區 (黏在頂部) */
-        .controls-container { background: white; position: sticky; top: 70px; z-index: 99; border-bottom: 1px solid #eee; }
+        .controls-container { background: white; position: sticky; top: 70px; z-index: 99; border-bottom: 1px solid #eee; transition: top 0.3s; }
         
         .search-container { padding: 10px 20px; }
         .search-box { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #eee; border-radius: 20px; outline: none; box-sizing: border-box; background: #f9f9f9; }
         .search-box:focus { border-color: #4facfe; background: white; }
 
-        /* 日期按鈕區 (可左右滑動) */
-        .filter-container { overflow-x: auto; white-space: nowrap; padding: 10px 15px; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* 隱藏捲軸 */ }
+        /* 日期按鈕區 */
+        .filter-container { overflow-x: auto; white-space: nowrap; padding: 10px 15px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .filter-container::-webkit-scrollbar { display: none; }
         
-        /* --- 按鈕樣式 --- */
+        /* 按鈕樣式 */
         .filter-btn { 
-            display: inline-flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            padding: 5px 12px; 
-            margin-right: 6px; 
-            border-radius: 12px; 
-            border: 1px solid #ddd; 
-            background: white; 
-            color: #555; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            vertical-align: middle;
-            min-width: 75px; 
-            height: 48px;    
+            display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 5px 12px; margin-right: 6px; border-radius: 12px; border: 1px solid #ddd; 
+            background: white; color: #555; cursor: pointer; transition: all 0.2s; 
+            vertical-align: middle; min-width: 75px; height: 48px;    
         }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
-        
         .btn-main { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; }
         .btn-emoji { font-size: 18px; line-height: 1; margin-bottom: 2px; }
         .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1; white-space: nowrap; }
 
         /* 行程卡片區 */
-        .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 80px; }
+        /* ★★★ 底部 padding 加大，避免被底部導覽列擋住 ★★★ */
+        .container { max-width: 800px; margin: 0 auto; padding: 10px 20px 100px; }
         
         .day-header { margin-top: 25px; margin-bottom: 15px; padding-left: 10px; border-left: 5px solid #4facfe; display: flex; align-items: baseline; }
         .day-header h2 { margin: 0; font-size: 20px; color: #2c3e50; }
@@ -57,18 +46,7 @@
 
         .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 0px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: flex-start; z-index: 2; position: relative; }
         
-        .time-box { 
-            background: #eef2f7; 
-            padding: 8px 4px; 
-            border-radius: 8px; 
-            text-align: center; 
-            width: 65px; 
-            flex-shrink: 0; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+        .time-box { background: #eef2f7; padding: 8px 4px; border-radius: 8px; text-align: center; width: 65px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .t-start { font-size: 15px; font-weight: 800; color: #2c3e50; line-height: 1.2; }
         .t-arrow { font-size: 10px; color: #aaa; margin: 2px 0; }
         .t-end { font-size: 13px; font-weight: 600; color: #7f8c8d; line-height: 1.2; }
@@ -80,25 +58,8 @@
         .location a { color: #007bff; text-decoration: none; border-bottom: 1px dotted #007bff; }
         .note { font-size: 13px; color: #555; background: #fff8e1; padding: 8px; border-radius: 6px; border-left: 3px solid #ffc107; margin-top: 5px; line-height: 1.5; }
         
-        .drive-info {
-            text-align: center;
-            font-size: 12px;
-            color: #aaa;
-            padding: 5px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            position: relative;
-            z-index: 1;
-        }
-        .drive-info::before, .drive-info::after {
-            content: '';
-            display: block;
-            width: 1px;
-            height: 12px;
-            border-left: 2px dotted #ddd;
-        }
+        .drive-info { text-align: center; font-size: 12px; color: #aaa; padding: 5px 0; display: flex; align-items: center; justify-content: center; gap: 5px; position: relative; z-index: 1; }
+        .drive-info::before, .drive-info::after { content: ''; display: block; width: 1px; height: 12px; border-left: 2px dotted #ddd; }
 
         .img-card { display: block; }
         .responsive-img { width: 100%; height: auto; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -112,39 +73,59 @@
         .tag.car { background-color: #5352ed; } 
         .tag.recommendation { background-color: #ff6b81; } 
 
-        /* ★★★ 匯率計算機懸浮鈕 ★★★ */
+        /* ★★★ 底部導覽列樣式 (Mobile Bottom Bar) ★★★ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px; /* 高度 */
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 2000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            padding-bottom: env(safe-area-inset-bottom); /* 適配 iPhone 底部橫條 */
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #999;
+            font-size: 10px;
+            cursor: pointer;
+            padding: 5px 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-item.active { color: #4facfe; font-weight: bold; }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+
+        /* ★★★ 匯率計算機懸浮鈕 (位置調整) ★★★ */
         .fab-btn {
             position: fixed;
-            bottom: 20px;
+            bottom: 85px; /* 往上移，避開底部導覽列 */
             right: 20px;
-            width: 60px;
-            height: 60px;
+            width: 50px; /* 稍微改小一點 */
+            height: 50px;
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
             border-radius: 50%;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
+            font-size: 24px;
             cursor: pointer;
             z-index: 1000;
             transition: transform 0.2s;
         }
         .fab-btn:active { transform: scale(0.9); }
-        .fab-btn::after { content: "匯率"; position: absolute; bottom: 12px; font-size: 10px; color: #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .fab-btn::after { content: "匯率"; position: absolute; bottom: 8px; font-size: 8px; color: #fff; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
         .rate-modal {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 280px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            padding: 20px;
-            z-index: 999;
-            display: none;
-            animation: popUp 0.3s ease;
+            position: fixed; bottom: 150px; right: 20px; /* 配合按鈕上移 */
+            width: 280px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); padding: 20px; z-index: 999;
+            display: none; animation: popUp 0.3s ease;
         }
         @keyframes popUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -155,7 +136,7 @@
         .input-group input { width: 100%; padding: 10px; font-size: 18px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; text-align: right; }
         .rate-info { font-size: 11px; color: #888; text-align: right; margin-top: 5px; }
 
-        /* ★★★ 分帳表專用樣式 ★★★ */
+        /* 分帳表樣式 */
         .split-container { display: none; padding: 10px 0; }
         .split-input-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .split-row { display: flex; gap: 10px; margin-bottom: 10px; }
@@ -181,22 +162,19 @@
         <p>行程小幫手</p>
     </div>
 
-    <div class="controls-container">
+    <div id="topControls" class="controls-container">
         <div class="search-container">
             <input type="text" id="searchInput" class="search-box" placeholder="🔍 搜尋行程 (例如：燒肉)...">
         </div>
         <div id="dayFilter" class="filter-container"></div>
     </div>
 
-    <div class="container" id="itineraryContainer">
-        </div>
+    <div class="container" id="itineraryContainer"></div>
 
     <div class="container split-container" id="splitBillContainer">
-        
         <div style="background:#fff3e0; color:#e65100; padding:10px; border-radius:8px; font-size:13px; margin-bottom:15px; text-align:center;">
             ⚠️ 提示：資料會自動儲存在這支手機裡，關掉網頁也不會消失。
         </div>
-
         <div class="split-input-card">
             <h3 style="margin-top:0; color:#2c3e50;">📝 新增帳目</h3>
             <div class="split-row">
@@ -218,7 +196,6 @@
             </div>
             <button class="btn-add" onclick="addExpense()">＋ 加入清單</button>
         </div>
-
         <h3 style="color:#2c3e50; margin-bottom:10px;">📋 帳目列表</h3>
         <table class="split-table">
             <thead>
@@ -226,20 +203,17 @@
                     <th width="20%">日期</th>
                     <th>項目</th>
                     <th width="25%">金額</th>
-                    <th width="15%">墊付</th>
+                    <th width="15%">墊</th>
                     <th width="10%">刪</th>
                 </tr>
             </thead>
-            <tbody id="expenseListBody">
-                </tbody>
+            <tbody id="expenseListBody"></tbody>
         </table>
-
         <div class="summary-card" id="splitSummary">
             <div style="margin-bottom:10px;">📊 統計資訊 (匯率依右下角即時計算)</div>
             <div class="summary-total" id="totalDisplay">計算中...</div>
             <div class="summary-final" id="finalSettlement">請新增帳目以開始計算</div>
         </div>
-        
         <div style="text-align:center; margin-top:20px;">
             <button onclick="clearAllExpenses()" style="background:none; color:#e74c3c; border:none; padding:5px; cursor:pointer; text-decoration:underline; font-size:12px;">⚠️ 清除所有帳目</button>
         </div>
@@ -263,6 +237,18 @@
         <div class="rate-info" id="rateDisplay">正在載入匯率...</div>
     </div>
 
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('itinerary', this)">
+            <span class="nav-icon">📅</span>行程
+        </div>
+        <div class="nav-item" onclick="switchTab('flights', this)">
+            <span class="nav-icon">✈️</span>班機
+        </div>
+        <div class="nav-item" onclick="switchTab('hotels', this)">
+            <span class="nav-icon">🏨</span>住宿
+        </div>
+    </div>
+
     <script>
         // ★★★ 您的完整行程資料 ★★★
         const itineraryData = [
@@ -276,7 +262,7 @@
             { day: "Day 1", date: "2/8 (日)", time: "1940-", type: "food play", title: "晚餐、超市採買", location: "永旺 那霸店 (Aeon Naha)", note: "晚餐、隨意逛逛" },
             { day: "Day 1", date: "2/8 (日)", time: "1805-1840", type: "hotel", title: "住宿：那霸小祿站前ys旅館", location: "那霸小祿站前ys旅館", note: "退房時間為12:00" },
 
-            // --- Day 2 (租車日) ---
+            // --- Day 2 ---
             { day: "Day 2", date: "2/9 (一)", time: "1000-1200", type: "food", title: "早午餐：A&W 漢堡", location: "A&W Naha Kanagusuku 或 Aeon", note: "經典 Root Beer" },
             { day: "Day 2", date: "2/9 (一)", time: "1200-1230", type: "flight", title: "前往租車行", location: "單軌：赤嶺站 (北口)", note: "搭乘接駁車" },
             { day: "Day 2", date: "2/9 (一)", time: "1230-1330", type: "car", title: "取車 (大榮租車)", location: "大榮租車", note: "<b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br><br>🚗 <b>車款：</b>Toyota Yaris<br>💰 <b>費用：</b>NT$8,400 (現場支付/未含保險)<br>📄 <b>單號：</b>N0209-0215RC4-08<br>👤 <b>訂購人：</b>徐啟翔 / 0918-563-811<br><br><span style='color:#e74c3c; font-weight:bold; background-color:#fff0f0; padding:2px 5px; border-radius:4px;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>" },
@@ -287,7 +273,7 @@
             { day: "Day 2", date: "2/9 (一)", time: "1830-2030", type: "food", title: "晚餐：燒肉五苑", location: "燒肉五苑名護店", driveTime: "10分", note: "已預約 18:30 (2位)，可順逛隔壁漫畫倉庫" },
             { day: "Day 2", date: "2/9 (一)", time: "2040-", type: "hotel", title: "住宿：名護 Resonex Nago", location: "ホテルリゾネックス名護", driveTime: "10分", note: "隔天有飯店早餐" },
 
-            // --- Day 3 (古宇利島) ---
+            // --- Day 3 ---
             { day: "Day 3", date: "2/10 (二)", time: "0830-0930", type: "food", title: "早餐", location: "ホテルリゾネックス名護", note: "飯店早餐" },
             { day: "Day 3", date: "2/10 (二)", time: "1000-1330", type: "play", title: "美麗海水族館", location: "美麗海水族館", driveTime: "25分", note: "黑潮之海" },
             { day: "Day 3", date: "2/10 (二)", time: "1410-1500", type: "food", title: "午餐：海景餐廳", location: "L LOTA", driveTime: "35分", note: "古宇利島" },
@@ -336,8 +322,7 @@
             { day: "Day 8", date: "2/15 (日)", time: "0930-1155", type: "flight", title: "辦理登機手續", location: "那霸機場國際線航廈", driveTime: "15分", note: "搭乘接駁車" },
             { day: "Day 8", date: "2/15 (日)", time: "1155-1235", type: "flight", title: "飛機起飛 🛫", location: "那霸機場國際線航廈", note: "華航 CI121，抵達桃園機場第二航廈" },
 
-            // ★★★ 沖繩推薦區 (圖片版) ★★★
-            // 請確認已上傳對應的圖片檔名：pic_souvenir.jpg, pic_food.jpg, pic_iias.jpg, pic_parco.jpg, pic_aeon.jpg
+            // ★★★ 沖繩推薦區 ★★★
             { day: "沖繩推薦", type: "recommendation", title: "🎁 沖繩限定伴手禮", image: "pic_souvenir.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🥗 素食 / 精選餐廳", image: "pic_food.jpg" },
             { day: "沖繩推薦", type: "recommendation", title: "🛍️ iias 沖繩豐崎 攻略", image: "pic_iias.jpg" },
@@ -349,10 +334,10 @@
         const splitContainer = document.getElementById('splitBillContainer');
         const filterContainer = document.getElementById('dayFilter');
         const searchInput = document.getElementById('searchInput');
+        const topControls = document.getElementById('topControls');
 
         // ★★★ 匯率與分帳邏輯 ★★★
         let currentRate = 0.22; 
-        
         async function fetchRate() {
             try {
                 const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
@@ -374,16 +359,10 @@
             const amount = parseFloat(document.getElementById('billAmount').value);
             const currency = document.getElementById('billCurrency').value;
 
-            if (!date || !item || !amount) {
-                alert("請填寫完整資訊喔！");
-                return;
-            }
+            if (!date || !item || !amount) { alert("請填寫完整資訊喔！"); return; }
 
             expenses.push({ date, item, payer, amount, currency });
-            
-            // 排序 (日期舊 -> 新)
             expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
-
             localStorage.setItem('okinawa_expenses', JSON.stringify(expenses));
             
             document.getElementById('billItem').value = '';
@@ -410,30 +389,15 @@
         function renderExpenses() {
             const tbody = document.getElementById('expenseListBody');
             tbody.innerHTML = '';
-            
-            let totalTWD = 0;
-            let paidByA = 0; 
-            let paidByB = 0; 
+            let totalTWD = 0; let paidByA = 0; let paidByB = 0; 
 
             expenses.forEach((ex, index) => {
                 let amountInTWD = ex.currency === 'TWD' ? ex.amount : (ex.amount * currentRate);
-                
-                if (ex.payer === '啟翔') paidByA += amountInTWD;
-                else paidByB += amountInTWD;
-                
+                if (ex.payer === '啟翔') paidByA += amountInTWD; else paidByB += amountInTWD;
                 totalTWD += amountInTWD;
 
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${ex.date.slice(5)}</td>
-                    <td>${ex.item}</td>
-                    <td>
-                        ${ex.amount.toLocaleString()} 
-                        <span class="currency-tag ${ex.currency === 'TWD' ? 'curr-twd' : 'curr-jpy'}">${ex.currency}</span>
-                    </td>
-                    <td>${ex.payer}</td>
-                    <td><button class="btn-del" onclick="deleteExpense(${index})">×</button></td>
-                `;
+                tr.innerHTML = `<td>${ex.date.slice(5)}</td><td>${ex.item}</td><td>${ex.amount.toLocaleString()} <span class="currency-tag ${ex.currency === 'TWD' ? 'curr-twd' : 'curr-jpy'}">${ex.currency}</span></td><td>${ex.payer}</td><td><button class="btn-del" onclick="deleteExpense(${index})">×</button></td>`;
                 tbody.appendChild(tr);
             });
 
@@ -441,30 +405,19 @@
             const diff = paidByA - paidByB; 
             const settlementAmount = Math.abs(diff / 2).toFixed(0);
             
-            document.getElementById('totalDisplay').innerHTML = `
-                總花費：<b>$${totalTWD.toFixed(0)}</b> (每人分攤 $${perPerson.toFixed(0)})<br>
-                啟翔已付：$${paidByA.toFixed(0)} | 胖蜜蜂已付：$${paidByB.toFixed(0)}
-            `;
+            document.getElementById('totalDisplay').innerHTML = `總花費：<b>$${totalTWD.toFixed(0)}</b> (每人分攤 $${perPerson.toFixed(0)})<br>啟翔已付：$${paidByA.toFixed(0)} | 胖蜜蜂已付：$${paidByB.toFixed(0)}`;
 
             let finalMsg = "";
-            if (Math.abs(diff) < 1) {
-                finalMsg = "🎉 兩位付得剛剛好，不用給錢！";
-            } else if (diff > 0) {
-                finalMsg = `👉 胖蜜蜂 要給 啟翔 <span style="color:#ff6b81">$${settlementAmount}</span>`;
-            } else {
-                finalMsg = `👉 啟翔 要給 胖蜜蜂 <span style="color:#ff6b81">$${settlementAmount}</span>`;
-            }
+            if (Math.abs(diff) < 1) finalMsg = "🎉 兩位付得剛剛好，不用給錢！";
+            else if (diff > 0) finalMsg = `👉 胖蜜蜂 要給 啟翔 <span style="color:#ff6b81">$${settlementAmount}</span>`;
+            else finalMsg = `👉 啟翔 要給 胖蜜蜂 <span style="color:#ff6b81">$${settlementAmount}</span>`;
             document.getElementById('finalSettlement').innerHTML = finalMsg;
         }
 
         function toggleRateModal() {
             const modal = document.getElementById('rateModal');
-            if (modal.style.display === 'block') {
-                modal.style.display = 'none';
-            } else {
-                modal.style.display = 'block';
-                fetchRate(); 
-            }
+            if (modal.style.display === 'block') { modal.style.display = 'none'; } 
+            else { modal.style.display = 'block'; fetchRate(); }
         }
 
         function convert(type) {
@@ -472,24 +425,18 @@
             const twdInput = document.getElementById('inputTWD');
             if (type === 'JPY') {
                 const jpy = parseFloat(jpyInput.value);
-                if (!isNaN(jpy)) twdInput.value = Math.round(jpy * currentRate);
-                else twdInput.value = '';
+                if (!isNaN(jpy)) twdInput.value = Math.round(jpy * currentRate); else twdInput.value = '';
             } else {
                 const twd = parseFloat(twdInput.value);
-                if (!isNaN(twd)) jpyInput.value = Math.round(twd / currentRate);
-                else jpyInput.value = '';
+                if (!isNaN(twd)) jpyInput.value = Math.round(twd / currentRate); else jpyInput.value = '';
             }
         }
 
-        // --- 行程表渲染邏輯 ---
+        // --- 核心邏輯：Tab 切換與渲染 ---
 
         function initFilters() {
             const dayMap = new Map();
-            itineraryData.forEach(item => {
-                if (!dayMap.has(item.day)) {
-                    dayMap.set(item.day, item.date);
-                }
-            });
+            itineraryData.forEach(item => { if (!dayMap.has(item.day)) dayMap.set(item.day, item.date); });
 
             let buttonsHtml = "";
             let isFirst = true;
@@ -498,61 +445,90 @@
             dayMap.forEach((date, day) => {
                 const activeClass = isFirst ? "active" : "";
                 if(isFirst) { firstDay = day; isFirst = false; }
-
                 let innerHtml = "";
-                if (day === "沖繩推薦") {
-                    innerHtml = `<span class="btn-emoji">❤️</span><span class="btn-sub">沖繩推薦</span>`;
-                } else if (date) {
-                    innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
-                } else {
-                    innerHtml = `<span class="btn-main">${day}</span>`;
-                }
-
-                buttonsHtml += `<button class="filter-btn ${activeClass}" onclick="filterByDay('${day}', this)">${innerHtml}</button>`;
+                if (day === "沖繩推薦") innerHtml = `<span class="btn-emoji">❤️</span><span class="btn-sub">沖繩推薦</span>`;
+                else if (date) innerHtml = `<span class="btn-main">${day}</span><span class="btn-sub">${date}</span>`;
+                else innerHtml = `<span class="btn-main">${day}</span>`;
+                buttonsHtml += `<button class="filter-btn ${activeClass}" onclick="switchTab('itinerary', this, '${day}')">${innerHtml}</button>`;
             });
-            
-            buttonsHtml += `<button class="filter-btn" onclick="showSplitBill(this)">
-                <span class="btn-emoji">💰</span>
-                <span class="btn-sub">分帳表</span>
-            </button>`;
+            // 分帳表按鈕放在最右邊
+            buttonsHtml += `<button class="filter-btn" onclick="showSplitBill(this)"><span class="btn-emoji">💰</span><span class="btn-sub">分帳表</span></button>`;
 
             filterContainer.innerHTML = buttonsHtml;
-            
-            // 預設渲染第一天的資料
-            filterByDay(firstDay, filterContainer.querySelector('.filter-btn'));
-            
-            // 設定記帳日期預設為第一天
+            // 預設載入 Day 1
+            renderByDay(firstDay); 
             document.getElementById('billDate').value = "2026-02-08";
-            
-            // 初始化也要排序一次
             expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
 
-        window.filterByDay = function(day, btnElement) {
-            if(btnElement) {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        // ★★★ 底部導覽列切換邏輯 ★★★
+        window.switchTab = function(tabName, btnElement, day = null) {
+            // 底部按鈕樣式更新
+            if(tabName !== 'itinerary' && btnElement) { // 點擊底部按鈕時
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
                 btnElement.classList.add('active');
+            } else if (tabName === 'itinerary') { // 點擊上方 Day 按鈕時，底部要切回行程
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                document.querySelector('.nav-item:first-child').classList.add('active');
+                
+                // 上方按鈕樣式更新
+                if(btnElement) {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btnElement.classList.add('active');
+                }
             }
-            searchInput.value = ''; 
-            
-            container.style.display = 'block';
-            splitContainer.style.display = 'none';
 
-            const filtered = itineraryData.filter(item => item.day === day);
-            render(filtered);
+            // 頁面內容切換
+            splitContainer.style.display = 'none'; // 隱藏分帳表
+            container.style.display = 'block'; // 顯示行程卡片區
+
+            if (tabName === 'itinerary') {
+                topControls.style.display = 'block'; // 顯示上方篩選區
+                if (day) renderByDay(day); // 如果有指定天數 (點擊上方按鈕)
+                else {
+                    // 點擊底部「行程」按鈕，恢復顯示 Day 1 (或上次停留的，這裡簡化為 Day 1)
+                    // 重新觸發第一個 Day 按鈕的點擊
+                    const firstBtn = filterContainer.querySelector('.filter-btn');
+                    if(firstBtn) firstBtn.click();
+                }
+            } else if (tabName === 'flights') {
+                topControls.style.display = 'none'; // 隱藏上方篩選區
+                renderFlights();
+            } else if (tabName === 'hotels') {
+                topControls.style.display = 'none'; // 隱藏上方篩選區
+                renderHotels();
+            }
         };
 
+        // 顯示分帳表 (舊有邏輯，相容)
         window.showSplitBill = function(btnElement) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
-            
             container.style.display = 'none';
             splitContainer.style.display = 'block';
-            fetchRate(); 
-            renderExpenses();
+            topControls.style.display = 'block'; // 保持上方顯示，因為分帳表按鈕在上方
+            fetchRate(); renderExpenses();
         };
 
-        function render(data) {
+        // 渲染特定日期的行程
+        function renderByDay(day) {
+            const filtered = itineraryData.filter(item => item.day === day);
+            render(filtered);
+        }
+
+        // 渲染所有班機
+        function renderFlights() {
+            const filtered = itineraryData.filter(item => item.type.includes('flight'));
+            render(filtered, true); // true 表示不顯示 Day Header，直接顯示列表
+        }
+
+        // 渲染所有住宿
+        function renderHotels() {
+            const filtered = itineraryData.filter(item => item.type.includes('hotel'));
+            render(filtered, true);
+        }
+
+        function render(data, hideDayHeader = false) {
             container.innerHTML = "";
             let currentDay = "";
 
@@ -562,7 +538,8 @@
             }
 
             data.forEach(item => {
-                if (item.day !== currentDay) {
+                // 如果是依照日期檢視，才顯示 Day Header
+                if (!hideDayHeader && item.day !== currentDay) {
                     currentDay = item.day;
                     const header = document.createElement('div');
                     header.className = 'day-header';
@@ -579,6 +556,7 @@
                     return; 
                 }
 
+                // 班機和住宿模式下，若沒有 driveTime 不顯示
                 if (item.driveTime) {
                     const driveDiv = document.createElement('div');
                     driveDiv.className = 'drive-info';
@@ -601,7 +579,13 @@
                 const noteBlock = item.note ? `<div class="note">${item.note}</div>` : "";
                 const tagsHtml = item.type.split(' ').map(t => `<span class="tag ${t}">${getTypeName(t)}</span>`).join('');
 
-                card.innerHTML = `<div class="time-box">${timeHtml}</div><div class="info-box"><div class="activity">${tagsHtml} ${item.title}</div><div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>${noteBlock}</div>`;
+                // 在班機/住宿總覽模式下，顯示日期會比較清楚
+                let titleHtml = item.title;
+                if(hideDayHeader) {
+                    titleHtml = `<span style="font-size:12px; color:#999; display:block; margin-bottom:2px;">${item.date}</span>` + item.title;
+                }
+
+                card.innerHTML = `<div class="time-box">${timeHtml}</div><div class="info-box"><div class="activity">${tagsHtml} ${titleHtml}</div><div class="location">${item.location.includes('<a') ? '📍 ' + item.location : mapLink}</div>${noteBlock}</div>`;
                 container.appendChild(card);
             });
         }
