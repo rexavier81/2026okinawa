@@ -149,7 +149,7 @@
                     <div class="text-2xl font-black text-blue-800 tracking-tight">¥<span id="public-balance">0</span></div>
                     <div class="text-[10px] text-gray-400 mt-1 flex gap-2">
                         <span>平均匯率: <span id="avg-rate-display">--</span></span>
-                        <span>(約 NT$<span id="public-balance-twd">0</span>)</span>
+                        <span class="text-blue-400 font-medium">(約 NT$<span id="public-balance-twd">0</span>)</span>
                     </div>
                 </div>
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center">
@@ -181,9 +181,7 @@
             </div>
 
             <div>
-                <div class="flex justify-between items-end mb-3 px-1">
-                    <h3 class="font-bold text-gray-700">消費明細</h3>
-                </div>
+                <h3 class="font-bold text-gray-700 mb-3 px-1">消費明細</h3>
                 <div id="expense-list" class="space-y-3 pb-10 text-center text-gray-400 text-sm">載入中...</div>
             </div>
         </div>
@@ -536,6 +534,12 @@
                 const res = await fetch(GAS_URL);
                 const data = await res.json();
                 
+                // --- 錯誤處理 ---
+                if (data.error) {
+                    listDiv.innerHTML = `<div class="text-center text-red-400 py-4 text-sm">${data.error}</div>`;
+                    return;
+                }
+
                 let totalTWD = 0, totalJPY = 0;
                 let exchangeHistoryHtml = '';
                 
@@ -564,27 +568,23 @@
 
                 data.expenses.forEach(bill => {
                     let twd = 0;
-                    let displaySubText = ''; // 小字顯示內容
+                    let displaySubText = '';
 
                     if (bill.currency === 'JPY') {
-                        // 日幣消費
                         twd = Math.round(bill.amount * AVG_RATE);
-                        // 顯示換算台幣 & 當下匯率
+                        // 顯示即時匯率 (從GAS讀回來的 rate)
                         displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${Number(bill.rate).toFixed(4)})</span>`;
                         
                         if (String(bill.payer).startsWith('公費')) {
                             spentPublicJPY += parseInt(bill.amount);
                         }
                     } else {
-                        // 台幣消費
                         twd = parseInt(bill.amount);
-                        // 不顯示任何小字 (符合需求)
                         displaySubText = ''; 
                     }
 
                     // --- 分帳核心邏輯 ---
                     if (bill.payer === '公費' || bill.payer.includes('共同')) {
-                        // 純公費共同消費：不產生私人債務
                     } 
                     else if (bill.payer === '公費-翔') {
                         extraDebt_YanOwesXiang -= (twd / 2); 
@@ -632,7 +632,6 @@
                 
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
-                // 新增：公款餘額換算台幣
                 document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * AVG_RATE).toLocaleString();
 
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
@@ -648,7 +647,6 @@
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            // 注意：因為現在預設隱藏，所以不需要這裡控制 hidden class，而是控制內容
             const text = document.getElementById('settlement-text');
             
             const baseDiff = (xiang - yan) / 2;
