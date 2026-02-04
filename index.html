@@ -29,7 +29,7 @@
             display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 5px 12px; margin-right: 6px; border-radius: 12px; border: 1px solid #ddd; 
             background: white; color: #555; cursor: pointer; transition: all 0.2s; 
-            vertical-align: middle; min-width: 75px; height: 48px;     
+            vertical-align: middle; min-width: 75px; height: 48px;      
         }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
         .btn-main { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; }
@@ -113,8 +113,8 @@
         }
         .pdf-btn:active { transform: scale(0.98); background-color: #ff4757; }
 
-        /* 分帳表樣式 (保留樣式，供後續使用) */
-        .split-container { display: none; padding: 10px 0 100px; }
+        /* 分帳表樣式 */
+        .split-container { display: none; padding: 10px 20px 100px; }
         .split-input-card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .split-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .split-row input, .split-row select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; flex: 1; box-sizing: border-box; }
@@ -122,7 +122,7 @@
         .split-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .split-table th { background: #f0f4f8; padding: 10px; font-size: 13px; color: #555; text-align: left; }
         .split-table td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
-        .btn-del { color: #ff6b81; cursor: pointer; font-weight: bold; border: none; background: none; }
+        .btn-del { color: #ff6b81; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 16px; }
         .summary-card { background: #2c3e50; color: white; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .summary-total { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
         .summary-final { font-size: 18px; font-weight: bold; color: #f1c40f; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.3); }
@@ -195,7 +195,57 @@
         </div>
     </div>
 
-    <div class="container split-container" id="splitBillContainer"></div>
+    <div class="container split-container" id="splitBillContainer">
+        <div class="split-input-card">
+            <h3 style="margin-top:0; color:#2c3e50; border-bottom:1px solid #eee; padding-bottom:10px;">💸 新增一筆帳目</h3>
+            
+            <div class="split-row">
+                <input type="date" id="billDate">
+                <select id="billPayer">
+                    <option value="徐">徐</option>
+                    <option value="親友A">親友A</option>
+                    <option value="公費">公費</option>
+                </select>
+            </div>
+
+            <div class="split-row">
+                <input type="text" id="billItem" placeholder="例如：燒肉、停車費、飲料">
+            </div>
+
+            <div class="split-row">
+                <select id="billCurrency" onchange="updateRateHint()">
+                    <option value="JPY">JPY 日幣</option>
+                    <option value="TWD">TWD 台幣</option>
+                </select>
+                <input type="number" id="billAmount" placeholder="輸入金額">
+            </div>
+            
+            <div style="font-size:12px; color:#888; margin-bottom:10px; text-align:right;" id="rateHint">
+                當前匯率：1 JPY ≈ 0.22 TWD
+            </div>
+
+            <button class="btn-add" onclick="addBill()">＋ 記帳</button>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-total">總支出 (換算台幣)</div>
+            <div class="summary-final" id="totalTwdDisplay">NT$ 0</div>
+        </div>
+
+        <table class="split-table">
+            <thead>
+                <tr>
+                    <th style="width:15%">日期</th>
+                    <th style="width:15%">誰付</th>
+                    <th>項目</th>
+                    <th style="width:25%">金額</th>
+                    <th style="width:10%"></th>
+                </tr>
+            </thead>
+            <tbody id="billListBody">
+                </tbody>
+        </table>
+    </div>
 
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('itinerary', this)"><span class="nav-icon">📅</span>行程</div>
@@ -286,9 +336,131 @@
         const searchInput = document.getElementById('searchInput');
         const topControls = document.getElementById('topControls');
 
-        // ★★★ 原本的分帳邏輯已被清空 ★★★
+        // ★★★ 分帳功能邏輯 ★★★
+        
+        // 設定匯率 (可以隨時調整)
+        const JPY_RATE = 0.218; 
+        
+        // 從瀏覽器記憶體讀取舊資料，如果沒有就給空陣列
+        let bills = JSON.parse(localStorage.getItem('okinawa_bills_2026')) || [];
 
-        // --- 核心邏輯 ---
+        function initSplitBill() {
+            // 1. 設定預設日期為今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('billDate').value = today;
+            
+            // 2. 渲染列表
+            renderBills();
+            updateRateHint();
+        }
+
+        function updateRateHint() {
+            const curr = document.getElementById('billCurrency').value;
+            const hint = document.getElementById('rateHint');
+            if(curr === 'JPY') {
+                hint.innerText = `當前匯率：1 JPY ≈ ${JPY_RATE} TWD`;
+            } else {
+                hint.innerText = `當前幣別：台幣 (免手續費)`;
+            }
+        }
+
+        function addBill() {
+            // 獲取輸入值
+            const date = document.getElementById('billDate').value;
+            const payer = document.getElementById('billPayer').value;
+            const item = document.getElementById('billItem').value;
+            const currency = document.getElementById('billCurrency').value;
+            const amount = parseFloat(document.getElementById('billAmount').value);
+
+            // 簡單驗證
+            if (!item || !amount) {
+                alert("請輸入項目名稱和金額！");
+                return;
+            }
+
+            // 建立帳務物件
+            const newBill = {
+                id: Date.now(), // 用時間戳記當作唯一 ID
+                date,
+                payer,
+                item,
+                currency,
+                amount
+            };
+
+            // 加入陣列並儲存
+            bills.push(newBill);
+            saveBills();
+            
+            // 清空輸入框 (保留日期與付款人，方便連續輸入)
+            document.getElementById('billItem').value = '';
+            document.getElementById('billAmount').value = '';
+            
+            // 重新渲染介面
+            renderBills();
+        }
+
+        function deleteBill(id) {
+            if(confirm('確定要刪除這筆帳目嗎？')) {
+                bills = bills.filter(b => b.id !== id);
+                saveBills();
+                renderBills();
+            }
+        }
+
+        function saveBills() {
+            localStorage.setItem('okinawa_bills_2026', JSON.stringify(bills));
+        }
+
+        function renderBills() {
+            const tbody = document.getElementById('billListBody');
+            const totalDisplay = document.getElementById('totalTwdDisplay');
+            tbody.innerHTML = '';
+
+            let totalTWD = 0;
+
+            // 將資料依照日期排序 (新的在上面)
+            const sortedBills = bills.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+            sortedBills.forEach(bill => {
+                // 計算顯示金額
+                let amountDisplay = '';
+                let rowTWD = 0;
+
+                if (bill.currency === 'JPY') {
+                    amountDisplay = `¥${bill.amount}`;
+                    rowTWD = Math.round(bill.amount * JPY_RATE);
+                } else {
+                    amountDisplay = `NT$${bill.amount}`;
+                    rowTWD = bill.amount;
+                }
+                
+                totalTWD += rowTWD;
+
+                // 判斷幣別標籤顏色
+                const currClass = bill.currency === 'JPY' ? 'curr-jpy' : 'curr-twd';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size:12px; color:#888;">${bill.date.slice(5)}</td>
+                    <td><span style="font-weight:bold; color:#4facfe;">${bill.payer}</span></td>
+                    <td>${bill.item}</td>
+                    <td>
+                        <div style="font-weight:bold;">${amountDisplay}</div>
+                        <div style="font-size:10px; color:#aaa;">≈ NT$${rowTWD}</div>
+                    </td>
+                    <td style="text-align:right;">
+                        <button class="btn-del" onclick="deleteBill(${bill.id})">×</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 更新總金額 (加上千分位逗號)
+            totalDisplay.innerText = `NT$ ${totalTWD.toLocaleString()}`;
+        }
+
+        // --- 核心邏輯 (行程篩選) ---
 
         function initFilters() {
             const dayMap = new Map();
@@ -353,10 +525,9 @@
                 const filtered = itineraryData.filter(item => item.day === '必買');
                 render(filtered);
             } else if (tabName === 'split') {
-                // 分帳頁面：目前為空
                 splitContainer.style.display = 'block';
                 topControls.style.display = 'none'; 
-                // 這裡原本的 initSplitBill() 已移除
+                initSplitBill(); // 啟動分帳功能
             }
         };
 
