@@ -6,23 +6,43 @@
     <title>✈️2026沖繩8天7夜✈️</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f9ff; color: #333; overscroll-behavior-y: none; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            overscroll-behavior-y: none;
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         .pt-safe-top { padding-top: max(env(safe-area-inset-top), 1rem); }
         .tab-content { display: none; opacity: 0; transition: opacity 0.2s ease-in-out; }
         .tab-content.active { display: block; opacity: 1; }
-        .desc-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; transition: all 0.3s ease; }
+        
+        .desc-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: pre-wrap;
+            transition: all 0.3s ease;
+        }
         .desc-text.expanded { -webkit-line-clamp: unset; }
-        .timeline-line { position: absolute; left: 27px; top: 3.5rem; bottom: -1rem; width: 2px; background-color: #bfdbfe; z-index: 0; }
+        
+        .timeline-line {
+            position: absolute; left: 27px; top: 3.5rem; bottom: -1rem; width: 2px;
+            background-color: #bfdbfe; z-index: 0;
+        }
+
         .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal.hidden-modal { opacity: 0; visibility: hidden; pointer-events: none; }
         .modal.show-modal { opacity: 1; visibility: visible; pointer-events: auto; }
         .modal-content { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .hidden-modal .modal-content { transform: scale(0.9) translateY(20px); }
         .show-modal .modal-content { transform: scale(1) translateY(0); }
+
         .desc-text a { color: #0284c7; text-decoration: underline; font-weight: 500; }
+        
         #settlement-content { transition: max-height 0.3s ease-out, opacity 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
         #settlement-content.open { max-height: 500px; opacity: 1; }
         #arrow-settlement { transition: transform 0.3s ease; }
@@ -41,7 +61,9 @@
     </header>
 
     <main id="app-container" class="flex-1 overflow-y-auto relative bg-sky-50/50 pb-24">
-        <div id="loading-msg" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm z-50">資料同步中...</div>
+        <div id="loading-msg" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm z-50">
+            資料同步中...
+        </div>
 
         <div id="view-itinerary" class="tab-content active">
             <div class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 py-3 shadow-sm">
@@ -51,14 +73,20 @@
         </div>
 
         <div id="view-flights" class="tab-content p-5 space-y-4"></div>
+
         <div id="view-hotels" class="tab-content p-5 space-y-4"></div>
-        <div id="view-mustbuy" class="tab-content p-5 space-y-4"><div id="mustbuy-list" class="space-y-6"></div></div>
+
+        <div id="view-mustbuy" class="tab-content p-5 space-y-4">
+            <div id="mustbuy-list" class="space-y-6"></div>
+        </div>
 
         <div id="view-accounting" class="tab-content p-5 space-y-4">
             
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-4 relative">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2" id="form-title">💸 新增消費</h2>
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2" id="form-title">
+                        💸 新增消費
+                    </h2>
                     <button id="btn-cancel-edit" onclick="resetFormState()" class="hidden text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-bold">✕ 取消</button>
                 </div>
                 
@@ -108,7 +136,9 @@
                         <input type="text" id="acc-note" placeholder="..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
                     
-                    <button type="submit" id="btn-submit-acc" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95">記帳</button>
+                    <button type="submit" id="btn-submit-acc" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95">
+                        記帳
+                    </button>
                 </form>
             </div>
 
@@ -122,7 +152,8 @@
                     </div>
                 </div>
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center">
-                    <span class="text-lg mb-0.5">💱</span><span>換匯</span>
+                    <span class="text-lg mb-0.5">💱</span>
+                    <span>換匯</span>
                 </button>
             </div>
 
@@ -133,12 +164,15 @@
                         <button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">
                             💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
-                        <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button>
+                        <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
+                            ↻ 更新
+                        </button>
                     </div>
                 </div>
                 <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3">
                     <p class="text-3xl font-black text-cyan-700" id="total-expense">0</p>
                 </div>
+
                 <div id="settlement-content" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 mt-2">
                     <p class="font-bold mb-1">💰 結算建議 (不含公費)：</p>
                     <p id="settlement-text">計算中...</p>
@@ -155,30 +189,66 @@
     <div id="exchange-modal" class="fixed inset-0 z-[70] flex items-center justify-center px-4 modal hidden-modal">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleExchangeModal()"></div>
         <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative z-10">
-            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg flex items-center gap-2">🔄 新增換匯紀錄</h3><button onclick="toggleExchangeModal()" class="text-white/80 hover:text-white">✕</button></div>
+            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">🔄 新增換匯紀錄</h3>
+                <button onclick="toggleExchangeModal()" class="text-white/80 hover:text-white">✕</button>
+            </div>
             <div class="p-5 space-y-4">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-gray-500 mb-1">日期</label><input type="date" id="ex-date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2"></div>
-                    <div><label class="block text-xs font-bold text-gray-500 mb-1">誰換的</label><select id="ex-who" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2"><option value="翔">翔</option><option value="彥">彥</option></select></div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
+                        <input type="date" id="ex-date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">誰換的</label>
+                        <select id="ex-who" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                            <option value="翔">翔</option>
+                            <option value="彥">彥</option>
+                        </select>
+                    </div>
                 </div>
-                <div><label class="block text-xs font-bold text-gray-500 mb-1">台幣成本 (TWD)</label><input type="number" id="ex-twd" placeholder="例如：8500" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800"></div>
-                <div><label class="block text-xs font-bold text-gray-500 mb-1">換得日幣 (JPY)</label><input type="number" id="ex-jpy" placeholder="例如：38636" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800"></div>
-                <button onclick="submitExchange()" id="btn-submit-ex" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md mt-2">確認新增</button>
-                <div class="mt-4 pt-4 border-t border-gray-100"><p class="text-xs font-bold text-gray-400 mb-2">換匯歷史</p><div id="exchange-history" class="space-y-2 max-h-32 overflow-y-auto text-xs"></div></div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">台幣成本 (TWD)</label>
+                    <input type="number" id="ex-twd" placeholder="例如：8500" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">換得日幣 (JPY)</label>
+                    <input type="number" id="ex-jpy" placeholder="例如：38636" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800">
+                </div>
+                <button onclick="submitExchange()" id="btn-submit-ex" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md mt-2">
+                    確認新增
+                </button>
+                
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-xs font-bold text-gray-400 mb-2">換匯歷史</p>
+                    <div id="exchange-history" class="space-y-2 max-h-32 overflow-y-auto text-xs"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <button onclick="toggleCalc()" class="fixed bottom-24 right-5 z-40 bg-pink-500 hover:bg-pink-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border-2 border-white"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></button>
+    <button onclick="toggleCalc()" class="fixed bottom-24 right-5 z-40 bg-pink-500 hover:bg-pink-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border-2 border-white">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+    </button>
+
     <div id="calc-modal" class="fixed inset-0 z-[70] flex items-center justify-center px-4 modal hidden-modal">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleCalc()"></div>
         <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative z-10">
-            <div class="bg-cyan-600 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg flex items-center gap-2">💱 匯率換算</h3><button onclick="toggleCalc()" class="text-white/80 hover:text-white">✕</button></div>
+            <div class="bg-cyan-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">💱 匯率換算</h3>
+                <button onclick="toggleCalc()" class="text-white/80 hover:text-white">✕</button>
+            </div>
             <div class="p-6 space-y-6">
                 <div class="text-center text-sm text-gray-500 mb-2">當前平均匯率：1 JPY ≈ <span id="display-rate" class="font-bold text-cyan-600 text-lg">--</span> TWD</div>
                 <div class="space-y-4">
-                    <div class="relative"><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇯🇵 日幣 (JPY)</label><input type="number" id="input-jpy" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800"></div>
-                    <div class="relative"><label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇹🇼 新台幣 (TWD)</label><input type="number" id="input-twd" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800"></div>
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇯🇵 日幣 (JPY)</label>
+                        <input type="number" id="input-jpy" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800">
+                    </div>
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇹🇼 新台幣 (TWD)</label>
+                        <input type="number" id="input-twd" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800">
+                    </div>
                 </div>
             </div>
         </div>
@@ -195,13 +265,40 @@
     </nav>
 
     <script>
+        // ==========================
+        // 1. Google Apps Script 網址
+        // ==========================
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
+        // ==========================
+        // 2. 沖繩資料
+        // ==========================
         const DATA = {
-            days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
-            flights: [ { type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:05", from: "桃園 T1", to: "那霸", note: "預計 17:05 抵達" }, { type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", note: "09:30 辦理登機" } ],
-            hotels: [ { name: "那霸小祿站前ys旅館", dates: "2/8 - 2/9 (1晚)", location: "那霸小祿", note: "單軌小祿站旁，Check-in 18:05後", mapLink: "https://www.google.com/maps/search/?api=1&query=Ys+Inn+Naha+Oroku", checkIn: "15:00", checkOut: "12:00" }, { name: "ホテルリゾネックス名護", dates: "2/9 - 2/10 (1晚)", location: "名護", note: "Resonex Nago，私人沙灘，所有房間面海。", mapLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Resonex+Nago", checkIn: "15:00", checkOut: "11:00" }, { name: "刻の宿 那覇", dates: "2/10 - 2/15 (5晚)", location: "那霸", note: "連住5晚，含簡易廚房。", mapLink: "https://www.google.com/maps/search/?api=1&query=Toki+no+Yado+Naha", checkIn: "15:00", checkOut: "10:00" } ],
-            shopping: [ { name: "紅芋塔 (Beni Imo Tart)", desc: "沖繩最經典伴手禮，御菓子御殿必買。", highlight: "經典必買" }, { name: "金楚糕 (Chinsuko)", desc: "琉球傳統餅乾，口感酥脆，鹽味最受歡迎。", highlight: "傳統點心" }, { name: "沖繩蝦餅", desc: "辣味蝦餅，非常涮嘴，適合當下酒菜。", highlight: "人氣零食" }, { name: "Fukugiya 年輪蛋糕", desc: "國際通名店，蜂蜜和黑糖口味都很棒。", highlight: "排隊美食" } ],
+            days: [
+                { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" },
+                { day: 2, date: "2/9 (一)", title: "租車 & 名護" },
+                { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" },
+                { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" },
+                { day: 5, date: "2/12 (四)", title: "中部 & 美國村" },
+                { day: 6, date: "2/13 (五)", title: "市區 & 購物" },
+                { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" },
+                { day: 8, date: "2/15 (日)", title: "還車 & 返台" }
+            ],
+            flights: [
+                { type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:05", from: "桃園 T1", to: "那霸", note: "預計 17:05 抵達" },
+                { type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", note: "09:30 辦理登機" }
+            ],
+            hotels: [
+                { name: "那霸小祿站前ys旅館", dates: "2/8 - 2/9 (1晚)", location: "那霸小祿", note: "單軌小祿站旁，Check-in 18:05後", mapLink: "https://www.google.com/maps/search/?api=1&query=Ys+Inn+Naha+Oroku", checkIn: "15:00", checkOut: "12:00" },
+                { name: "ホテルリゾネックス名護", dates: "2/9 - 2/10 (1晚)", location: "名護", note: "Resonex Nago，私人沙灘，所有房間面海。", mapLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Resonex+Nago", checkIn: "15:00", checkOut: "11:00" },
+                { name: "刻の宿 那覇", dates: "2/10 - 2/15 (5晚)", location: "那霸", note: "連住5晚，含簡易廚房。", mapLink: "https://www.google.com/maps/search/?api=1&query=Toki+no+Yado+Naha", checkIn: "15:00", checkOut: "10:00" }
+            ],
+            shopping: [
+                { name: "紅芋塔 (Beni Imo Tart)", desc: "沖繩最經典伴手禮，御菓子御殿必買。", highlight: "經典必買" },
+                { name: "金楚糕 (Chinsuko)", desc: "琉球傳統餅乾，口感酥脆，鹽味最受歡迎。", highlight: "傳統點心" },
+                { name: "沖繩蝦餅", desc: "辣味蝦餅，非常涮嘴，適合當下酒菜。", highlight: "人氣零食" },
+                { name: "Fukugiya 年輪蛋糕", desc: "國際通名店，蜂蜜和黑糖口味都很棒。", highlight: "排隊美食" }
+            ],
             activities: [
                 { dayId: 1, time: "11:00", title: "🚗 開車去停車場", desc: "Times 大園高鐵北路二段停車場 (停車1天100元，轉捷運領航站)", type: "transport" },
                 { dayId: 1, time: "11:30", title: "🛫 辦理登機手續", desc: "桃園機場第一航廈 (領航站-機場第一航廈站)", type: "transport" },
@@ -291,18 +388,29 @@
             if(tabName === 'accounting') fetchData();
         }
 
-        // --- 行程功能 ---
-        function selectDay(dayId) { currentDayId = dayId; renderDaySelector(); renderItinerary(dayId); document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' }); }
+        // --- 行程相關功能 (省略重複代碼，保持原樣) ---
+        function selectDay(dayId) {
+            currentDayId = dayId;
+            renderDaySelector();
+            renderItinerary(dayId);
+            document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
+        }
         function renderDaySelector() {
             const container = document.getElementById('day-selector');
             container.innerHTML = DATA.days.map(d => {
                 const isActive = d.day === currentDayId;
-                return `<button onclick="selectDay(${d.day})" class="flex-none flex flex-col items-center justify-center min-w-[3.8rem] py-2 rounded-xl transition-all duration-200 ${isActive ? 'bg-cyan-600 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 border border-gray-100'}"><span class="text-[10px] font-medium opacity-90">Day ${d.day}</span><span class="text-sm font-bold">${d.date.split('(')[0]}</span></button>`;
+                const activeClass = isActive ? 'bg-cyan-600 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 border border-gray-100';
+                return `<button onclick="selectDay(${d.day})" class="flex-none flex flex-col items-center justify-center min-w-[3.8rem] py-2 rounded-xl transition-all duration-200 ${activeClass}">
+                        <span class="text-[10px] font-medium opacity-90">Day ${d.day}</span>
+                        <span class="text-sm font-bold">${d.date.split('(')[0]}</span>
+                    </button>`;
             }).join('');
         }
         function renderItinerary(dayId) {
+            const list = document.getElementById('itinerary-list');
+            const dayData = DATA.days.find(d => d.day === dayId);
             const items = DATA.activities.filter(a => a.dayId === dayId);
-            let html = `<div class="mb-4 px-1"><h2 class="text-2xl font-bold text-gray-800">${DATA.days.find(d => d.day === dayId).title}</h2><p class="text-sm text-gray-500 mt-1">${DATA.days.find(d => d.day === dayId).date}</p></div>`;
+            let html = `<div class="mb-4 px-1"><h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2><p class="text-sm text-gray-500 mt-1">${dayData.date}</p></div>`;
             if (items.length === 0) html += `<div class="p-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">本日無特定行程</div>`;
             else {
                 html += items.map((item, index) => {
@@ -312,11 +420,17 @@
                     return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}</div></div></div></div>`;
                 }).join('');
             }
-            document.getElementById('itinerary-list').innerHTML = html;
+            list.innerHTML = html;
         }
-        function renderFlights() { document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4"><div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div><div class="flex justify-between items-center mb-4 mt-2"><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.from}</div></div><div class="flex-1 flex flex-col items-center px-4"><div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div><div class="w-full h-[1px] bg-gray-300"></div></div><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.to}</div></div></div><div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100">${f.note}</div></div>`).join(''); }
-        function renderHotels() { document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4"><div class="flex justify-between items-start mb-3"><span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">${h.location}</span><span class="text-xs text-gray-400 font-medium">${h.dates}</span></div><h3 class="text-xl font-bold text-gray-800 mb-2">${h.name}</h3><div class="text-sm text-gray-600 p-3 rounded border border-gray-100 mb-4">${h.note}</div><a href="${h.mapLink}" target="_blank" class="block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium transition-colors">📍 查看地圖</a></div>`).join(''); }
-        function renderMustBuy() { document.getElementById('mustbuy-list').innerHTML = DATA.shopping.map(item => `<div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex justify-between items-start"><div><h3 class="text-lg font-bold text-blue-800">${item.name}</h3><p class="text-sm text-gray-600 mt-1">${item.desc}</p></div><span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">${item.highlight}</span></div>`).join(''); }
+        function renderFlights() {
+            document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4"><div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div><div class="flex justify-between items-center mb-4 mt-2"><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.from}</div></div><div class="flex-1 flex flex-col items-center px-4"><div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div><div class="w-full h-[1px] bg-gray-300"></div></div><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.to}</div></div></div><div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100">${f.note}</div></div>`).join('');
+        }
+        function renderHotels() {
+            document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4"><div class="flex justify-between items-start mb-3"><span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">${h.location}</span><span class="text-xs text-gray-400 font-medium">${h.dates}</span></div><h3 class="text-xl font-bold text-gray-800 mb-2">${h.name}</h3><div class="text-sm text-gray-600 p-3 rounded border border-gray-100 mb-4">${h.note}</div><a href="${h.mapLink}" target="_blank" class="block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium transition-colors">📍 查看地圖</a></div>`).join('');
+        }
+        function renderMustBuy() {
+            document.getElementById('mustbuy-list').innerHTML = DATA.shopping.map(item => `<div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex justify-between items-start"><div><h3 class="text-lg font-bold text-blue-800">${item.name}</h3><p class="text-sm text-gray-600 mt-1">${item.desc}</p></div><span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">${item.highlight}</span></div>`).join('');
+        }
         function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
         function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
@@ -462,7 +576,6 @@
                 
                 document.getElementById('avg-rate-display').innerText = AVG_RATE.toFixed(4);
                 document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4); // 計算機
-                document.getElementById('total-jpy-pool').innerText = `¥${totalJPY.toLocaleString()}`;
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
                 // 2. 處理消費紀錄
@@ -552,7 +665,7 @@
 
             } catch (err) {
                 console.error(err);
-                listDiv.innerHTML = '<div class="text-center text-red-400 py-4 text-sm">讀取失敗：' + err.message + '</div>';
+                listDiv.innerHTML = '<div class="text-center text-red-400 py-4 text-sm">讀取失敗</div>';
             } finally {
                 loadingMsg.classList.add('hidden');
                 listDiv.style.opacity = '1';
