@@ -33,7 +33,6 @@
         }
         .filter-btn.active { background: #4facfe; color: white; border-color: #4facfe; box-shadow: 0 2px 5px rgba(79, 172, 254, 0.4); }
         .btn-main { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; }
-        .btn-emoji { font-size: 18px; line-height: 1; margin-bottom: 2px; }
         .btn-sub { font-size: 11px; opacity: 0.85; line-height: 1; white-space: nowrap; }
 
         /* 行程卡片區 */
@@ -123,12 +122,20 @@
         .split-table th { background: #f0f4f8; padding: 10px; font-size: 13px; color: #555; text-align: left; }
         .split-table td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
         .btn-del { color: #ff6b81; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 16px; }
+        
         .summary-card { background: #2c3e50; color: white; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .summary-total { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
-        .summary-final { font-size: 18px; font-weight: bold; color: #f1c40f; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.3); }
+        .summary-final { font-size: 18px; font-weight: bold; color: #f1c40f; margin-top: 5px; padding-top: 5px; border-top: 1px dashed rgba(255,255,255,0.3); }
+
+        /* 新增：結算建議卡片 */
+        .settlement-card { background: #fff3e0; border: 1px solid #ffe0b2; color: #e65100; padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .settlement-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; color: #ef6c00; }
+        .settlement-result { font-size: 18px; font-weight: 800; }
+
         .currency-tag { font-size: 10px; padding: 2px 4px; border-radius: 3px; margin-left: 5px; }
-        .curr-twd { background: #e1f5fe; color: #0288d1; }
-        .curr-jpy { background: #fff3e0; color: #ef6c00; }
+        /* 公費標籤樣式 */
+        .payer-public { background-color: #eee; color: #777; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .payer-person { color: #4facfe; font-weight: bold; }
 
     </style>
 </head>
@@ -202,8 +209,8 @@
             <div class="split-row">
                 <input type="date" id="billDate">
                 <select id="billPayer">
-                    <option value="徐">徐</option>
-                    <option value="親友A">親友A</option>
+                    <option value="翔">翔</option>
+                    <option value="彥">彥</option>
                     <option value="公費">公費</option>
                 </select>
             </div>
@@ -227,9 +234,15 @@
             <button class="btn-add" onclick="addBill()">＋ 記帳</button>
         </div>
 
+        <div class="settlement-card" id="settlementCard" style="display:none;">
+            <div class="settlement-title">💰 結算建議 (排除公費)</div>
+            <div class="settlement-result" id="settlementResult">--</div>
+        </div>
+
         <div class="summary-card">
-            <div class="summary-total">總支出 (換算台幣)</div>
+            <div class="summary-total">總支出 (含公費換算)</div>
             <div class="summary-final" id="totalTwdDisplay">NT$ 0</div>
+            <div style="font-size:12px; color:#aaa; margin-top:5px;">(所有幣別皆已換算為台幣顯示)</div>
         </div>
 
         <table class="split-table">
@@ -415,9 +428,16 @@
         function renderBills() {
             const tbody = document.getElementById('billListBody');
             const totalDisplay = document.getElementById('totalTwdDisplay');
+            const settlementCard = document.getElementById('settlementCard');
+            const settlementResult = document.getElementById('settlementResult');
+            
             tbody.innerHTML = '';
 
             let totalTWD = 0;
+            let xiangPaid = 0; // 翔已付
+            let yanPaid = 0;   // 彥已付
+            // 公費總額不納入拆帳計算，但納入顯示
+            let publicTotal = 0; 
 
             // 將資料依照日期排序 (新的在上面)
             const sortedBills = bills.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
@@ -435,15 +455,30 @@
                     rowTWD = bill.amount;
                 }
                 
-                totalTWD += rowTWD;
+                // 邏輯判斷
+                if (bill.payer === '公費') {
+                    publicTotal += rowTWD;
+                } else {
+                    // 只有翔和彥的支出才算入總支出與拆帳邏輯
+                    totalTWD += rowTWD;
+                    if (bill.payer === '翔') xiangPaid += rowTWD;
+                    if (bill.payer === '彥') yanPaid += rowTWD;
+                }
 
-                // 判斷幣別標籤顏色
-                const currClass = bill.currency === 'JPY' ? 'curr-jpy' : 'curr-twd';
+                // 判斷樣式
+                let payerHtml = "";
+                if (bill.payer === '公費') {
+                    payerHtml = `<span class="payer-public">公費</span>`;
+                } else {
+                    payerHtml = `<span class="payer-person">${bill.payer}</span>`;
+                }
 
                 const tr = document.createElement('tr');
+                if(bill.payer === '公費') tr.style.backgroundColor = '#f9f9f9'; // 公費淡灰底
+
                 tr.innerHTML = `
                     <td style="font-size:12px; color:#888;">${bill.date.slice(5)}</td>
-                    <td><span style="font-weight:bold; color:#4facfe;">${bill.payer}</span></td>
+                    <td>${payerHtml}</td>
                     <td>${bill.item}</td>
                     <td>
                         <div style="font-weight:bold;">${amountDisplay}</div>
@@ -456,8 +491,29 @@
                 tbody.appendChild(tr);
             });
 
-            // 更新總金額 (加上千分位逗號)
-            totalDisplay.innerText = `NT$ ${totalTWD.toLocaleString()}`;
+            // 更新總金額 (含公費顯示)
+            const grandTotal = totalTWD + publicTotal;
+            totalDisplay.innerText = `NT$ ${grandTotal.toLocaleString()}`;
+
+            // ★★★ 計算誰給誰 (僅計算翔與彥) ★★★
+            if (xiangPaid === 0 && yanPaid === 0) {
+                settlementCard.style.display = 'none';
+            } else {
+                settlementCard.style.display = 'block';
+                // 兩人平分總支出
+                const diff = xiangPaid - yanPaid;
+                const settleAmount = Math.abs(diff) / 2;
+
+                if (settleAmount === 0) {
+                     settlementResult.innerHTML = "🎉 目前帳務平衡，不需付款！";
+                } else if (diff > 0) {
+                    // 翔付比較多，彥要給翔
+                    settlementResult.innerHTML = `彥 應給 翔 <span style="color:#d35400;">NT$ ${Math.round(settleAmount).toLocaleString()}</span>`;
+                } else {
+                    // 彥付比較多，翔要給彥
+                    settlementResult.innerHTML = `翔 應給 彥 <span style="color:#d35400;">NT$ ${Math.round(settleAmount).toLocaleString()}</span>`;
+                }
+            }
         }
 
         // --- 核心邏輯 (行程篩選) ---
