@@ -34,7 +34,6 @@
             background-color: #bfdbfe; z-index: 0;
         }
 
-        /* Modal 動畫 */
         .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal.hidden-modal { opacity: 0; visibility: hidden; pointer-events: none; }
         .modal.show-modal { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -76,7 +75,7 @@
             <div id="mustbuy-list" class="space-y-6"></div>
         </div>
 
-       <div id="view-accounting" class="tab-content p-5 space-y-4">
+        <div id="view-accounting" class="tab-content p-5 space-y-4">
             
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-4 relative">
                 <div class="flex justify-between items-center mb-4">
@@ -175,29 +174,6 @@
                 <div id="expense-list" class="space-y-3 pb-10 text-center text-gray-400 text-sm">載入中...</div>
             </div>
         </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
-                    <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
-                        ↻ 更新
-                    </button>
-                </div>
-                <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3">
-                    <p class="text-3xl font-black text-cyan-700" id="total-expense">0</p>
-                </div>
-
-                <div id="settlement-box" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 hidden">
-                    <p class="font-bold mb-1">💰 結算建議 (不含公費)：</p>
-                    <p id="settlement-text">計算中...</p>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="font-bold text-gray-700 mb-3 px-1">消費明細</h3>
-                <div id="expense-list" class="space-y-3 pb-10 text-center text-gray-400 text-sm">載入中...</div>
-            </div>
-        </div>
     </main>
 
     <div id="exchange-modal" class="fixed inset-0 z-[70] flex items-center justify-center px-4 modal hidden-modal">
@@ -235,8 +211,7 @@
                 
                 <div class="mt-4 pt-4 border-t border-gray-100">
                     <p class="text-xs font-bold text-gray-400 mb-2">換匯歷史</p>
-                    <div id="exchange-history" class="space-y-2 max-h-32 overflow-y-auto text-xs">
-                        </div>
+                    <div id="exchange-history" class="space-y-2 max-h-32 overflow-y-auto text-xs"></div>
                 </div>
             </div>
         </div>
@@ -315,7 +290,6 @@
                 { name: "Fukugiya 年輪蛋糕", desc: "國際通名店，蜂蜜和黑糖口味都很棒。", highlight: "排隊美食" }
             ],
             activities: [
-                // Day 1
                 { dayId: 1, time: "11:00", title: "🚗 開車去停車場", desc: "Times 大園高鐵北路二段停車場 (停車1天100元，轉捷運領航站)", type: "transport" },
                 { dayId: 1, time: "11:30", title: "🛫 辦理登機手續", desc: "桃園機場第一航廈 (領航站-機場第一航廈站)", type: "transport" },
                 { dayId: 1, time: "14:45", title: "✈️ 飛機起飛", desc: "泰國越捷航空 VZ568，預計 17:05 抵達", type: "flight" },
@@ -324,7 +298,6 @@
                 { dayId: 1, time: "18:40", title: "🍜 晚餐：琉球新麵 通堂", desc: "通堂 小祿本店 (男人麵/女人麵)", type: "food" },
                 { dayId: 1, time: "19:40", title: "🛒 晚餐、超市採買", desc: "永旺 那霸店 (Aeon Naha) 晚餐、隨意逛逛", type: "shopping" },
                 { dayId: 1, time: "21:00", title: "🏨 住宿：那霸小祿站前ys旅館", desc: "退房時間為12:00", type: "hotel" },
-                // Day 2
                 { dayId: 2, time: "10:00", title: "🍔 早午餐：A&W 漢堡", desc: "<a href='https://www.google.com/maps/search/?api=1&query=A%26W+Naha+Kanagusuku' target='_blank'>A&W Naha Kanagusuku</a> 或 <a href='https://www.google.com/maps/search/?api=1&query=Aeon+Naha' target='_blank'>Aeon Naha</a> (經典 Root Beer)", type: "food" },
                 { dayId: 2, time: "12:00", title: "🚆 前往租車行", desc: "單軌：赤嶺站 (北口) 搭乘接駁車", type: "transport" },
                 { dayId: 2, time: "12:30", title: "🚗 取車 (大榮租車)", desc: "大榮租車<br><b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank'>單軌赤嶺站 12:30 接駁方法</a></b><br>車款：Toyota Yaris<br>費用：NT$8,400 (現場支付/未含保險)<br>單號：N0209-0215RC4-08<br>訂購人：徐啟翔 / 0918-563-811<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>", type: "transport", tag: "租車" },
@@ -334,14 +307,12 @@
                 { dayId: 2, time: "17:55", title: "🏨 飯店 Check-in", desc: "ホテルリゾネックス名護 (私人海灘散步、夕陽很美)", type: "hotel" },
                 { dayId: 2, time: "18:30", title: "🥩 晚餐：燒肉五苑", desc: "燒肉五苑名護店 (已預約 18:30 2位，可順逛隔壁漫畫倉庫)", type: "food", important: true },
                 { dayId: 2, time: "20:40", title: "🏨 住宿：名護 Resonex Nago", desc: "隔天有飯店早餐", type: "hotel" },
-                // Day 3
                 { dayId: 3, time: "08:30", title: "🥣 早餐", desc: "ホテルリゾネックス名護 (飯店早餐)", type: "food" },
                 { dayId: 3, time: "10:00", title: "🦈 美麗海水族館", desc: "美麗海水族館 (黑潮之海) 車程約25分", type: "activity", important: true },
                 { dayId: 3, time: "14:10", title: "🍽️ 午餐：海景餐廳", desc: "L LOTA (古宇利島) 車程約35分", type: "food" },
                 { dayId: 3, time: "15:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity" },
                 { dayId: 3, time: "18:00", title: "☕ 晚餐 / 下午茶", desc: "BANTA CAFE (看夜景) <a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank'>FB介紹</a> (回程較遠，預抓1.5hr)", type: "food" },
                 { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "刻の宿 那覇 (停車：沖縄県樋川立体駐車場) 入住代碼：［代收］、買隔天早餐", type: "hotel" },
-                // Day 4
                 { dayId: 4, time: "09:00", title: "🥣 早餐", desc: "刻の宿 那覇", type: "food" },
                 { dayId: 4, time: "09:50", title: "🏰 古蹟巡禮", desc: "首里城公園 (車程約20分)", type: "activity" },
                 { dayId: 4, time: "11:50", title: "🍽️ 午餐", desc: "永旺城 南城大里 (車程約30分)", type: "food" },
@@ -350,14 +321,12 @@
                 { dayId: 4, time: "17:50", title: "👕 機能服飾", desc: "WORKMAN Yaese (ワークマン 八重瀬店)", type: "shopping" },
                 { dayId: 4, time: "19:05", title: "🍛 晚餐：咖哩飯", desc: "CoCo Ichibanya Round 1 南風原店", type: "food" },
                 { dayId: 4, time: "20:30", title: "🏨 返回住宿", desc: "刻の宿 那覇 (沖縄県樋川立体駐車場)", type: "hotel" },
-                // Day 5
                 { dayId: 5, time: "08:30", title: "🍜 早餐：沖繩麵", desc: "STAND EIBUN (步行4分鐘。必點：亞瑟麵 Arthur Soba、咖哩麵)", type: "food" },
                 { dayId: 5, time: "10:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity" },
                 { dayId: 5, time: "12:10", title: "🐙 點心：章魚燒", desc: "沖縄イイダコ屋太陽 <a href='https://www.facebook.com/reel/1540297270440381' target='_blank'>FB連結介紹</a>", type: "food" },
                 { dayId: 5, time: "13:00", title: "🛍️ 午餐 & 逛街", desc: "永旺夢樂城來客夢 Rycom (Porter在SAC'S BAR Resort)", type: "shopping" },
                 { dayId: 5, time: "17:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：北谷町營或 Depot Island。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity" },
                 { dayId: 5, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇", type: "hotel" },
-                // Day 6
                 { dayId: 6, time: "09:30", title: "🌸 賞櫻", desc: "與儀公園 (步行 6 分鐘)", type: "activity" },
                 { dayId: 6, time: "10:15", title: "🐟 早餐：海鮮", desc: "泊港漁市場 (車程約15分)", type: "food" },
                 { dayId: 6, time: "11:30", title: "⛩️ 參拜", desc: "波上宮 (停附近付費停車場)", type: "activity" },
@@ -366,13 +335,11 @@
                 { dayId: 6, time: "14:50", title: "🛍️ 午餐+購物大戰", desc: "PARCO CITY (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping" },
                 { dayId: 6, time: "19:45", title: "👟 運動用品", desc: "Sports Depo 天久店 (運動鞋)", type: "shopping" },
                 { dayId: 6, time: "21:00", title: "🍜 晚餐：拉麵", desc: "烈火ラーメン暖暮 (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food" },
-                // Day 7
                 { dayId: 7, time: "09:00", title: "🥣 早餐：市場巡禮", desc: "牧志公設市場 (步行 10 分鐘)", type: "food" },
                 { dayId: 7, time: "10:40", title: "✈️ 看飛機/海景", desc: "瀨長島 Umikaji Terrace", type: "activity" },
                 { dayId: 7, time: "12:00", title: "🛍️ Outlet 購物 & 午餐", desc: "Ashibinaa Outlet (iias 沖繩豐崎)<br>逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：沖繩菜園 Karakara <a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>", type: "shopping" },
                 { dayId: 7, time: "17:45", title: "🌃 國際通", desc: "車先停回停車場。<br>晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった</a>", type: "activity" },
                 { dayId: 7, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (收行李)", type: "hotel" },
-                // Day 8
                 { dayId: 8, time: "07:30", title: "🥣 早餐 / 退房", desc: "刻の宿 那覇 (檢查行李)", type: "food" },
                 { dayId: 8, time: "08:00", title: "🚗 前往大榮租車", desc: "大榮租車 (加油 & 還車)", type: "transport" },
                 { dayId: 8, time: "09:30", title: "🛫 辦理登機手續", desc: "那霸機場國際線航廈 (搭乘接駁車)", type: "transport" },
@@ -384,7 +351,7 @@
         // 核心邏輯
         // ==========================
         let currentDayId = 1;
-        let AVG_RATE = 0.22; // 預設匯率 (會被自動更新)
+        let AVG_RATE = 0.22; 
 
         window.addEventListener('DOMContentLoaded', () => {
             renderDaySelector();
@@ -410,7 +377,7 @@
             if(tabName === 'accounting') fetchData();
         }
 
-        // --- 行程相關功能 (省略重複代碼，保持原樣) ---
+        // --- 行程相關功能 ---
         function selectDay(dayId) {
             currentDayId = dayId;
             renderDaySelector();
@@ -458,7 +425,7 @@
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
 
         // ==========================
-        // 記帳與換匯邏輯 (主要更新區)
+        // 記帳與換匯邏輯
         // ==========================
         function toggleExchangeModal() {
             const modal = document.getElementById('exchange-modal');
@@ -484,12 +451,25 @@
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
                 alert("✅ 換匯紀錄成功！");
                 toggleExchangeModal();
-                fetchData(); // 重新讀取並計算匯率
+                fetchData();
             } catch (err) {
                 alert("❌ 連線失敗");
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
+            }
+        }
+
+        function updateRateHint() {
+            const currency = document.getElementById('acc-currency').value;
+            const hintEl = document.getElementById('dynamic-rate-hint');
+            const rateValEl = document.getElementById('hint-rate-val');
+
+            if (currency === 'JPY') {
+                hintEl.classList.remove('hidden');
+                rateValEl.innerText = AVG_RATE.toFixed(4);
+            } else {
+                hintEl.classList.add('hidden');
             }
         }
 
@@ -508,7 +488,7 @@
                 item: document.getElementById('acc-item').value,
                 currency: document.getElementById('acc-currency').value,
                 amount: document.getElementById('acc-amount').value,
-                rate: AVG_RATE, // 存入當下的平均匯率
+                rate: AVG_RATE, 
                 note: document.getElementById('acc-note').value
             };
 
@@ -527,6 +507,7 @@
 
         async function fetchData() {
             const listDiv = document.getElementById('expense-list');
+            const totalEl = document.getElementById('total-expense');
             const loadingMsg = document.getElementById('loading-msg');
             loadingMsg.classList.remove('hidden');
             listDiv.style.opacity = '0.5';
@@ -535,7 +516,6 @@
                 const res = await fetch(GAS_URL);
                 const data = await res.json();
                 
-                // 1. 處理換匯紀錄 & 計算匯率
                 let totalTWD = 0, totalJPY = 0;
                 let exchangeHistoryHtml = '';
                 
@@ -547,23 +527,21 @@
                     });
                     
                     if (totalJPY > 0) {
-                        AVG_RATE = (totalTWD / totalJPY); // 計算平均匯率
+                        AVG_RATE = (totalTWD / totalJPY); 
                     }
                 }
                 
                 document.getElementById('avg-rate-display').innerText = AVG_RATE.toFixed(4);
-                document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4); // 更新計算機的匯率
+                document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4); 
                 document.getElementById('total-jpy-pool').innerText = `¥${totalJPY.toLocaleString()}`;
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
-                // 2. 處理消費紀錄
                 let totalSpentTWD = 0;
-                let spentPublicJPY = 0; // 公費花掉的日幣
+                let spentPublicJPY = 0;
                 let xiangPaid = 0, yanPaid = 0;
                 let html = '';
 
                 data.expenses.forEach(bill => {
-                    // 使用即時計算的 AVG_RATE 來顯示日幣消費的台幣價值，而不是用資料庫舊的
                     let twd = 0;
                     if (bill.currency === 'JPY') {
                         twd = Math.round(bill.amount * AVG_RATE);
@@ -608,11 +586,11 @@
                 document.getElementById('expense-list').innerHTML = html || '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
                 document.getElementById('total-expense').innerText = totalSpentTWD.toLocaleString();
                 
-                // 更新公款餘額
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
 
                 updateSettlement(xiangPaid, yanPaid);
+                updateRateHint();
 
             } catch (err) {
                 console.error(err);
@@ -623,7 +601,6 @@
             }
         }
 
-        // --- 其他輔助功能 (保留原樣) ---
         function updateSettlement(xiang, yan) {
             const box = document.getElementById('settlement-box');
             const text = document.getElementById('settlement-text');
@@ -665,7 +642,6 @@
             document.getElementById('btn-cancel-edit').classList.add('hidden');
         }
         
-        // 匯率計算機邏輯
         const jpyInput = document.getElementById('input-jpy');
         const twdInput = document.getElementById('input-twd');
         function toggleCalc() {
@@ -683,8 +659,10 @@
             if (!isNaN(val)) jpyInput.value = Math.round(val / AVG_RATE);
             else jpyInput.value = '';
         });
-        function updateRateDisplay() {
-            // 只是為了切換幣別時更新提示，不需要做什麼
+        function exportToCSV() {
+            const table = document.getElementById('expense-list'); 
+            if (!table || table.innerText.includes('目前沒有帳目')) { alert("沒有帳目可匯出"); return; }
+            alert("請至 Google Sheet 直接下載"); // 因為現在資料在雲端，建議直接去雲端看
         }
     </script>
 </body>
