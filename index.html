@@ -76,34 +76,9 @@
             <div id="mustbuy-list" class="space-y-6"></div>
         </div>
 
-        <div id="view-accounting" class="tab-content p-5 space-y-4">
+       <div id="view-accounting" class="tab-content p-5 space-y-4">
             
-            <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden mb-6">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
-                
-                <div class="flex justify-between items-start mb-4 relative z-10">
-                    <div>
-                        <h2 class="text-sm font-bold text-blue-100 mb-1">🇯🇵 公款日幣餘額</h2>
-                        <div class="text-3xl font-black tracking-tight">¥<span id="public-balance">0</span></div>
-                    </div>
-                    <button onclick="toggleExchangeModal()" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1">
-                        ➕ 換匯
-                    </button>
-                </div>
-
-                <div class="flex gap-4 text-xs relative z-10">
-                    <div class="bg-black/20 px-3 py-2 rounded-lg backdrop-blur-sm flex-1">
-                        <div class="text-blue-200 mb-0.5">平均匯率</div>
-                        <div class="font-bold text-lg" id="avg-rate-display">--</div>
-                    </div>
-                    <div class="bg-black/20 px-3 py-2 rounded-lg backdrop-blur-sm flex-1">
-                        <div class="text-blue-200 mb-0.5">總換得日幣</div>
-                        <div class="font-bold text-lg" id="total-jpy-pool">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6 relative">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-4 relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2" id="form-title">
                         💸 新增消費
@@ -121,7 +96,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">付款人</label>
-                            <select id="acc-payer" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <select id="acc-payer" onchange="updateRateHint()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                                 <option value="公費">公費 (從金庫出)</option>
                                 <option value="翔">翔 (私人代墊)</option>
                                 <option value="彥">彥 (私人代墊)</option>
@@ -135,13 +110,18 @@
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
                             <label class="block text-xs font-bold text-gray-500 mb-1">幣別</label>
-                            <select id="acc-currency" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <select id="acc-currency" onchange="updateRateHint()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                                 <option value="JPY">🇯🇵 日幣</option>
                                 <option value="TWD">🇹🇼 台幣</option>
                             </select>
                         </div>
                         <div class="col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">金額</label>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 flex justify-between">
+                                <span>金額</span>
+                                <span id="dynamic-rate-hint" class="text-cyan-600 font-normal hidden">
+                                    匯率: <span id="hint-rate-val">--</span>
+                                </span>
+                            </label>
                             <input type="number" id="acc-amount" required placeholder="輸入數字" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         </div>
                     </div>
@@ -155,6 +135,46 @@
                     </button>
                 </form>
             </div>
+
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 flex justify-between items-center shadow-sm">
+                <div>
+                    <h2 class="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wider">🇯🇵 公款日幣餘額</h2>
+                    <div class="text-2xl font-black text-blue-800 tracking-tight">¥<span id="public-balance">0</span></div>
+                    <div class="text-[10px] text-gray-400 mt-1">
+                        平均匯率: <span id="avg-rate-display">--</span> | 總換得: <span id="total-jpy-pool">0</span>
+                    </div>
+                </div>
+                <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center">
+                    <span class="text-lg mb-0.5">💱</span>
+                    <span>換匯</span>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
+                    <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
+                        ↻ 更新
+                    </button>
+                </div>
+                <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3">
+                    <p class="text-3xl font-black text-cyan-700" id="total-expense">0</p>
+                </div>
+
+                <div id="settlement-box" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 hidden">
+                    <p class="font-bold mb-1">💰 結算建議 (不含公費)：</p>
+                    <p id="settlement-text">計算中...</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-end mb-3 px-1">
+                    <h3 class="font-bold text-gray-700">消費明細</h3>
+                    <button onclick="exportToCSV()" class="text-[10px] text-gray-400 hover:text-gray-600 underline">匯出 Excel</button>
+                </div>
+                <div id="expense-list" class="space-y-3 pb-10 text-center text-gray-400 text-sm">載入中...</div>
+            </div>
+        </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
                 <div class="flex justify-between items-center mb-1">
