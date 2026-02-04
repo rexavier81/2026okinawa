@@ -339,7 +339,7 @@
             }
         }
 
-        // 呼叫 GAS 進行翻譯
+// 呼叫 GAS 進行翻譯
         async function doTranslate() {
             const text = document.getElementById('trans-input').value;
             if (!text) return;
@@ -361,10 +361,13 @@
                 if (data.result === 'success') {
                     resultArea.innerText = data.text;
                 } else {
-                    resultArea.innerText = "翻譯失敗: " + data.msg;
+                    // ★★★ 修正這裡：同時顯示 msg 或 error，抓出真正原因 ★★★
+                    const errorMsg = data.msg || data.error || "未知錯誤";
+                    resultArea.innerText = "失敗: " + errorMsg;
                 }
             } catch (err) {
-                resultArea.innerText = "連線錯誤";
+                console.error(err);
+                resultArea.innerText = "連線錯誤: " + err.message;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "翻譯成日文";
