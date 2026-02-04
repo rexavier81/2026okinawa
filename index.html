@@ -42,6 +42,12 @@
         .show-modal .modal-content { transform: scale(1) translateY(0); }
 
         .desc-text a { color: #0284c7; text-decoration: underline; font-weight: 500; }
+        
+        /* 結算區塊動畫 */
+        #settlement-content { transition: max-height 0.3s ease-out, opacity 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
+        #settlement-content.open { max-height: 500px; opacity: 1; }
+        #arrow-settlement { transition: transform 0.3s ease; }
+        #arrow-settlement.rotate { transform: rotate(180deg); }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col overflow-hidden max-w-md mx-auto bg-gray-50 shadow-2xl relative">
@@ -119,8 +125,8 @@
                         <div class="col-span-2">
                             <label class="block text-xs font-bold text-gray-500 mb-1 flex justify-between">
                                 <span>金額</span>
-                                <span id="dynamic-rate-hint" class="text-cyan-600 font-normal hidden">
-                                    匯率: <span id="hint-rate-val">--</span>
+                                <span id="dynamic-rate-hint" class="text-cyan-600 font-normal hidden text-[10px]">
+                                    (依公款匯率: <span id="hint-rate-val">--</span>)
                                 </span>
                             </label>
                             <input type="number" id="acc-amount" required placeholder="輸入數字" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
@@ -141,8 +147,9 @@
                 <div>
                     <h2 class="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wider">🇯🇵 公款日幣餘額</h2>
                     <div class="text-2xl font-black text-blue-800 tracking-tight">¥<span id="public-balance">0</span></div>
-                    <div class="text-[10px] text-gray-400 mt-1">
-                        平均匯率: <span id="avg-rate-display">--</span> | 總換得: <span id="total-jpy-pool">0</span>
+                    <div class="text-[10px] text-gray-400 mt-1 flex gap-2">
+                        <span>平均匯率: <span id="avg-rate-display">--</span></span>
+                        <span>(約 NT$<span id="public-balance-twd">0</span>)</span>
                     </div>
                 </div>
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center">
@@ -154,15 +161,20 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
                 <div class="flex justify-between items-center mb-1">
                     <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
-                    <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
-                        ↻ 更新
-                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">
+                            💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
+                            ↻ 更新
+                        </button>
+                    </div>
                 </div>
                 <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3">
                     <p class="text-3xl font-black text-cyan-700" id="total-expense">0</p>
                 </div>
 
-                <div id="settlement-box" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 hidden">
+                <div id="settlement-content" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 mt-2">
                     <p class="font-bold mb-1">💰 結算建議 (不含公費)：</p>
                     <p id="settlement-text">計算中...</p>
                 </div>
@@ -171,7 +183,6 @@
             <div>
                 <div class="flex justify-between items-end mb-3 px-1">
                     <h3 class="font-bold text-gray-700">消費明細</h3>
-                    <button onclick="exportToCSV()" class="text-[10px] text-gray-400 hover:text-gray-600 underline">匯出 Excel</button>
                 </div>
                 <div id="expense-list" class="space-y-3 pb-10 text-center text-gray-400 text-sm">載入中...</div>
             </div>
@@ -435,6 +446,13 @@
             modal.classList.toggle('show-modal');
         }
 
+        function toggleSettlement() {
+            const content = document.getElementById('settlement-content');
+            const arrow = document.getElementById('arrow-settlement');
+            content.classList.toggle('open');
+            arrow.classList.toggle('rotate');
+        }
+
         async function submitExchange() {
             const btn = document.getElementById('btn-submit-ex');
             const originalText = btn.innerText;
@@ -541,34 +559,40 @@
                 let totalSpentTWD = 0;
                 let spentPublicJPY = 0;
                 let xiangPaid = 0, yanPaid = 0;
-                let extraDebt_YanOwesXiang = 0; // 新增：公費私用債務 (正數代表彥欠翔，負數代表翔欠彥)
+                let extraDebt_YanOwesXiang = 0; 
                 let html = '';
 
                 data.expenses.forEach(bill => {
                     let twd = 0;
+                    let displaySubText = ''; // 小字顯示內容
+
                     if (bill.currency === 'JPY') {
+                        // 日幣消費
                         twd = Math.round(bill.amount * AVG_RATE);
+                        // 顯示換算台幣 & 當下匯率
+                        displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${Number(bill.rate).toFixed(4)})</span>`;
+                        
                         if (String(bill.payer).startsWith('公費')) {
                             spentPublicJPY += parseInt(bill.amount);
                         }
                     } else {
+                        // 台幣消費
                         twd = parseInt(bill.amount);
+                        // 不顯示任何小字 (符合需求)
+                        displaySubText = ''; 
                     }
 
-                    // --- 分帳核心邏輯 (修正版) ---
+                    // --- 分帳核心邏輯 ---
                     if (bill.payer === '公費' || bill.payer.includes('共同')) {
                         // 純公費共同消費：不產生私人債務
                     } 
                     else if (bill.payer === '公費-翔') {
-                        // 公費幫翔付 -> 翔欠彥一半 -> 彥欠翔減少
                         extraDebt_YanOwesXiang -= (twd / 2); 
                     }
                     else if (bill.payer === '公費-彥') {
-                        // 公費幫彥付 -> 彥欠翔一半 -> 彥欠翔增加
                         extraDebt_YanOwesXiang += (twd / 2);
                     }
                     else {
-                        // 私人代墊
                         totalSpentTWD += twd;
                         if (bill.payer.includes('翔')) xiangPaid += twd;
                         if (bill.payer.includes('彥')) yanPaid += twd;
@@ -577,7 +601,6 @@
                     const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
                     const rowData = JSON.stringify(bill).replace(/"/g, '"');
                     
-                    // 簡化顯示名稱
                     let payerLabel = bill.payer.split(' ')[0];
                     if(bill.payer === '公費-翔') payerLabel = '公費(翔)';
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
@@ -594,7 +617,7 @@
                             </div>
                             <div class="text-right flex flex-col items-end">
                                 <div class="font-bold text-cyan-700 text-lg">${displayAmt}</div>
-                                <div class="text-[10px] text-gray-400">≈ NT$${twd}</div>
+                                <div class="text-[10px] text-gray-400">${displaySubText}</div>
                                 <div class="flex gap-2 mt-1">
                                     <button onclick='editExpense(${rowData})' class="text-xs text-blue-400">修改</button>
                                     <button onclick="deleteExpense(${bill.rowIndex})" class="text-xs text-red-300">刪除</button>
@@ -609,8 +632,9 @@
                 
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
+                // 新增：公款餘額換算台幣
+                document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * AVG_RATE).toLocaleString();
 
-                // 傳入三個參數：翔已付、彥已付、額外債務
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
                 updateRateHint();
 
@@ -624,28 +648,17 @@
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            const box = document.getElementById('settlement-box');
+            // 注意：因為現在預設隱藏，所以不需要這裡控制 hidden class，而是控制內容
             const text = document.getElementById('settlement-text');
             
-            // 基礎拆帳：誰付比較多，另一人就要給他 (差額的一半)
-            // 公式：(翔付 - 彥付) / 2
             const baseDiff = (xiang - yan) / 2;
-            
-            // 總結算：基礎拆帳 + 額外債務
-            // 正數 = 彥要給翔
-            // 負數 = 翔要給彥
             const finalDiff = baseDiff + extraDebt;
 
-            if (Math.round(finalDiff) === 0 && xiang === 0 && yan === 0) {
-                box.classList.add('hidden');
-            } else {
-                box.classList.remove('hidden');
-                const absVal = Math.round(Math.abs(finalDiff));
-                
-                if (absVal === 0) text.innerText = "🎉 平衡";
-                else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
-                else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
-            }
+            const absVal = Math.round(Math.abs(finalDiff));
+            
+            if (absVal === 0) text.innerText = "🎉 平衡";
+            else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
         }
 
         function editExpense(data) {
@@ -693,11 +706,6 @@
             if (!isNaN(val)) jpyInput.value = Math.round(val / AVG_RATE);
             else jpyInput.value = '';
         });
-        function exportToCSV() {
-            const table = document.getElementById('expense-list'); 
-            if (!table || table.innerText.includes('目前沒有帳目')) { alert("沒有帳目可匯出"); return; }
-            alert("請至 Google Sheet 直接下載"); 
-        }
     </script>
 </body>
 </html>
