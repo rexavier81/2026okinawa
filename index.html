@@ -8,7 +8,7 @@
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f9ff; /* 淺藍底色 */
+            background-color: #f0f9ff;
             color: #333;
             overscroll-behavior-y: none;
         }
@@ -19,7 +19,6 @@
         .tab-content { display: none; opacity: 0; transition: opacity 0.2s ease-in-out; }
         .tab-content.active { display: block; opacity: 1; }
         
-        /* 文字展開收合樣式 */
         .desc-text {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -28,22 +27,13 @@
             white-space: pre-wrap;
             transition: all 0.3s ease;
         }
-        .desc-text.expanded {
-            -webkit-line-clamp: unset;
-        }
+        .desc-text.expanded { -webkit-line-clamp: unset; }
         
-        /* 時間軸線條 */
         .timeline-line {
-            position: absolute;
-            left: 27px;
-            top: 3.5rem;
-            bottom: -1rem;
-            width: 2px;
-            background-color: #bfdbfe; /* 淺藍線條 */
-            z-index: 0;
+            position: absolute; left: 27px; top: 3.5rem; bottom: -1rem; width: 2px;
+            background-color: #bfdbfe; z-index: 0;
         }
 
-        /* 計算機 Modal 動畫 */
         #calc-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
         #calc-modal.hidden-modal { opacity: 0; visibility: hidden; pointer-events: none; }
         #calc-modal.show-modal { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -51,12 +41,7 @@
         .hidden-modal #calc-content { transform: scale(0.9) translateY(20px); }
         .show-modal #calc-content { transform: scale(1) translateY(0); }
 
-        /* 連結樣式優化 */
-        .desc-text a {
-            color: #0284c7;
-            text-decoration: underline;
-            font-weight: 500;
-        }
+        .desc-text a { color: #0284c7; text-decoration: underline; font-weight: 500; }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col overflow-hidden max-w-md mx-auto bg-gray-50 shadow-2xl relative">
@@ -71,7 +56,10 @@
     </header>
 
     <main id="app-container" class="flex-1 overflow-y-auto relative bg-sky-50/50 pb-24">
-        
+        <div id="loading-msg" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm z-50">
+            資料同步中...
+        </div>
+
         <div id="view-itinerary" class="tab-content active">
             <div class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 py-3 shadow-sm">
                 <div id="day-selector" class="flex px-4 gap-3 overflow-x-auto hide-scrollbar"></div>
@@ -84,20 +72,22 @@
         <div id="view-hotels" class="tab-content p-5 space-y-4"></div>
 
         <div id="view-mustbuy" class="tab-content p-5 space-y-4">
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-r">
-                <p class="text-sm text-blue-700 font-bold">🛒 購物小貼士</p>
-                <p class="text-xs text-blue-600 mt-1">沖繩必逛：國際通、美國村、Aeon Mall、Outlet。記得達 5000 日幣可退稅。</p>
-            </div>
             <div id="mustbuy-list" class="space-y-6"></div>
         </div>
 
         <div id="view-accounting" class="tab-content p-5 space-y-4">
             
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6 relative">
-                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4">
-                    💸 新增一筆帳目
-                </h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2" id="form-title">
+                        💸 新增一筆帳目
+                    </h2>
+                    <button id="btn-cancel-edit" onclick="resetFormState()" class="hidden text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-bold">✕ 取消</button>
+                </div>
+                
                 <form id="account-form" class="space-y-4" onsubmit="submitExpense(event)">
+                    <input type="hidden" id="edit-row-id" value="">
+                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
@@ -129,9 +119,13 @@
                             <input type="number" id="acc-amount" required placeholder="輸入數字" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         </div>
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">備註 (選填)</label>
+                        <input type="text" id="acc-note" placeholder="..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
                     <p id="acc-rate-hint" class="text-xs text-gray-400 -mt-2 text-right">匯率計算中...</p>
                     
-                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95">
+                    <button type="submit" id="btn-submit-acc" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95">
                         記帳
                     </button>
                 </form>
@@ -139,9 +133,9 @@
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
                 <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
-                    <button onclick="exportToCSV()" class="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-1 rounded-full border border-green-200">
-                        📥 匯出 Excel
+                    <p class="text-xs text-gray-500 font-bold">總支出 (從雲端讀取)</p>
+                    <button onclick="fetchExpenses()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
+                        ↻ 更新
                     </button>
                 </div>
                 <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3">
@@ -156,7 +150,7 @@
 
             <div>
                 <h3 class="font-bold text-gray-700 mb-3 px-1">消費明細</h3>
-                <div id="expense-list" class="space-y-3 pb-10"></div>
+                <div id="expense-list" class="space-y-3 pb-10 text-center text-gray-400 text-sm">載入中...</div>
             </div>
         </div>
     </main>
@@ -173,19 +167,15 @@
                 <button onclick="toggleCalc()" class="text-white/80 hover:text-white">✕</button>
             </div>
             <div class="p-6 space-y-6">
-                <div class="text-center text-sm text-gray-500 mb-2">
-                    當前匯率：1 JPY ≈ <span id="display-rate" class="font-bold text-cyan-600 text-lg">0.22</span> TWD
-                </div>
+                <div class="text-center text-sm text-gray-500 mb-2">當前匯率：1 JPY ≈ <span id="display-rate" class="font-bold text-cyan-600 text-lg">0.22</span> TWD</div>
                 <div class="space-y-4">
                     <div class="relative">
                         <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇯🇵 日幣 (JPY)</label>
                         <input type="number" id="input-jpy" placeholder="輸入金額" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                        <span class="absolute right-4 top-[2.1rem] text-gray-400 text-sm font-bold">¥</span>
                     </div>
                     <div class="relative">
                         <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇹🇼 新台幣 (TWD)</label>
                         <input type="number" id="input-twd" placeholder="輸入金額" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                        <span class="absolute right-4 top-[2.1rem] text-gray-400 text-sm font-bold">$</span>
                     </div>
                 </div>
             </div>
@@ -194,27 +184,22 @@
 
     <nav class="bg-white border-t border-gray-200 shrink-0 pb-safe z-50 fixed bottom-0 w-full max-w-md">
         <div class="grid grid-cols-5 h-16">
-            <button onclick="switchTab('itinerary')" id="btn-itinerary" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cyan-600">
-                <span class="text-xl">📅</span><span class="text-[10px] font-medium mt-1">行程</span>
-            </button>
-            <button onclick="switchTab('flights')" id="btn-flights" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
-                <span class="text-xl">✈️</span><span class="text-[10px] font-medium mt-1">班機</span>
-            </button>
-            <button onclick="switchTab('hotels')" id="btn-hotels" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
-                <span class="text-xl">🏨</span><span class="text-[10px] font-medium mt-1">住宿</span>
-            </button>
-            <button onclick="switchTab('mustbuy')" id="btn-mustbuy" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
-                <span class="text-xl">🛍️</span><span class="text-[10px] font-medium mt-1">必買</span>
-            </button>
-            <button onclick="switchTab('accounting')" id="btn-accounting" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400">
-                <span class="text-xl">💰</span><span class="text-[10px] font-medium mt-1">分帳</span>
-            </button>
+            <button onclick="switchTab('itinerary')" id="btn-itinerary" class="nav-btn flex flex-col items-center justify-center w-full h-full text-cyan-600"><span class="text-xl">📅</span><span class="text-[10px] font-medium mt-1">行程</span></button>
+            <button onclick="switchTab('flights')" id="btn-flights" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400"><span class="text-xl">✈️</span><span class="text-[10px] font-medium mt-1">班機</span></button>
+            <button onclick="switchTab('hotels')" id="btn-hotels" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400"><span class="text-xl">🏨</span><span class="text-[10px] font-medium mt-1">住宿</span></button>
+            <button onclick="switchTab('mustbuy')" id="btn-mustbuy" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400"><span class="text-xl">🛍️</span><span class="text-[10px] font-medium mt-1">必買</span></button>
+            <button onclick="switchTab('accounting')" id="btn-accounting" class="nav-btn flex flex-col items-center justify-center w-full h-full text-gray-400"><span class="text-xl">💰</span><span class="text-[10px] font-medium mt-1">分帳</span></button>
         </div>
     </nav>
 
     <script>
         // ==========================
-        // 沖繩資料 (確實修正版)
+        // 1. Google Apps Script 網址 (請勿修改，這就是你的網址)
+        // ==========================
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
+
+        // ==========================
+        // 2. 沖繩資料 (行程已修正)
         // ==========================
         const DATA = {
             days: [
@@ -252,7 +237,6 @@
                 { dayId: 1, time: "18:40", title: "🍜 晚餐：琉球新麵 通堂", desc: "通堂 小祿本店 (男人麵/女人麵)", type: "food" },
                 { dayId: 1, time: "19:40", title: "🛒 晚餐、超市採買", desc: "永旺 那霸店 (Aeon Naha) 晚餐、隨意逛逛", type: "shopping" },
                 { dayId: 1, time: "21:00", title: "🏨 住宿：那霸小祿站前ys旅館", desc: "退房時間為12:00", type: "hotel" },
-                
                 // Day 2
                 { dayId: 2, time: "10:00", title: "🍔 早午餐：A&W 漢堡", desc: "<a href='https://www.google.com/maps/search/?api=1&query=A%26W+Naha+Kanagusuku' target='_blank'>A&W Naha Kanagusuku</a> 或 <a href='https://www.google.com/maps/search/?api=1&query=Aeon+Naha' target='_blank'>Aeon Naha</a> (經典 Root Beer)", type: "food" },
                 { dayId: 2, time: "12:00", title: "🚆 前往租車行", desc: "單軌：赤嶺站 (北口) 搭乘接駁車", type: "transport" },
@@ -263,7 +247,6 @@
                 { dayId: 2, time: "17:55", title: "🏨 飯店 Check-in", desc: "ホテルリゾネックス名護 (私人海灘散步、夕陽很美)", type: "hotel" },
                 { dayId: 2, time: "18:30", title: "🥩 晚餐：燒肉五苑", desc: "燒肉五苑名護店 (已預約 18:30 2位，可順逛隔壁漫畫倉庫)", type: "food", important: true },
                 { dayId: 2, time: "20:40", title: "🏨 住宿：名護 Resonex Nago", desc: "隔天有飯店早餐", type: "hotel" },
-
                 // Day 3
                 { dayId: 3, time: "08:30", title: "🥣 早餐", desc: "ホテルリゾネックス名護 (飯店早餐)", type: "food" },
                 { dayId: 3, time: "10:00", title: "🦈 美麗海水族館", desc: "美麗海水族館 (黑潮之海) 車程約25分", type: "activity", important: true },
@@ -271,7 +254,6 @@
                 { dayId: 3, time: "15:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity" },
                 { dayId: 3, time: "18:00", title: "☕ 晚餐 / 下午茶", desc: "BANTA CAFE (看夜景) <a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank'>FB介紹</a> (回程較遠，預抓1.5hr)", type: "food" },
                 { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "刻の宿 那覇 (停車：沖縄県樋川立体駐車場) 入住代碼：［代收］、買隔天早餐", type: "hotel" },
-
                 // Day 4
                 { dayId: 4, time: "09:00", title: "🥣 早餐", desc: "刻の宿 那覇", type: "food" },
                 { dayId: 4, time: "09:50", title: "🏰 古蹟巡禮", desc: "首里城公園 (車程約20分)", type: "activity" },
@@ -281,7 +263,6 @@
                 { dayId: 4, time: "17:50", title: "👕 機能服飾", desc: "WORKMAN Yaese (ワークマン 八重瀬店)", type: "shopping" },
                 { dayId: 4, time: "19:05", title: "🍛 晚餐：咖哩飯", desc: "CoCo Ichibanya Round 1 南風原店", type: "food" },
                 { dayId: 4, time: "20:30", title: "🏨 返回住宿", desc: "刻の宿 那覇 (沖縄県樋川立体駐車場)", type: "hotel" },
-
                 // Day 5
                 { dayId: 5, time: "08:30", title: "🍜 早餐：沖繩麵", desc: "STAND EIBUN (步行4分鐘。必點：亞瑟麵 Arthur Soba、咖哩麵)", type: "food" },
                 { dayId: 5, time: "10:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity" },
@@ -289,7 +270,6 @@
                 { dayId: 5, time: "13:00", title: "🛍️ 午餐 & 逛街", desc: "永旺夢樂城來客夢 Rycom (Porter在SAC'S BAR Resort)", type: "shopping" },
                 { dayId: 5, time: "17:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：北谷町營或 Depot Island。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity" },
                 { dayId: 5, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇", type: "hotel" },
-
                 // Day 6
                 { dayId: 6, time: "09:30", title: "🌸 賞櫻", desc: "與儀公園 (步行 6 分鐘)", type: "activity" },
                 { dayId: 6, time: "10:15", title: "🐟 早餐：海鮮", desc: "泊港漁市場 (車程約15分)", type: "food" },
@@ -299,14 +279,12 @@
                 { dayId: 6, time: "14:50", title: "🛍️ 午餐+購物大戰", desc: "PARCO CITY (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping" },
                 { dayId: 6, time: "19:45", title: "👟 運動用品", desc: "Sports Depo 天久店 (運動鞋)", type: "shopping" },
                 { dayId: 6, time: "21:00", title: "🍜 晚餐：拉麵", desc: "烈火ラーメン暖暮 (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food" },
-
                 // Day 7
                 { dayId: 7, time: "09:00", title: "🥣 早餐：市場巡禮", desc: "牧志公設市場 (步行 10 分鐘)", type: "food" },
                 { dayId: 7, time: "10:40", title: "✈️ 看飛機/海景", desc: "瀨長島 Umikaji Terrace", type: "activity" },
                 { dayId: 7, time: "12:00", title: "🛍️ Outlet 購物 & 午餐", desc: "Ashibinaa Outlet (iias 沖繩豐崎)<br>逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：沖繩菜園 Karakara <a href='https://www.facebook.com/reel/1424317575868459' target='_blank'>FB介紹</a>", type: "shopping" },
                 { dayId: 7, time: "17:45", title: "🌃 國際通", desc: "車先停回停車場。<br>晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank'>沖縄料理居酒屋 ぶった</a>", type: "activity" },
                 { dayId: 7, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (收行李)", type: "hotel" },
-
                 // Day 8
                 { dayId: 8, time: "07:30", title: "🥣 早餐 / 退房", desc: "刻の宿 那覇 (檢查行李)", type: "food" },
                 { dayId: 8, time: "08:00", title: "🚗 前往大榮租車", desc: "大榮租車 (加油 & 還車)", type: "transport" },
@@ -319,7 +297,7 @@
         // 核心邏輯
         // ==========================
         let currentDayId = 1;
-        let JPY_RATE = 0.218; // 預設匯率
+        let JPY_RATE = 0.218;
 
         window.addEventListener('DOMContentLoaded', () => {
             renderDaySelector();
@@ -328,23 +306,23 @@
             renderHotels();
             renderMustBuy();
             
-            // 初始化記帳相關
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
             updateRateDisplay();
-            renderExpenses(); // 從 LocalStorage 讀取
+            // 切換到分帳頁面時才載入資料，避免一開始就卡住
         });
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${tabName}`).classList.add('active');
             
-            // 更新按鈕狀態
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-cyan-600');
                 btn.classList.add('text-gray-400');
             });
             document.getElementById(`btn-${tabName}`).classList.remove('text-gray-400');
             document.getElementById(`btn-${tabName}`).classList.add('text-cyan-600');
+
+            if(tabName === 'accounting') fetchExpenses();
         }
 
         function selectDay(dayId) {
@@ -450,12 +428,12 @@
 
         function getTypeColor(type) {
             switch(type) {
-                case 'transport': return '#06b6d4'; // cyan
-                case 'flight': return '#2563eb'; // blue
-                case 'hotel': return '#a855f7'; // purple
-                case 'food': return '#f97316'; // orange
-                case 'shopping': return '#ec4899'; // pink
-                default: return '#10b981'; // green
+                case 'transport': return '#06b6d4'; 
+                case 'flight': return '#2563eb'; 
+                case 'hotel': return '#a855f7'; 
+                case 'food': return '#f97316'; 
+                case 'shopping': return '#ec4899'; 
+                default: return '#10b981'; 
             }
         }
         
@@ -471,7 +449,7 @@
         }
 
         // ==========================
-        // 匯率計算機邏輯 (JPY/TWD)
+        // 匯率計算機 (JPY/TWD)
         // ==========================
         const jpyInput = document.getElementById('input-jpy');
         const twdInput = document.getElementById('input-twd');
@@ -487,14 +465,12 @@
             }
         }
 
-        // JPY 輸入 -> 換算 TWD (乘匯率)
         jpyInput.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             if (!isNaN(val)) twdInput.value = Math.round(val * JPY_RATE);
             else twdInput.value = '';
         });
 
-        // TWD 輸入 -> 換算 JPY (除匯率)
         twdInput.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             if (!isNaN(val)) jpyInput.value = Math.round(val / JPY_RATE);
@@ -502,117 +478,170 @@
         });
 
         // ==========================
-        // 記帳邏輯 (LocalStorage)
+        // 記帳邏輯 (Google Sheet)
         // ==========================
-        let bills = JSON.parse(localStorage.getItem('okinawa_bills_2026')) || [];
-
         function updateRateDisplay() {
             const currency = document.getElementById('acc-currency').value;
             const hint = document.getElementById('acc-rate-hint');
             hint.innerText = (currency === 'JPY') ? `匯率: 1 JPY ≈ ${JPY_RATE} TWD` : '以 1:1 計算';
         }
 
-        function submitExpense(e) {
+        async function submitExpense(e) {
             e.preventDefault();
-            const date = document.getElementById('acc-date').value;
-            const payer = document.getElementById('acc-payer').value;
-            const item = document.getElementById('acc-item').value;
-            const currency = document.getElementById('acc-currency').value;
-            const amount = parseFloat(document.getElementById('acc-amount').value);
+            const btn = document.getElementById('btn-submit-acc');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '處理中...';
 
-            const newBill = { id: Date.now(), date, payer, item, currency, amount };
-            bills.push(newBill);
-            saveBills();
-            
-            // 重置表單 (保留日期和付款人)
-            document.getElementById('acc-item').value = '';
-            document.getElementById('acc-amount').value = '';
-            
-            alert(`✅ 記帳成功！\n${item} (${currency} ${amount})`);
-            renderExpenses();
-        }
+            const payload = {
+                action: document.getElementById('edit-row-id').value ? 'edit' : 'add',
+                row: document.getElementById('edit-row-id').value,
+                date: document.getElementById('acc-date').value,
+                payer: document.getElementById('acc-payer').value,
+                item: document.getElementById('acc-item').value,
+                currency: document.getElementById('acc-currency').value,
+                amount: document.getElementById('acc-amount').value,
+                rate: (document.getElementById('acc-currency').value === 'JPY') ? JPY_RATE : 1,
+                note: document.getElementById('acc-note').value
+            };
 
-        function deleteBill(id) {
-            if(confirm('確定要刪除這筆帳目嗎？')) {
-                bills = bills.filter(b => b.id !== id);
-                saveBills();
-                renderExpenses();
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert(payload.action === 'edit' ? '✅ 修改成功！' : '✅ 記帳成功！');
+                resetFormState();
+                fetchExpenses();
+            } catch (err) {
+                console.error(err);
+                alert("❌ 連線失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
 
-        function saveBills() {
-            localStorage.setItem('okinawa_bills_2026', JSON.stringify(bills));
-        }
-
-        function renderExpenses() {
+        async function fetchExpenses() {
             const listDiv = document.getElementById('expense-list');
             const totalEl = document.getElementById('total-expense');
-            const settlementBox = document.getElementById('settlement-box');
-            const settlementText = document.getElementById('settlement-text');
+            const loadingMsg = document.getElementById('loading-msg');
+            
+            loadingMsg.classList.remove('hidden');
+            listDiv.style.opacity = '0.5';
 
-            listDiv.innerHTML = '';
-            let totalTWD = 0;
-            let xiangPaid = 0, yanPaid = 0;
-
-            const sortedBills = bills.sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
-
-            sortedBills.forEach(bill => {
-                let rowTWD = (bill.currency === 'JPY') ? Math.round(bill.amount * JPY_RATE) : bill.amount;
+            try {
+                const res = await fetch(GAS_URL);
+                const data = await res.json();
                 
-                if (bill.payer === '公費') {
-                    // 公費不列入私人拆帳，但列入總支出顯示
-                } else {
-                    totalTWD += rowTWD;
-                    if (bill.payer === '翔') xiangPaid += rowTWD;
-                    if (bill.payer === '彥') yanPaid += rowTWD;
+                if (data.length === 0) {
+                    listDiv.innerHTML = '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
+                    totalEl.innerText = '0';
+                    return;
                 }
 
-                const displayAmount = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
-                
-                listDiv.innerHTML += `
-                    <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative">
-                        <div>
-                            <div class="font-bold text-gray-800 text-sm">${bill.item}</div>
-                            <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${bill.payer}</span>
-                                <span class="opacity-75">${bill.date.slice(5)}</span>
+                listDiv.innerHTML = '';
+                let totalTWD = 0;
+                let xiangPaid = 0, yanPaid = 0;
+
+                data.forEach(bill => {
+                    const twd = parseInt(bill.twd); 
+                    if (!isNaN(twd)) {
+                        if (bill.payer === '公費') {
+                            // 公費僅顯示
+                        } else {
+                            totalTWD += twd;
+                            if (bill.payer === '翔') xiangPaid += twd;
+                            if (bill.payer === '彥') yanPaid += twd;
+                        }
+                    }
+
+                    const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
+                    const rowData = JSON.stringify(bill).replace(/"/g, '&quot;');
+
+                    listDiv.innerHTML += `
+                        <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative group">
+                            <div>
+                                <div class="font-bold text-gray-800 text-sm">${bill.item}</div>
+                                <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                    <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${bill.payer}</span>
+                                    <span class="opacity-75">${bill.date}</span>
+                                </div>
+                                ${bill.note ? `<div class="text-xs text-gray-400 mt-1">${bill.note}</div>` : ''}
+                            </div>
+                            <div class="text-right flex flex-col items-end">
+                                <div class="font-bold text-cyan-700 text-lg">${displayAmt}</div>
+                                <div class="text-[10px] text-gray-400">≈ NT$${twd}</div>
+                                <div class="flex gap-2 mt-1">
+                                    <button onclick='editExpense(${rowData})' class="text-xs text-blue-400">修改</button>
+                                    <button onclick="deleteExpense(${bill.rowIndex})" class="text-xs text-red-300">刪除</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-right flex flex-col items-end">
-                            <div class="font-bold text-cyan-700 text-lg">${displayAmount}</div>
-                            <div class="text-[10px] text-gray-400">≈ NT$${rowTWD}</div>
-                            <button onclick="deleteBill(${bill.id})" class="text-xs text-red-300 hover:text-red-500 mt-1">刪除</button>
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
 
-            totalEl.innerText = totalTWD.toLocaleString();
+                totalEl.innerText = totalTWD.toLocaleString();
+                updateSettlement(xiangPaid, yanPaid);
 
-            // 結算邏輯
-            if (xiangPaid === 0 && yanPaid === 0) {
-                settlementBox.classList.add('hidden');
-            } else {
-                settlementBox.classList.remove('hidden');
-                const diff = xiangPaid - yanPaid;
-                const settleAmount = Math.abs(diff) / 2;
-                if (settleAmount === 0) settlementText.innerHTML = "🎉 目前平衡！";
-                else if (diff > 0) settlementText.innerHTML = `彥 應給 翔 <span class="font-bold text-red-600">$${Math.round(settleAmount).toLocaleString()}</span>`;
-                else settlementText.innerHTML = `翔 應給 彥 <span class="font-bold text-red-600">$${Math.round(settleAmount).toLocaleString()}</span>`;
+            } catch (err) {
+                console.error(err);
+                listDiv.innerHTML = '<div class="text-center text-red-400 py-4 text-sm">讀取失敗</div>';
+            } finally {
+                loadingMsg.classList.add('hidden');
+                listDiv.style.opacity = '1';
             }
         }
 
-        function exportToCSV() {
-            if (bills.length === 0) { alert("沒有帳目可匯出"); return; }
-            let csv = "\uFEFF日期,付款人,項目,幣別,金額,約台幣\n";
-            bills.forEach(b => {
-                let twd = (b.currency === 'JPY') ? Math.round(b.amount * JPY_RATE) : b.amount;
-                csv += `${b.date},${b.payer},${b.item},${b.currency},${b.amount},${twd}\n`;
-            });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
-            link.download = "沖繩記帳.csv";
-            link.click();
+        function updateSettlement(xiang, yan) {
+            const box = document.getElementById('settlement-box');
+            const text = document.getElementById('settlement-text');
+            
+            if (xiang === 0 && yan === 0) {
+                box.classList.add('hidden');
+            } else {
+                box.classList.remove('hidden');
+                const diff = xiang - yan;
+                const amt = Math.abs(diff) / 2;
+                if (amt === 0) text.innerText = "🎉 平衡";
+                else if (diff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${Math.round(amt).toLocaleString()}</span>`;
+                else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${Math.round(amt).toLocaleString()}</span>`;
+            }
+        }
+
+        function editExpense(data) {
+            document.getElementById('edit-row-id').value = data.rowIndex;
+            document.getElementById('acc-date').value = data.date;
+            document.getElementById('acc-payer').value = data.payer;
+            document.getElementById('acc-item').value = data.item;
+            document.getElementById('acc-currency').value = data.currency;
+            document.getElementById('acc-amount').value = data.amount;
+            document.getElementById('acc-note').value = data.note;
+            
+            document.getElementById('form-title').innerText = "✏️ 修改帳目";
+            document.getElementById('btn-submit-acc').innerText = "確認更新";
+            document.getElementById('btn-submit-acc').classList.replace('bg-cyan-600', 'bg-blue-600');
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteExpense(rowIndex) {
+            if (!confirm('確定刪除？')) return;
+            try {
+                await fetch(GAS_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'delete', row: rowIndex }) 
+                });
+                alert('🗑️ 已刪除');
+                fetchExpenses();
+            } catch (e) { alert('失敗'); }
+        }
+
+        function resetFormState() {
+            document.getElementById('account-form').reset();
+            document.getElementById('edit-row-id').value = '';
+            document.getElementById('acc-date').valueAsDate = new Date();
+            document.getElementById('form-title').innerText = "💸 新增一筆帳目";
+            document.getElementById('btn-submit-acc').innerText = "記帳";
+            document.getElementById('btn-submit-acc').classList.replace('bg-blue-600', 'bg-cyan-600');
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
         }
     </script>
 </body>
