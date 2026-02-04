@@ -34,12 +34,13 @@
             background-color: #bfdbfe; z-index: 0;
         }
 
-        #calc-modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
-        #calc-modal.hidden-modal { opacity: 0; visibility: hidden; pointer-events: none; }
-        #calc-modal.show-modal { opacity: 1; visibility: visible; pointer-events: auto; }
-        #calc-content { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .hidden-modal #calc-content { transform: scale(0.9) translateY(20px); }
-        .show-modal #calc-content { transform: scale(1) translateY(0); }
+        /* Modal 動畫 */
+        .modal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal.hidden-modal { opacity: 0; visibility: hidden; pointer-events: none; }
+        .modal.show-modal { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-content { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .hidden-modal .modal-content { transform: scale(0.9) translateY(20px); }
+        .show-modal .modal-content { transform: scale(1) translateY(0); }
 
         .desc-text a { color: #0284c7; text-decoration: underline; font-weight: 500; }
     </style>
@@ -77,10 +78,35 @@
 
         <div id="view-accounting" class="tab-content p-5 space-y-4">
             
+            <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden mb-6">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <div>
+                        <h2 class="text-sm font-bold text-blue-100 mb-1">🇯🇵 公款日幣餘額</h2>
+                        <div class="text-3xl font-black tracking-tight">¥<span id="public-balance">0</span></div>
+                    </div>
+                    <button onclick="toggleExchangeModal()" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1">
+                        ➕ 換匯
+                    </button>
+                </div>
+
+                <div class="flex gap-4 text-xs relative z-10">
+                    <div class="bg-black/20 px-3 py-2 rounded-lg backdrop-blur-sm flex-1">
+                        <div class="text-blue-200 mb-0.5">平均匯率</div>
+                        <div class="font-bold text-lg" id="avg-rate-display">--</div>
+                    </div>
+                    <div class="bg-black/20 px-3 py-2 rounded-lg backdrop-blur-sm flex-1">
+                        <div class="text-blue-200 mb-0.5">總換得日幣</div>
+                        <div class="font-bold text-lg" id="total-jpy-pool">0</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6 relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2" id="form-title">
-                        💸 新增一筆帳目
+                        💸 新增消費
                     </h2>
                     <button id="btn-cancel-edit" onclick="resetFormState()" class="hidden text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-bold">✕ 取消</button>
                 </div>
@@ -96,9 +122,9 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">付款人</label>
                             <select id="acc-payer" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                                <option value="翔">翔</option>
-                                <option value="彥">彥</option>
-                                <option value="公費">公費</option>
+                                <option value="公費">公費 (從金庫出)</option>
+                                <option value="翔">翔 (私人代墊)</option>
+                                <option value="彥">彥 (私人代墊)</option>
                             </select>
                         </div>
                     </div>
@@ -109,7 +135,7 @@
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
                             <label class="block text-xs font-bold text-gray-500 mb-1">幣別</label>
-                            <select id="acc-currency" onchange="updateRateDisplay()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <select id="acc-currency" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                                 <option value="JPY">🇯🇵 日幣</option>
                                 <option value="TWD">🇹🇼 台幣</option>
                             </select>
@@ -123,7 +149,6 @@
                         <label class="block text-xs font-bold text-gray-500 mb-1">備註 (選填)</label>
                         <input type="text" id="acc-note" placeholder="..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
-                    <p id="acc-rate-hint" class="text-xs text-gray-400 -mt-2 text-right">匯率計算中...</p>
                     
                     <button type="submit" id="btn-submit-acc" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-xl shadow-md transition-all active:scale-95">
                         記帳
@@ -133,8 +158,8 @@
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
                 <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs text-gray-500 font-bold">總支出 (從雲端讀取)</p>
-                    <button onclick="fetchExpenses()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
+                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
+                    <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">
                         ↻ 更新
                     </button>
                 </div>
@@ -155,27 +180,69 @@
         </div>
     </main>
 
+    <div id="exchange-modal" class="fixed inset-0 z-[70] flex items-center justify-center px-4 modal hidden-modal">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleExchangeModal()"></div>
+        <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative z-10">
+            <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2">🔄 新增換匯紀錄</h3>
+                <button onclick="toggleExchangeModal()" class="text-white/80 hover:text-white">✕</button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">日期</label>
+                        <input type="date" id="ex-date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">誰換的</label>
+                        <select id="ex-who" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                            <option value="翔">翔</option>
+                            <option value="彥">彥</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">台幣成本 (TWD)</label>
+                    <input type="number" id="ex-twd" placeholder="例如：8500" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">換得日幣 (JPY)</label>
+                    <input type="number" id="ex-jpy" placeholder="例如：38636" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800">
+                </div>
+                <button onclick="submitExchange()" id="btn-submit-ex" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md mt-2">
+                    確認新增
+                </button>
+                
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-xs font-bold text-gray-400 mb-2">換匯歷史</p>
+                    <div id="exchange-history" class="space-y-2 max-h-32 overflow-y-auto text-xs">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <button onclick="toggleCalc()" class="fixed bottom-24 right-5 z-40 bg-pink-500 hover:bg-pink-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border-2 border-white">
         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
     </button>
 
-    <div id="calc-modal" class="fixed inset-0 z-[60] flex items-center justify-center px-4 hidden-modal">
+    <div id="calc-modal" class="fixed inset-0 z-[70] flex items-center justify-center px-4 modal hidden-modal">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleCalc()"></div>
-        <div id="calc-content" class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative z-10">
+        <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative z-10">
             <div class="bg-cyan-600 p-4 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg flex items-center gap-2">💱 即時匯率換算</h3>
+                <h3 class="font-bold text-lg flex items-center gap-2">💱 匯率換算</h3>
                 <button onclick="toggleCalc()" class="text-white/80 hover:text-white">✕</button>
             </div>
             <div class="p-6 space-y-6">
-                <div class="text-center text-sm text-gray-500 mb-2">當前匯率：1 JPY ≈ <span id="display-rate" class="font-bold text-cyan-600 text-lg">0.22</span> TWD</div>
+                <div class="text-center text-sm text-gray-500 mb-2">當前平均匯率：1 JPY ≈ <span id="display-rate" class="font-bold text-cyan-600 text-lg">--</span> TWD</div>
                 <div class="space-y-4">
                     <div class="relative">
                         <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇯🇵 日幣 (JPY)</label>
-                        <input type="number" id="input-jpy" placeholder="輸入金額" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="number" id="input-jpy" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800">
                     </div>
                     <div class="relative">
                         <label class="block text-xs font-bold text-gray-500 mb-1 ml-1">🇹🇼 新台幣 (TWD)</label>
-                        <input type="number" id="input-twd" placeholder="輸入金額" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="number" id="input-twd" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-gray-800">
                     </div>
                 </div>
             </div>
@@ -194,12 +261,12 @@
 
     <script>
         // ==========================
-        // 1. Google Apps Script 網址 (請勿修改，這就是你的網址)
+        // 1. Google Apps Script 網址
         // ==========================
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
         // ==========================
-        // 2. 沖繩資料 (行程已修正)
+        // 2. 沖繩資料
         // ==========================
         const DATA = {
             days: [
@@ -297,7 +364,7 @@
         // 核心邏輯
         // ==========================
         let currentDayId = 1;
-        let JPY_RATE = 0.218;
+        let AVG_RATE = 0.22; // 預設匯率 (會被自動更新)
 
         window.addEventListener('DOMContentLoaded', () => {
             renderDaySelector();
@@ -307,14 +374,12 @@
             renderMustBuy();
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
-            updateRateDisplay();
-            // 切換到分帳頁面時才載入資料，避免一開始就卡住
+            document.getElementById('ex-date').valueAsDate = new Date();
         });
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`view-${tabName}`).classList.add('active');
-            
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-cyan-600');
                 btn.classList.add('text-gray-400');
@@ -322,16 +387,16 @@
             document.getElementById(`btn-${tabName}`).classList.remove('text-gray-400');
             document.getElementById(`btn-${tabName}`).classList.add('text-cyan-600');
 
-            if(tabName === 'accounting') fetchExpenses();
+            if(tabName === 'accounting') fetchData();
         }
 
+        // --- 行程相關功能 (省略重複代碼，保持原樣) ---
         function selectDay(dayId) {
             currentDayId = dayId;
             renderDaySelector();
             renderItinerary(dayId);
             document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         function renderDaySelector() {
             const container = document.getElementById('day-selector');
             container.innerHTML = DATA.days.map(d => {
@@ -343,147 +408,69 @@
                     </button>`;
             }).join('');
         }
-
         function renderItinerary(dayId) {
             const list = document.getElementById('itinerary-list');
             const dayData = DATA.days.find(d => d.day === dayId);
             const items = DATA.activities.filter(a => a.dayId === dayId);
-
             let html = `<div class="mb-4 px-1"><h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2><p class="text-sm text-gray-500 mt-1">${dayData.date}</p></div>`;
-
-            if (items.length === 0) {
-                html += `<div class="p-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">本日無特定行程</div>`;
-            } else {
+            if (items.length === 0) html += `<div class="p-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">本日無特定行程</div>`;
+            else {
                 html += items.map((item, index) => {
                     const isLast = index === items.length - 1;
                     const typeColor = getTypeColor(item.type);
                     const typeIcon = getTypeIcon(item.type);
-                    
-                    return `
-                    <div class="relative pl-4">
-                        ${!isLast ? '<div class="timeline-line"></div>' : ''}
-                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}">
-                            <div class="p-4 flex gap-4" onclick="toggleDesc(this)">
-                                <div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1">
-                                    <span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span>
-                                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div>
-                                </div>
-                                <div class="flex-1 min-w-0 pt-1">
-                                    <h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3>
-                                    <div class="mt-1 text-sm text-gray-600 desc-text leading-relaxed">${item.desc}</div>
-                                    ${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}</div></div></div></div>`;
                 }).join('');
             }
             list.innerHTML = html;
         }
-
         function renderFlights() {
-            document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4">
-                    <div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div>
-                    <div class="flex justify-between items-center mb-4 mt-2">
-                        <div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.from}</div></div>
-                        <div class="flex-1 flex flex-col items-center px-4"><div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div><div class="w-full h-[1px] bg-gray-300"></div></div>
-                        <div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.to}</div></div>
-                    </div>
-                    <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100">${f.note}</div>
-                </div>
-            `).join('');
+            document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4"><div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div><div class="flex justify-between items-center mb-4 mt-2"><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.from}</div></div><div class="flex-1 flex flex-col items-center px-4"><div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div><div class="w-full h-[1px] bg-gray-300"></div></div><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.to}</div></div></div><div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100">${f.note}</div></div>`).join('');
         }
-
         function renderHotels() {
-            document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => `
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">${h.location}</span>
-                        <span class="text-xs text-gray-400 font-medium">${h.dates}</span>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${h.name}</h3>
-                    <div class="text-sm text-gray-600 p-3 rounded border border-gray-100 mb-4">${h.note}</div>
-                    <a href="${h.mapLink}" target="_blank" class="block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium transition-colors">📍 查看地圖</a>
-                </div>
-            `).join('');
+            document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4"><div class="flex justify-between items-start mb-3"><span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">${h.location}</span><span class="text-xs text-gray-400 font-medium">${h.dates}</span></div><h3 class="text-xl font-bold text-gray-800 mb-2">${h.name}</h3><div class="text-sm text-gray-600 p-3 rounded border border-gray-100 mb-4">${h.note}</div><a href="${h.mapLink}" target="_blank" class="block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium transition-colors">📍 查看地圖</a></div>`).join('');
         }
-
         function renderMustBuy() {
-            document.getElementById('mustbuy-list').innerHTML = DATA.shopping.map(item => `
-                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex justify-between items-start">
-                    <div>
-                        <h3 class="text-lg font-bold text-blue-800">${item.name}</h3>
-                        <p class="text-sm text-gray-600 mt-1">${item.desc}</p>
-                    </div>
-                    <span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">${item.highlight}</span>
-                </div>
-            `).join('');
+            document.getElementById('mustbuy-list').innerHTML = DATA.shopping.map(item => `<div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex justify-between items-start"><div><h3 class="text-lg font-bold text-blue-800">${item.name}</h3><p class="text-sm text-gray-600 mt-1">${item.desc}</p></div><span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">${item.highlight}</span></div>`).join('');
+        }
+        function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
+        function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
+        function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
+
+        // ==========================
+        // 記帳與換匯邏輯 (主要更新區)
+        // ==========================
+        function toggleExchangeModal() {
+            const modal = document.getElementById('exchange-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
         }
 
-        function toggleDesc(el) {
-            const desc = el.querySelector('.desc-text');
-            if(desc) desc.classList.toggle('expanded');
-        }
+        async function submitExchange() {
+            const btn = document.getElementById('btn-submit-ex');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "處理中...";
 
-        function getTypeColor(type) {
-            switch(type) {
-                case 'transport': return '#06b6d4'; 
-                case 'flight': return '#2563eb'; 
-                case 'hotel': return '#a855f7'; 
-                case 'food': return '#f97316'; 
-                case 'shopping': return '#ec4899'; 
-                default: return '#10b981'; 
-            }
-        }
-        
-        function getTypeIcon(type) {
-            const icons = {
-                transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>',
-                flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>',
-                hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>',
-                food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', 
-                shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>'
+            const payload = {
+                action: 'add_exchange',
+                date: document.getElementById('ex-date').value,
+                who: document.getElementById('ex-who').value,
+                twd: document.getElementById('ex-twd').value,
+                jpy: document.getElementById('ex-jpy').value
             };
-            return icons[type] || icons.transport;
-        }
 
-        // ==========================
-        // 匯率計算機 (JPY/TWD)
-        // ==========================
-        const jpyInput = document.getElementById('input-jpy');
-        const twdInput = document.getElementById('input-twd');
-
-        function toggleCalc() {
-            const modal = document.getElementById('calc-modal');
-            if (modal.classList.contains('hidden-modal')) {
-                modal.classList.remove('hidden-modal');
-                modal.classList.add('show-modal');
-            } else {
-                modal.classList.remove('show-modal');
-                modal.classList.add('hidden-modal');
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert("✅ 換匯紀錄成功！");
+                toggleExchangeModal();
+                fetchData(); // 重新讀取並計算匯率
+            } catch (err) {
+                alert("❌ 連線失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
             }
-        }
-
-        jpyInput.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            if (!isNaN(val)) twdInput.value = Math.round(val * JPY_RATE);
-            else twdInput.value = '';
-        });
-
-        twdInput.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            if (!isNaN(val)) jpyInput.value = Math.round(val / JPY_RATE);
-            else jpyInput.value = '';
-        });
-
-        // ==========================
-        // 記帳邏輯 (Google Sheet)
-        // ==========================
-        function updateRateDisplay() {
-            const currency = document.getElementById('acc-currency').value;
-            const hint = document.getElementById('acc-rate-hint');
-            hint.innerText = (currency === 'JPY') ? `匯率: 1 JPY ≈ ${JPY_RATE} TWD` : '以 1:1 計算';
         }
 
         async function submitExpense(e) {
@@ -494,24 +481,23 @@
             btn.innerHTML = '處理中...';
 
             const payload = {
-                action: document.getElementById('edit-row-id').value ? 'edit' : 'add',
+                action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense',
                 row: document.getElementById('edit-row-id').value,
                 date: document.getElementById('acc-date').value,
                 payer: document.getElementById('acc-payer').value,
                 item: document.getElementById('acc-item').value,
                 currency: document.getElementById('acc-currency').value,
                 amount: document.getElementById('acc-amount').value,
-                rate: (document.getElementById('acc-currency').value === 'JPY') ? JPY_RATE : 1,
+                rate: AVG_RATE, // 存入當下的平均匯率
                 note: document.getElementById('acc-note').value
             };
 
             try {
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert(payload.action === 'edit' ? '✅ 修改成功！' : '✅ 記帳成功！');
+                alert('✅ 記帳成功！');
                 resetFormState();
-                fetchExpenses();
+                fetchData();
             } catch (err) {
-                console.error(err);
                 alert("❌ 連線失敗");
             } finally {
                 btn.disabled = false;
@@ -519,11 +505,9 @@
             }
         }
 
-        async function fetchExpenses() {
+        async function fetchData() {
             const listDiv = document.getElementById('expense-list');
-            const totalEl = document.getElementById('total-expense');
             const loadingMsg = document.getElementById('loading-msg');
-            
             loadingMsg.classList.remove('hidden');
             listDiv.style.opacity = '0.5';
 
@@ -531,37 +515,60 @@
                 const res = await fetch(GAS_URL);
                 const data = await res.json();
                 
-                if (data.length === 0) {
-                    listDiv.innerHTML = '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
-                    totalEl.innerText = '0';
-                    return;
+                // 1. 處理換匯紀錄 & 計算匯率
+                let totalTWD = 0, totalJPY = 0;
+                let exchangeHistoryHtml = '';
+                
+                if (data.exchanges && data.exchanges.length > 0) {
+                    data.exchanges.forEach(ex => {
+                        totalTWD += parseInt(ex.twd);
+                        totalJPY += parseInt(ex.jpy);
+                        exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
+                    });
+                    
+                    if (totalJPY > 0) {
+                        AVG_RATE = (totalTWD / totalJPY); // 計算平均匯率
+                    }
                 }
+                
+                document.getElementById('avg-rate-display').innerText = AVG_RATE.toFixed(4);
+                document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4); // 更新計算機的匯率
+                document.getElementById('total-jpy-pool').innerText = `¥${totalJPY.toLocaleString()}`;
+                document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
-                listDiv.innerHTML = '';
-                let totalTWD = 0;
+                // 2. 處理消費紀錄
+                let totalSpentTWD = 0;
+                let spentPublicJPY = 0; // 公費花掉的日幣
                 let xiangPaid = 0, yanPaid = 0;
+                let html = '';
 
-                data.forEach(bill => {
-                    const twd = parseInt(bill.twd); 
-                    if (!isNaN(twd)) {
+                data.expenses.forEach(bill => {
+                    // 使用即時計算的 AVG_RATE 來顯示日幣消費的台幣價值，而不是用資料庫舊的
+                    let twd = 0;
+                    if (bill.currency === 'JPY') {
+                        twd = Math.round(bill.amount * AVG_RATE);
                         if (bill.payer === '公費') {
-                            // 公費僅顯示
-                        } else {
-                            totalTWD += twd;
-                            if (bill.payer === '翔') xiangPaid += twd;
-                            if (bill.payer === '彥') yanPaid += twd;
+                            spentPublicJPY += parseInt(bill.amount);
                         }
+                    } else {
+                        twd = parseInt(bill.amount);
+                    }
+
+                    if (bill.payer !== '公費') {
+                        totalSpentTWD += twd;
+                        if (bill.payer.includes('翔')) xiangPaid += twd;
+                        if (bill.payer.includes('彥')) yanPaid += twd;
                     }
 
                     const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
-                    const rowData = JSON.stringify(bill).replace(/"/g, '&quot;');
+                    const rowData = JSON.stringify(bill).replace(/"/g, '"');
 
-                    listDiv.innerHTML += `
+                    html += `
                         <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative group">
                             <div>
                                 <div class="font-bold text-gray-800 text-sm">${bill.item}</div>
                                 <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                    <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${bill.payer}</span>
+                                    <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${bill.payer.split(' ')[0]}</span>
                                     <span class="opacity-75">${bill.date}</span>
                                 </div>
                                 ${bill.note ? `<div class="text-xs text-gray-400 mt-1">${bill.note}</div>` : ''}
@@ -578,7 +585,13 @@
                     `;
                 });
 
-                totalEl.innerText = totalTWD.toLocaleString();
+                document.getElementById('expense-list').innerHTML = html || '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
+                document.getElementById('total-expense').innerText = totalSpentTWD.toLocaleString();
+                
+                // 更新公款餘額
+                const currentBalance = totalJPY - spentPublicJPY;
+                document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
+
                 updateSettlement(xiangPaid, yanPaid);
 
             } catch (err) {
@@ -590,13 +603,12 @@
             }
         }
 
+        // --- 其他輔助功能 (保留原樣) ---
         function updateSettlement(xiang, yan) {
             const box = document.getElementById('settlement-box');
             const text = document.getElementById('settlement-text');
-            
-            if (xiang === 0 && yan === 0) {
-                box.classList.add('hidden');
-            } else {
+            if (xiang === 0 && yan === 0) box.classList.add('hidden');
+            else {
                 box.classList.remove('hidden');
                 const diff = xiang - yan;
                 const amt = Math.abs(diff) / 2;
@@ -605,7 +617,6 @@
                 else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${Math.round(amt).toLocaleString()}</span>`;
             }
         }
-
         function editExpense(data) {
             document.getElementById('edit-row-id').value = data.rowIndex;
             document.getElementById('acc-date').value = data.date;
@@ -614,34 +625,46 @@
             document.getElementById('acc-currency').value = data.currency;
             document.getElementById('acc-amount').value = data.amount;
             document.getElementById('acc-note').value = data.note;
-            
             document.getElementById('form-title').innerText = "✏️ 修改帳目";
             document.getElementById('btn-submit-acc').innerText = "確認更新";
             document.getElementById('btn-submit-acc').classList.replace('bg-cyan-600', 'bg-blue-600');
             document.getElementById('btn-cancel-edit').classList.remove('hidden');
             document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         async function deleteExpense(rowIndex) {
             if (!confirm('確定刪除？')) return;
-            try {
-                await fetch(GAS_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: 'delete', row: rowIndex }) 
-                });
-                alert('🗑️ 已刪除');
-                fetchExpenses();
-            } catch (e) { alert('失敗'); }
+            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_expense', row: rowIndex }) }); alert('🗑️ 已刪除'); fetchData(); } catch (e) { alert('失敗'); }
         }
-
         function resetFormState() {
             document.getElementById('account-form').reset();
             document.getElementById('edit-row-id').value = '';
             document.getElementById('acc-date').valueAsDate = new Date();
-            document.getElementById('form-title').innerText = "💸 新增一筆帳目";
+            document.getElementById('form-title').innerText = "💸 新增消費";
             document.getElementById('btn-submit-acc').innerText = "記帳";
             document.getElementById('btn-submit-acc').classList.replace('bg-blue-600', 'bg-cyan-600');
             document.getElementById('btn-cancel-edit').classList.add('hidden');
+        }
+        
+        // 匯率計算機邏輯
+        const jpyInput = document.getElementById('input-jpy');
+        const twdInput = document.getElementById('input-twd');
+        function toggleCalc() {
+            const modal = document.getElementById('calc-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
+        }
+        jpyInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (!isNaN(val)) twdInput.value = Math.round(val * AVG_RATE);
+            else twdInput.value = '';
+        });
+        twdInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (!isNaN(val)) jpyInput.value = Math.round(val / AVG_RATE);
+            else jpyInput.value = '';
+        });
+        function updateRateDisplay() {
+            // 只是為了切換幣別時更新提示，不需要做什麼
         }
     </script>
 </body>
