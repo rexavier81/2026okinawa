@@ -96,7 +96,9 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">付款人</label>
                             <select id="acc-payer" onchange="updateRateHint()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                                <option value="公費">公費 (從金庫出)</option>
+                                <option value="公費">公費 (共同消費)</option>
+                                <option value="公費-翔">公費 (幫翔付)</option>
+                                <option value="公費-彥">公費 (幫彥付)</option>
                                 <option value="翔">翔 (私人代墊)</option>
                                 <option value="彥">彥 (私人代墊)</option>
                             </select>
@@ -539,20 +541,34 @@
                 let totalSpentTWD = 0;
                 let spentPublicJPY = 0;
                 let xiangPaid = 0, yanPaid = 0;
+                let extraDebt_YanOwesXiang = 0; // 新增：公費私用債務 (正數代表彥欠翔，負數代表翔欠彥)
                 let html = '';
 
                 data.expenses.forEach(bill => {
                     let twd = 0;
                     if (bill.currency === 'JPY') {
                         twd = Math.round(bill.amount * AVG_RATE);
-                        if (bill.payer === '公費') {
+                        if (String(bill.payer).startsWith('公費')) {
                             spentPublicJPY += parseInt(bill.amount);
                         }
                     } else {
                         twd = parseInt(bill.amount);
                     }
 
-                    if (bill.payer !== '公費') {
+                    // --- 分帳核心邏輯 (修正版) ---
+                    if (bill.payer === '公費' || bill.payer.includes('共同')) {
+                        // 純公費共同消費：不產生私人債務
+                    } 
+                    else if (bill.payer === '公費-翔') {
+                        // 公費幫翔付 -> 翔欠彥一半 -> 彥欠翔減少
+                        extraDebt_YanOwesXiang -= (twd / 2); 
+                    }
+                    else if (bill.payer === '公費-彥') {
+                        // 公費幫彥付 -> 彥欠翔一半 -> 彥欠翔增加
+                        extraDebt_YanOwesXiang += (twd / 2);
+                    }
+                    else {
+                        // 私人代墊
                         totalSpentTWD += twd;
                         if (bill.payer.includes('翔')) xiangPaid += twd;
                         if (bill.payer.includes('彥')) yanPaid += twd;
@@ -560,13 +576,18 @@
 
                     const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
                     const rowData = JSON.stringify(bill).replace(/"/g, '"');
+                    
+                    // 簡化顯示名稱
+                    let payerLabel = bill.payer.split(' ')[0];
+                    if(bill.payer === '公費-翔') payerLabel = '公費(翔)';
+                    if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     html += `
                         <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative group">
                             <div>
                                 <div class="font-bold text-gray-800 text-sm">${bill.item}</div>
                                 <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                    <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${bill.payer.split(' ')[0]}</span>
+                                    <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${payerLabel}</span>
                                     <span class="opacity-75">${bill.date}</span>
                                 </div>
                                 ${bill.note ? `<div class="text-xs text-gray-400 mt-1">${bill.note}</div>` : ''}
@@ -589,7 +610,8 @@
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
 
-                updateSettlement(xiangPaid, yanPaid);
+                // 傳入三個參數：翔已付、彥已付、額外債務
+                updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
                 updateRateHint();
 
             } catch (err) {
@@ -601,19 +623,31 @@
             }
         }
 
-        function updateSettlement(xiang, yan) {
+        function updateSettlement(xiang, yan, extraDebt = 0) {
             const box = document.getElementById('settlement-box');
             const text = document.getElementById('settlement-text');
-            if (xiang === 0 && yan === 0) box.classList.add('hidden');
-            else {
+            
+            // 基礎拆帳：誰付比較多，另一人就要給他 (差額的一半)
+            // 公式：(翔付 - 彥付) / 2
+            const baseDiff = (xiang - yan) / 2;
+            
+            // 總結算：基礎拆帳 + 額外債務
+            // 正數 = 彥要給翔
+            // 負數 = 翔要給彥
+            const finalDiff = baseDiff + extraDebt;
+
+            if (Math.round(finalDiff) === 0 && xiang === 0 && yan === 0) {
+                box.classList.add('hidden');
+            } else {
                 box.classList.remove('hidden');
-                const diff = xiang - yan;
-                const amt = Math.abs(diff) / 2;
-                if (amt === 0) text.innerText = "🎉 平衡";
-                else if (diff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${Math.round(amt).toLocaleString()}</span>`;
-                else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${Math.round(amt).toLocaleString()}</span>`;
+                const absVal = Math.round(Math.abs(finalDiff));
+                
+                if (absVal === 0) text.innerText = "🎉 平衡";
+                else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+                else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
             }
         }
+
         function editExpense(data) {
             document.getElementById('edit-row-id').value = data.rowIndex;
             document.getElementById('acc-date').value = data.date;
@@ -662,7 +696,7 @@
         function exportToCSV() {
             const table = document.getElementById('expense-list'); 
             if (!table || table.innerText.includes('目前沒有帳目')) { alert("沒有帳目可匯出"); return; }
-            alert("請至 Google Sheet 直接下載"); // 因為現在資料在雲端，建議直接去雲端看
+            alert("請至 Google Sheet 直接下載"); 
         }
     </script>
 </body>
