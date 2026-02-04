@@ -43,7 +43,6 @@
 
         .desc-text a { color: #0284c7; text-decoration: underline; font-weight: 500; }
         
-        /* 結算區塊動畫 */
         #settlement-content { transition: max-height 0.3s ease-out, opacity 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
         #settlement-content.open { max-height: 500px; opacity: 1; }
         #arrow-settlement { transition: transform 0.3s ease; }
@@ -101,8 +100,8 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">付款人</label>
-                            <select id="acc-payer" onchange="updateRateHint()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                                <option value="公費">公費 (共同消費)</option>
+                            <select id="acc-payer" onchange="updateRateInputLogic()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                                <option value="公費">公費 (從金庫出)</option>
                                 <option value="公費-翔">公費 (幫翔付)</option>
                                 <option value="公費-彥">公費 (幫彥付)</option>
                                 <option value="翔">翔 (私人代墊)</option>
@@ -117,7 +116,7 @@
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
                             <label class="block text-xs font-bold text-gray-500 mb-1">幣別</label>
-                            <select id="acc-currency" onchange="updateRateHint()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <select id="acc-currency" onchange="updateRateInputLogic()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                                 <option value="JPY">🇯🇵 日幣</option>
                                 <option value="TWD">🇹🇼 台幣</option>
                             </select>
@@ -125,8 +124,8 @@
                         <div class="col-span-2">
                             <label class="block text-xs font-bold text-gray-500 mb-1 flex justify-between">
                                 <span>金額</span>
-                                <span id="dynamic-rate-hint" class="text-cyan-600 font-normal hidden text-[10px]">
-                                    (依公款匯率: <span id="hint-rate-val">--</span>)
+                                <span id="rate-display-area" class="text-[10px] text-gray-400 font-normal hidden">
+                                    匯率: <input type="number" id="acc-custom-rate" class="w-16 border-b border-gray-300 text-center text-cyan-600 focus:outline-none" step="0.0001">
                                 </span>
                             </label>
                             <input type="number" id="acc-amount" required placeholder="輸入數字" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-cyan-500">
@@ -219,7 +218,6 @@
                 <button onclick="submitExchange()" id="btn-submit-ex" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md mt-2">
                     確認新增
                 </button>
-                
                 <div class="mt-4 pt-4 border-t border-gray-100">
                     <p class="text-xs font-bold text-gray-400 mb-2">換匯歷史</p>
                     <div id="exchange-history" class="space-y-2 max-h-32 overflow-y-auto text-xs"></div>
@@ -272,7 +270,7 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
         // ==========================
-        // 2. 沖繩資料
+        // 2. 沖繩資料 (行程已修正)
         // ==========================
         const DATA = {
             days: [
@@ -362,7 +360,7 @@
         // 核心邏輯
         // ==========================
         let currentDayId = 1;
-        let AVG_RATE = 0.22; 
+        let AVG_RATE = 0.22; // 平均匯率 (公款用)
 
         window.addEventListener('DOMContentLoaded', () => {
             renderDaySelector();
@@ -373,6 +371,8 @@
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
             document.getElementById('ex-date').valueAsDate = new Date();
+            // 預設匯率輸入欄位顯示平均匯率
+            document.getElementById('acc-custom-rate').value = AVG_RATE;
         });
 
         function switchTab(tabName) {
@@ -388,7 +388,7 @@
             if(tabName === 'accounting') fetchData();
         }
 
-        // --- 行程相關功能 ---
+        // --- 行程相關功能 (省略重複代碼，保持原樣) ---
         function selectDay(dayId) {
             currentDayId = dayId;
             renderDaySelector();
@@ -436,7 +436,7 @@
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
 
         // ==========================
-        // 記帳與換匯邏輯
+        // 記帳與換匯邏輯 (主要更新區)
         // ==========================
         function toggleExchangeModal() {
             const modal = document.getElementById('exchange-modal');
@@ -469,7 +469,7 @@
                 await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
                 alert("✅ 換匯紀錄成功！");
                 toggleExchangeModal();
-                fetchData();
+                fetchData(); // 重新讀取並計算匯率
             } catch (err) {
                 alert("❌ 連線失敗");
             } finally {
@@ -478,16 +478,32 @@
             }
         }
 
-        function updateRateHint() {
+        function updateRateInputLogic() {
             const currency = document.getElementById('acc-currency').value;
-            const hintEl = document.getElementById('dynamic-rate-hint');
-            const rateValEl = document.getElementById('hint-rate-val');
+            const payer = document.getElementById('acc-payer').value;
+            const rateArea = document.getElementById('rate-display-area');
+            const rateInput = document.getElementById('acc-custom-rate');
 
             if (currency === 'JPY') {
-                hintEl.classList.remove('hidden');
-                rateValEl.innerText = AVG_RATE.toFixed(4);
+                rateArea.classList.remove('hidden');
+                
+                // 判斷是否為公費相關 (名字包含"公費")
+                if (payer.includes('公費')) {
+                    // 公費強制使用平均匯率，且不能修改
+                    rateInput.value = AVG_RATE.toFixed(4);
+                    rateInput.disabled = true;
+                    rateInput.classList.add('bg-gray-100');
+                } else {
+                    // 私人代墊，允許修改匯率 (預設帶入平均匯率或0.22)
+                    // 如果輸入框是空的，或者原本是鎖定狀態(剛從公費切過來)，就填入當前匯率
+                    if(rateInput.disabled || rateInput.value === '') {
+                         rateInput.value = AVG_RATE.toFixed(4);
+                    }
+                    rateInput.disabled = false;
+                    rateInput.classList.remove('bg-gray-100');
+                }
             } else {
-                hintEl.classList.add('hidden');
+                rateArea.classList.add('hidden');
             }
         }
 
@@ -506,7 +522,8 @@
                 item: document.getElementById('acc-item').value,
                 currency: document.getElementById('acc-currency').value,
                 amount: document.getElementById('acc-amount').value,
-                rate: AVG_RATE, 
+                // 關鍵：使用輸入框中的匯率 (如果是公費，這裡會是 AVG_RATE；如果是私人，則是自訂的)
+                rate: document.getElementById('acc-custom-rate').value || AVG_RATE, 
                 note: document.getElementById('acc-note').value
             };
 
@@ -534,12 +551,13 @@
                 const res = await fetch(GAS_URL);
                 const data = await res.json();
                 
-                // --- 錯誤處理 ---
+                // 錯誤處理
                 if (data.error) {
                     listDiv.innerHTML = `<div class="text-center text-red-400 py-4 text-sm">${data.error}</div>`;
                     return;
                 }
 
+                // 1. 處理換匯紀錄 & 計算匯率
                 let totalTWD = 0, totalJPY = 0;
                 let exchangeHistoryHtml = '';
                 
@@ -556,35 +574,44 @@
                 }
                 
                 document.getElementById('avg-rate-display').innerText = AVG_RATE.toFixed(4);
-                document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4); 
+                document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4); // 計算機
                 document.getElementById('total-jpy-pool').innerText = `¥${totalJPY.toLocaleString()}`;
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
+                // 2. 處理消費紀錄
                 let totalSpentTWD = 0;
-                let spentPublicJPY = 0;
+                let spentPublicJPY = 0; // 公費花掉的日幣
                 let xiangPaid = 0, yanPaid = 0;
                 let extraDebt_YanOwesXiang = 0; 
                 let html = '';
 
                 data.expenses.forEach(bill => {
+                    // 1. 計算該筆帳目的台幣價值
                     let twd = 0;
                     let displaySubText = '';
 
                     if (bill.currency === 'JPY') {
-                        twd = Math.round(bill.amount * AVG_RATE);
-                        // 顯示即時匯率 (從GAS讀回來的 rate)
-                        displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${Number(bill.rate).toFixed(4)})</span>`;
+                        // 使用該筆紀錄存的 rate (bill.rate) 來計算
+                        // 如果是歷史資料沒有存 rate，則回退使用 AVG_RATE
+                        const appliedRate = bill.rate ? parseFloat(bill.rate) : AVG_RATE;
+                        twd = Math.round(bill.amount * appliedRate);
                         
+                        // 顯示：約 NT$xxx (匯率: 0.2xxx)
+                        displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
+
+                        // 只要是 "公費" 開頭的，都要從公款餘額扣除 (用日幣原價扣)
                         if (String(bill.payer).startsWith('公費')) {
                             spentPublicJPY += parseInt(bill.amount);
                         }
                     } else {
+                        // 台幣
                         twd = parseInt(bill.amount);
-                        displaySubText = ''; 
+                        displaySubText = ''; // 台幣不顯示小字
                     }
 
-                    // --- 分帳核心邏輯 ---
+                    // 2. 處理分帳邏輯
                     if (bill.payer === '公費' || bill.payer.includes('共同')) {
+                        // 純公費，不處理債務
                     } 
                     else if (bill.payer === '公費-翔') {
                         extraDebt_YanOwesXiang -= (twd / 2); 
@@ -635,7 +662,7 @@
                 document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * AVG_RATE).toLocaleString();
 
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
-                updateRateHint();
+                updateRateInputLogic(); // 確保 UI 狀態正確
 
             } catch (err) {
                 console.error(err);
@@ -648,10 +675,8 @@
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
             const text = document.getElementById('settlement-text');
-            
             const baseDiff = (xiang - yan) / 2;
             const finalDiff = baseDiff + extraDebt;
-
             const absVal = Math.round(Math.abs(finalDiff));
             
             if (absVal === 0) text.innerText = "🎉 平衡";
@@ -667,10 +692,14 @@
             document.getElementById('acc-currency').value = data.currency;
             document.getElementById('acc-amount').value = data.amount;
             document.getElementById('acc-note').value = data.note;
+            document.getElementById('acc-custom-rate').value = data.rate || AVG_RATE;
+            
             document.getElementById('form-title').innerText = "✏️ 修改帳目";
             document.getElementById('btn-submit-acc').innerText = "確認更新";
             document.getElementById('btn-submit-acc').classList.replace('bg-cyan-600', 'bg-blue-600');
             document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            
+            updateRateInputLogic(); // 觸發 UI 狀態更新 (鎖定/解鎖匯率欄位)
             document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
         }
         async function deleteExpense(rowIndex) {
@@ -685,6 +714,7 @@
             document.getElementById('btn-submit-acc').innerText = "記帳";
             document.getElementById('btn-submit-acc').classList.replace('bg-blue-600', 'bg-cyan-600');
             document.getElementById('btn-cancel-edit').classList.add('hidden');
+            updateRateInputLogic();
         }
         
         const jpyInput = document.getElementById('input-jpy');
