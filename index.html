@@ -176,8 +176,27 @@
                 { dayId: 1, time: "19:40", title: "🛒 晚餐、超市採買", desc: "<a href='https://maps.app.goo.gl/3St2Kjgai1WesYdv8' target='_blank'>永旺 那霸店 (Aeon Naha)</a> 晚餐、隨意逛逛", type: "shopping" },
                 { dayId: 1, time: "21:00", title: "🏨 住宿：那霸小祿站前ys旅館", desc: "退房時間為12:00", type: "hotel" },
                 { dayId: 2, time: "10:00", title: "🍔 早午餐：A&W 漢堡", desc: "<a href='https://www.google.com/maps/search/?api=1&query=A%26W+Naha+Kanagusuku' target='_blank'>A&W Naha Kanagusuku</a> 或 <a href='https://www.google.com/maps/search/?api=1&query=Aeon+Naha' target='_blank'>Aeon Naha</a> (經典 Root Beer)", type: "food" },
-                { dayId: 2, time: "12:00", title: "🚆 前往租車行", desc: "單軌：<a href='https://maps.app.goo.gl/1JoXTvGk3KzBkYby9' target='_blank'>赤嶺站 (北口)</a> 搭乘接駁車", type: "transport" },
-                { dayId: 2, time: "12:30", title: "🚗 取車 (大榮租車)", desc: "大榮租車<br><b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank' class='text-blue-600 underline'>單軌赤嶺站 12:30 接駁方法</a></b><br>車款：Toyota Yaris<br>費用：NT$8,400 (現場支付/未含保險)<br>單號：N0209-0215RC4-08<br>訂購人：徐啟翔 / 0918-563-811<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>", type: "transport", tag: "租車" },
+                
+                // ★★★ 2/9 行程調整 ★★★
+                { 
+                    dayId: 2, 
+                    time: "12:00", 
+                    title: "🚆 前往租車行", 
+                    // 將影片連結移到這裡
+                    desc: "單軌：<a href='https://maps.app.goo.gl/1JoXTvGk3KzBkYby9' target='_blank'>赤嶺站 (北口)</a> 搭乘接駁車<br><b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank' class='text-blue-600 underline'>單軌赤嶺站 12:30 接駁方法</a></b>", 
+                    type: "transport" 
+                },
+                { 
+                    dayId: 2, 
+                    time: "12:30", 
+                    title: "🚗 取車 (大榮租車)", 
+                    // 這裡的影片連結已移除
+                    desc: "大榮租車<br>車款：Toyota Yaris<br>費用：NT$8,400 (現場支付/未含保險)<br>單號：N0209-0215RC4-08<br>訂購人：徐啟翔 / 0918-563-811<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>", 
+                    type: "transport", 
+                    tag: "租車",
+                    forceOpen: true // ★★★ 設定為預設展開 ★★★
+                },
+                
                 { dayId: 2, time: "13:40", title: "🦞 午餐：海鮮吃爆", desc: "<a href='https://maps.app.goo.gl/VHzgnj1RH9PrVduw8' target='_blank'>系滿魚市場</a> (推薦生魚片、焗烤龍蝦) 車程約5分", type: "food" },
                 { dayId: 2, time: "15:50", title: "🌊 萬座毛", desc: "<a href='https://maps.app.goo.gl/1qQWKJXqCXNiG3hL8' target='_blank'>萬座毛 (象鼻岩景觀)</a> 車程約80分", type: "activity" },
                 { dayId: 2, time: "17:00", title: "🎫 買票 & 休息", desc: "<a href='https://maps.app.goo.gl/MPncpEnoHprksy1h7' target='_blank'>許田休息站</a> (車程約30分)<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 買水族館門票</span>、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>吃炸物</a>", type: "activity" },
@@ -280,7 +299,10 @@
                     // ★★★ 新增菜單按鈕 ★★★
                     let menuBtn = item.menuImage ? `<button onclick="event.stopPropagation(); showImageModal('${item.menuImage}')" class="mt-2 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-orange-100 transition-colors w-fit">📖 查看菜單</button>` : '';
 
-                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}${menuBtn}</div></div></div></div>`; 
+                    // ★★★ 處理強制展開 (forceOpen) ★★★
+                    const expandedClass = item.forceOpen ? 'expanded' : '';
+
+                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text ${expandedClass} leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}${menuBtn}</div></div></div></div>`; 
                 }).join(''); 
             } 
             list.innerHTML = html;
@@ -501,7 +523,6 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
-                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
                     <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
                         <div class="flex-1">
