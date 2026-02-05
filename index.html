@@ -56,7 +56,6 @@
         </div>
 
         <div id="view-flights" class="tab-content p-5 space-y-4"></div>
-        
         <div id="view-hotels" class="tab-content p-5 space-y-4"></div>
         
         <div id="view-mustbuy" class="tab-content p-5 space-y-4">
@@ -178,21 +177,23 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 班機資料新增「links」欄位 ★★★
+        // ★★★ 班機資料更新 (修正時間、備註、連結) ★★★
         const DATA = {
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [
                 { 
-                    type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:05", from: "桃園 T1", to: "那霸", note: "預計 17:05 抵達",
+                    type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:10", from: "桃園 T1", to: "那霸", 
+                    note: "託運15KG、飛行時間為1小時25分鐘、機型為空中巴士 A320 (中型)、無餐點",
                     links: [
                         { label: "🛫 桃園出發動態", url: "https://www.taoyuan-airport.com/flight_departure" },
-                        { label: "🛬 那霸抵達動態", url: "https://www.naha-airport.co.jp/t_ch/flight/today/" }
+                        { label: "🛬 那霸抵達動態", url: "https://www.naha-airport.co.jp/zh-hant/flight/today/" }
                     ]
                 },
                 { 
-                    type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", note: "09:30 辦理登機",
+                    type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", 
+                    note: "託運23KG、飛行時間為1小時40分鐘、經濟艙空中巴士 A350 XWB (大型)、有餐點",
                     links: [
-                        { label: "🛫 那霸起飛動態", url: "https://www.naha-airport.co.jp/t_ch/flight/today/" },
+                        { label: "🛫 那霸起飛動態", url: "https://www.naha-airport.co.jp/zh-hant/flight/today/" },
                         { label: "🛬 桃園抵達動態", url: "https://www.taoyuan-airport.com/flight_arrival" }
                     ]
                 }
@@ -268,6 +269,8 @@
             renderItinerary(currentDayId);
             renderFlights();
             renderHotels();
+            
+            // ★★★ 新增：渲染必買圖片 ★★★
             renderMustBuy();
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
