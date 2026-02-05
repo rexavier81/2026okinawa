@@ -108,6 +108,13 @@
 
     <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group">
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 pointer-events-none translate-y-10">
+            <button onclick="toggleMap(); toggleFab();" class="flex items-center gap-2 group/item">
+                <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span>
+                <div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+                    <span class="text-xl">🗺️</span>
+                </div>
+            </button>
+            
             <button onclick="toggleTaxCalc(); toggleFab();" class="flex items-center gap-2 group/item">
                 <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span>
                 <div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
@@ -130,6 +137,14 @@
         <button id="fab-main" onclick="toggleFab()" class="bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50">
             <span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span>
         </button>
+    </div>
+
+    <div id="map-modal" class="fixed inset-0 z-[95] flex items-center justify-center px-4 modal hidden-modal">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleMap()"></div>
+        <div class="relative z-10 w-full max-w-4xl h-full flex items-center justify-center p-4">
+            <img src="沖繩單軌電車地圖.jpg" alt="沖繩單軌電車地圖" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            <button onclick="toggleMap()" class="absolute top-6 right-6 bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold">✕</button>
+        </div>
     </div>
 
     <div id="tax-modal" class="fixed inset-0 z-[90] flex items-center justify-center px-4 modal hidden-modal">
@@ -309,7 +324,7 @@
         // 核心邏輯
         // ==========================
         let currentDayId = 1;
-        let AVG_RATE = 0.22; // 預設值，之後會被 API 覆蓋
+        let AVG_RATE = 0.22; // 平均匯率 (預設)
 
         window.addEventListener('DOMContentLoaded', () => {
             renderDaySelector();
@@ -436,6 +451,13 @@
                 icon.classList.remove('rotate-90');
                 mainBtn.classList.replace('bg-red-500', 'bg-gray-800'); // 變回深灰色
             }
+        }
+
+        // --- 單軌地圖邏輯 (新增) ---
+        function toggleMap() {
+            const modal = document.getElementById('map-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
         }
 
         // --- 翻譯機邏輯 ---
@@ -695,7 +717,6 @@
 
             const currency = document.getElementById('acc-currency').value;
             let rateToSend = document.getElementById('acc-custom-rate').value || AVG_RATE;
-            // 確保台幣匯率為 1
             if (currency === 'TWD') {
                 rateToSend = 1;
             }
@@ -741,7 +762,6 @@
                     return;
                 }
 
-                // ★★★ 關鍵修改：如果有即時匯率，就覆蓋掉 AVG_RATE ★★★
                 if (data.liveRate && parseFloat(data.liveRate) > 0) {
                     AVG_RATE = parseFloat(data.liveRate);
                 }
@@ -755,13 +775,10 @@
                         totalJPY += parseInt(ex.jpy);
                         exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
                     });
-                    // 注意：這裡我們不再使用換匯紀錄來計算 AVG_RATE，因為已經被上面的 liveRate 覆蓋了
                 }
                 
-                // 更新 UI 顯示，加上 LIVE 標籤
                 document.getElementById('avg-rate-display').innerHTML = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
                 
-                // 更新計算機的預設匯率
                 document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
@@ -776,7 +793,6 @@
                     let displaySubText = '';
 
                     if (bill.currency === 'JPY') {
-                        // 使用每筆消費當下記錄的匯率，如果沒有就用現在的 AVG_RATE
                         const appliedRate = bill.rate ? parseFloat(bill.rate) : AVG_RATE;
                         twd = Math.round(bill.amount * appliedRate);
                         displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
@@ -808,7 +824,6 @@
                 
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
-                // 公款餘額換算台幣也改用即時匯率
                 document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * AVG_RATE).toLocaleString();
 
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
