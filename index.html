@@ -102,14 +102,7 @@
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center"><span class="text-lg mb-0.5">💱</span><span>換匯</span></button>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
-                    <div class="flex gap-2">
-                        <button onclick="showStatsModal()" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full border border-indigo-200 flex items-center gap-1">📊 統計</button>
-                        <button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                        <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button>
-                    </div>
-                </div>
+                <div class="flex justify-between items-center mb-1"><p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p><div class="flex gap-2"><button onclick="showStatsModal()" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full border border-indigo-200 flex items-center gap-1">📊 統計</button><button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button></div></div>
                 <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3"><p class="text-3xl font-black text-cyan-700" id="total-expense">0</p></div>
                 <div id="settlement-content" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 mt-2"><p class="font-bold mb-1">💰 結算建議 (不含公費)：</p><p id="settlement-text">計算中...</p></div>
             </div>
@@ -1066,7 +1059,8 @@
                     if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
                 }
                 
-                document.getElementById('avg-rate-display').innerText = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
+                // ★★★ 這裡已改為 innerText (純文字) ★★★
+                document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
                 
                 document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
@@ -1108,7 +1102,6 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
-                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
                     <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
                         <div class="flex-1">
@@ -1132,22 +1125,35 @@
 
                 document.getElementById('expense-list').innerHTML = html || '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
                 document.getElementById('total-expense').innerText = totalSpentTWD.toLocaleString();
+                
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
-                // 公款換算台幣：使用現金匯率
                 document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * CASH_AVG_RATE).toLocaleString();
+
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
                 updateRateInputLogic(); 
-            } catch (err) { listDiv.innerHTML = '讀取失敗'; } finally { loadingMsg.classList.add('hidden'); listDiv.style.opacity = '1'; }
+
+            } catch (err) {
+                listDiv.innerHTML = '<div class="text-center text-red-400 py-4 text-sm">讀取失敗：' + err.message + '</div>';
+            } finally {
+                loadingMsg.classList.add('hidden');
+                listDiv.style.opacity = '1';
+            }
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            const text = document.getElementById('settlement-text'); const baseDiff = (xiang - yan) / 2; const finalDiff = baseDiff + extraDebt; const absVal = Math.round(Math.abs(finalDiff));
-            if (absVal === 0) text.innerText = "🎉 平衡"; else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`; else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            const text = document.getElementById('settlement-text');
+            const baseDiff = (xiang - yan) / 2;
+            const finalDiff = baseDiff + extraDebt;
+            const absVal = Math.round(Math.abs(finalDiff));
+            
+            if (absVal === 0) text.innerText = "🎉 平衡";
+            else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
         }
 
         function editExpense(index) { 
-            const data = ALL_EXPENSES[index]; // 從全域變數抓資料，絕對安全
+            const data = ALL_EXPENSES[index]; 
             if (!data) return;
 
             document.getElementById('edit-row-id').value = data.rowIndex; 
