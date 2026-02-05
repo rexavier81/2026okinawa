@@ -57,7 +57,10 @@
 
         <div id="view-flights" class="tab-content p-5 space-y-4"></div>
         <div id="view-hotels" class="tab-content p-5 space-y-4"></div>
-        <div id="view-mustbuy" class="tab-content p-5 space-y-4"><div id="mustbuy-list" class="space-y-6"></div></div>
+        
+        <div id="view-mustbuy" class="tab-content p-5 space-y-4">
+            <div id="mustbuy-list" class="space-y-6"></div>
+        </div>
 
         <div id="view-accounting" class="tab-content p-5 space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-4 relative">
@@ -178,7 +181,6 @@
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [ { type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:05", from: "桃園 T1", to: "那霸", note: "預計 17:05 抵達" }, { type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", note: "09:30 辦理登機" } ],
             hotels: [ { name: "那霸小祿站前ys旅館", dates: "2/8 - 2/9 (1晚)", location: "那霸小祿", note: "單軌小祿站旁，Check-in 18:05後", mapLink: "https://www.google.com/maps/search/?api=1&query=Ys+Inn+Naha+Oroku", checkIn: "15:00", checkOut: "12:00" }, { name: "ホテルリゾネックス名護", dates: "2/9 - 2/10 (1晚)", location: "名護", note: "Resonex Nago，私人沙灘，所有房間面海。", mapLink: "https://www.google.com/maps/search/?api=1&query=Hotel+Resonex+Nago", checkIn: "15:00", checkOut: "11:00" }, { name: "刻の宿 那覇", dates: "2/10 - 2/15 (5晚)", location: "那霸", note: "連住5晚，含簡易廚房。", mapLink: "https://www.google.com/maps/search/?api=1&query=Toki+no+Yado+Naha", checkIn: "15:00", checkOut: "10:00" } ],
-            shopping: [ { name: "紅芋塔 (Beni Imo Tart)", desc: "沖繩最經典伴手禮，御菓子御殿必買。", highlight: "經典必買" }, { name: "金楚糕 (Chinsuko)", desc: "琉球傳統餅乾，口感酥脆，鹽味最受歡迎。", highlight: "傳統點心" }, { name: "沖繩蝦餅", desc: "辣味蝦餅，非常涮嘴，適合當下酒菜。", highlight: "人氣零食" }, { name: "Fukugiya 年輪蛋糕", desc: "國際通名店，蜂蜜和黑糖口味都很棒。", highlight: "排隊美食" } ],
             activities: [
                 { dayId: 1, time: "11:00", title: "🚗 開車去停車場", desc: "<a href='https://maps.app.goo.gl/DAcNG4NwXqRsg7qTA' target='_blank'>Times 大園高鐵北路二段停車場</a> (停車1天100元，轉捷運領航站)", type: "transport" },
                 { dayId: 1, time: "11:30", title: "🛫 辦理登機手續", desc: "桃園機場第一航廈 (領航站-機場第一航廈站)", type: "transport" },
@@ -248,6 +250,8 @@
             renderItinerary(currentDayId);
             renderFlights();
             renderHotels();
+            
+            // ★★★ 新增：渲染必買圖片 ★★★
             renderMustBuy();
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
@@ -268,7 +272,7 @@
             if(tabName === 'accounting') fetchData();
         }
 
-        // --- 行程相關功能 (省略重複代碼，保持原樣) ---
+        // --- 行程相關功能 ---
         function selectDay(dayId) {
             currentDayId = dayId;
             renderDaySelector();
@@ -308,9 +312,29 @@
         function renderHotels() {
             document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4"><div class="flex justify-between items-start mb-3"><span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">${h.location}</span><span class="text-xs text-gray-400 font-medium">${h.dates}</span></div><h3 class="text-xl font-bold text-gray-800 mb-2">${h.name}</h3><div class="text-sm text-gray-600 p-3 rounded border border-gray-100 mb-4">${h.note}</div><a href="${h.mapLink}" target="_blank" class="block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl text-sm font-medium transition-colors">📍 查看地圖</a></div>`).join('');
         }
+        
+        // ★★★ 新增：渲染必買圖片 (取代原本的文字清單) ★★★
         function renderMustBuy() {
-            document.getElementById('mustbuy-list').innerHTML = DATA.shopping.map(item => `<div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex justify-between items-start"><div><h3 class="text-lg font-bold text-blue-800">${item.name}</h3><p class="text-sm text-gray-600 mt-1">${item.desc}</p></div><span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ml-2">${item.highlight}</span></div>`).join('');
+            // 您指定的 5 張圖片檔案名稱
+            const images = [
+                "pic_aeon.jpg",
+                "pic_food.jpg",
+                "pic_iias.jpg",
+                "pic_parco.jpg",
+                "pic_souvenir.jpg"
+            ];
+            
+            // 產生 HTML：每一張圖都是全寬、圓角、陰影
+            const html = images.map(img => 
+                `<div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4">
+                    <img src="${img}" alt="必買推薦" class="w-full h-auto block" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';">
+                 </div>`
+            ).join('');
+            
+            document.getElementById('mustbuy-list').innerHTML = html;
         }
+
         function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
         function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
