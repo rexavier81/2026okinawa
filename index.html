@@ -138,9 +138,7 @@
                         </div>
                     </div>
                 </div>
-
                 <hr class="border-gray-100">
-
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">公款總花費 (已支出)</h4>
                     <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
@@ -309,7 +307,6 @@
                 
                 { dayId: 7, time: "10:40 - 11:40", title: "✈️ 看飛機/海景", desc: "<a href='https://maps.app.goo.gl/KF5KNjECB1zjpcqo9' target='_blank'>瀨長島 Umikaji Terrace</a>", type: "activity", mapcode: "33 002 602*22" },
                 { dayId: 7, time: "12:00 - 13:40", title: "🛍️ Outlet 購物 & 午餐", desc: "<a href='https://maps.app.goo.gl/53Hpyq3h2Xz1HZ7d6' target='_blank'>Ashibinaa Outlet</a> (iias 沖繩豐崎)<br>逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：<a href='https://maps.app.goo.gl/JYRLNqQSZE9YqGxQ8' target='_blank'>沖繩菜園 Karakara</a> <a href='https://www.facebook.com/reel/1424317575868459' target='_blank' class='text-blue-600 underline'>FB介紹</a>", type: "shopping", mapcode: "232 544 452*22" }, 
-                { dayId: 7, time: "13:40 - 17:00", title: "🛍️ iias 沖繩豐崎", desc: "逛街、GRAN SAC'S", type: "shopping" },
                 { dayId: 7, time: "17:45 - 20:30", title: "🌃 國際通", desc: "車先停回<a href='https://maps.app.goo.gl/pKdmCGuYChxP3R8R8' target='_blank'>停車場</a>。<br>晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>沖縄料理居酒屋 ぶった</a>", type: "activity", mapcode: "33 128 661*23" }, // ★★★ 修正 MapCode ★★★
                 { dayId: 7, time: "21:00", title: "🏨 返回住宿", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a> (收行李) (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel" },
                 
@@ -445,10 +442,9 @@
             if (w) {
                 const icon = getWeatherIcon(w.code);
                 const rainClass = w.rain > 50 ? 'text-blue-600 font-bold' : 'text-gray-500';
-                const locName = w.loc ? `📍${w.loc}` : ''; // 顯示地點
+                // ★★★ 移除地名 ★★★
                 weatherHtml = `
-                    <div class="weather-capsule ml-3 inline-flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 shadow-sm">
-                        <span class="text-xs font-bold text-blue-800 mr-1">${locName}</span>
+                    <div class="weather-capsule ml-0 inline-flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 shadow-sm mt-1">
                         <span class="text-lg">${icon}</span>
                         <span class="text-xs font-bold text-gray-700">${w.min}°-${w.max}°C</span>
                         <span class="text-xs ${rainClass}">☔ ${w.rain}%</span>
@@ -456,12 +452,14 @@
                 `;
             }
 
-            let html = `<div class="mb-4 px-1 flex items-center flex-wrap">
-                            <div>
-                                <h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2>
-                                <p class="text-sm text-gray-500 mt-1">${dayData.date}</p>
+            // ★★★ 修正排版：大標題在上，日期+天氣在下 ★★★
+            let html = `<div class="mb-4 px-1">
+                            <h2 class="text-2xl font-bold text-gray-800 leading-tight">${dayData.title}</h2>
+                            <div class="flex items-center flex-wrap gap-2 mt-1">
+                                <p class="text-sm text-gray-500 font-bold">${dayData.date}</p>
+                                ${weatherHtml}
                             </div>
-                            ${weatherHtml} </div>`;
+                        </div>`;
 
             if (items.length === 0) html += `<div class="p-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">本日無特定行程</div>`;
             else {
@@ -1068,7 +1066,7 @@
                     if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
                 }
                 
-                document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
+                document.getElementById('avg-rate-display').innerText = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
                 
                 document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
@@ -1110,6 +1108,7 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
+                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
                     <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
                         <div class="flex-1">
@@ -1133,35 +1132,22 @@
 
                 document.getElementById('expense-list').innerHTML = html || '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
                 document.getElementById('total-expense').innerText = totalSpentTWD.toLocaleString();
-                
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
+                // 公款換算台幣：使用現金匯率
                 document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * CASH_AVG_RATE).toLocaleString();
-
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
                 updateRateInputLogic(); 
-
-            } catch (err) {
-                listDiv.innerHTML = '<div class="text-center text-red-400 py-4 text-sm">讀取失敗：' + err.message + '</div>';
-            } finally {
-                loadingMsg.classList.add('hidden');
-                listDiv.style.opacity = '1';
-            }
+            } catch (err) { listDiv.innerHTML = '讀取失敗'; } finally { loadingMsg.classList.add('hidden'); listDiv.style.opacity = '1'; }
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            const text = document.getElementById('settlement-text');
-            const baseDiff = (xiang - yan) / 2;
-            const finalDiff = baseDiff + extraDebt;
-            const absVal = Math.round(Math.abs(finalDiff));
-            
-            if (absVal === 0) text.innerText = "🎉 平衡";
-            else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
-            else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            const text = document.getElementById('settlement-text'); const baseDiff = (xiang - yan) / 2; const finalDiff = baseDiff + extraDebt; const absVal = Math.round(Math.abs(finalDiff));
+            if (absVal === 0) text.innerText = "🎉 平衡"; else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`; else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
         }
 
         function editExpense(index) { 
-            const data = ALL_EXPENSES[index]; 
+            const data = ALL_EXPENSES[index]; // 從全域變數抓資料，絕對安全
             if (!data) return;
 
             document.getElementById('edit-row-id').value = data.rowIndex; 
