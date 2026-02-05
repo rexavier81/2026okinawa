@@ -35,6 +35,9 @@
         
         /* 進度條動畫 */
         .progress-bar { transition: width 0.5s ease-in-out, background-color 0.5s ease; }
+        
+        /* 解決 iOS 點擊延遲與選取問題 */
+        .touch-manipulation { touch-action: manipulation; }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col overflow-hidden max-w-md mx-auto bg-gray-50 shadow-2xl relative">
@@ -148,7 +151,6 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 全域變數：儲存所有帳目 (解決手機無法點擊的關鍵) ★★★
         let ALL_EXPENSES = [];
 
         // ★★★ 班機與住宿資料 ★★★
@@ -180,7 +182,7 @@
                 { dayId: 2, time: "15:50", title: "🌊 萬座毛", desc: "<a href='https://maps.app.goo.gl/1qQWKJXqCXNiG3hL8' target='_blank'>萬座毛 (象鼻岩景觀)</a> 車程約80分", type: "activity" },
                 { dayId: 2, time: "17:00", title: "🎫 買票 & 休息", desc: "<a href='https://maps.app.goo.gl/MPncpEnoHprksy1h7' target='_blank'>許田休息站</a> (車程約30分)<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 買水族館門票</span>、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>吃炸物</a>", type: "activity" },
                 { dayId: 2, time: "17:55", title: "🏨 飯店 Check-in", desc: "<a href='https://maps.app.goo.gl/nbq8cNbLN9xJVUA98' target='_blank'>ホテルリゾネックス名護</a> (私人海灘散步、夕陽很美)", type: "hotel" },
-                { dayId: 2, time: "18:30", title: "🥩 晚餐：燒肉五苑", desc: "<a href='https://maps.app.goo.gl/zvE1ahjbgmokVTaY6' target='_blank'>燒肉五苑名護店</a> (已預約 18:30 2位，可順逛隔壁<a href='https://maps.app.goo.gl/PchKk1p2wReoJpsu8' target='_blank'>漫畫倉庫</a>)", type: "food", important: true, menuImage: "燒肉五苑名護店菜單.jpg" }, // ★★★ 新增菜單 ★★★
+                { dayId: 2, time: "18:30", title: "🥩 晚餐：燒肉五苑", desc: "<a href='https://maps.app.goo.gl/zvE1ahjbgmokVTaY6' target='_blank'>燒肉五苑名護店</a> (已預約 18:30 2位，可順逛隔壁<a href='https://maps.app.goo.gl/PchKk1p2wReoJpsu8' target='_blank'>漫畫倉庫</a>)", type: "food", important: true, menuImage: "燒肉五苑名護店菜單.jpg" }, 
                 { dayId: 2, time: "20:40", title: "🏨 住宿：名護 Resonex Nago", desc: "隔天有飯店早餐", type: "hotel" },
                 { dayId: 3, time: "08:30", title: "🥣 早餐", desc: "ホテルリゾネックス名護 (飯店早餐)", type: "food" },
                 { dayId: 3, time: "10:00", title: "🦈 美麗海水族館", desc: "<a href='https://maps.app.goo.gl/dbvaQEXwrBiSA7ST9' target='_blank'>美麗海水族館 (黑潮之海)</a> 車程約25分", type: "activity", important: true },
@@ -284,16 +286,67 @@
             list.innerHTML = html;
         }
         function renderFlights() { document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4"><div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div><div class="flex justify-between items-center mb-4 mt-2"><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.from}</div></div><div class="flex-1 flex flex-col items-center px-4"><div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div><div class="w-full h-[1px] bg-gray-300"></div></div><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.to}</div></div></div><div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100 mb-3">${f.note}</div><div class="grid grid-cols-1 gap-2">${f.links.map(link => `<a href="${link.url}" target="_blank" class="block text-center bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-600 py-2 rounded-lg text-xs font-bold transition-colors">${link.label}</a>`).join('')}</div></div>`).join(''); }
+        
+        // ★★★ 住宿卡片渲染 (修復按鈕點擊問題) ★★★
+        // 改善點：將 <a> 標籤設為 flex items-center justify-center w-full h-full，確保整個色塊都是熱區
         function renderHotels() {
             document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => {
-                const voucherBtn = h.voucher ? `<a href="${h.voucher}" target="_blank" class="flex-1 block text-center bg-teal-50 hover:bg-teal-100 text-teal-700 py-3 rounded-xl text-sm font-bold transition-colors border border-teal-100">📄 查看憑證</a>` : '';
+                const voucherBtn = h.voucher 
+                    ? `<div class="flex-1"><a href="${h.voucher}" target="_blank" class="flex items-center justify-center w-full h-full bg-teal-50 hover:bg-teal-100 text-teal-700 py-3 rounded-xl text-sm font-bold transition-colors border border-teal-100">📄 查看憑證</a></div>` 
+                    : '';
+
                 let extraSection = '';
                 if (h.qrImage || h.trashImage) {
-                    extraSection = `<div class="grid grid-cols-2 gap-2 mb-3">${h.qrImage ? `<button onclick="showImageModal('${h.qrImage}')" class="flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg text-xs font-bold transition-colors border border-gray-200">📱 入住 QR Code</button>` : ''}${h.trashImage ? `<button onclick="showImageModal('${h.trashImage}')" class="flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 py-2.5 rounded-lg text-xs font-bold transition-colors border border-red-100">🗑️ 垃圾處理</button>` : ''}</div>${h.trashNote ? `<div class="text-xs text-gray-500 bg-gray-50 p-2 rounded mb-3 border border-gray-100 leading-relaxed">💡 ${h.trashNote}</div>` : ''}`;
+                    extraSection = `
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        ${h.qrImage ? `<button onclick="showImageModal('${h.qrImage}')" class="flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg text-xs font-bold transition-colors border border-gray-200">📱 入住 QR Code</button>` : ''}
+                        ${h.trashImage ? `<button onclick="showImageModal('${h.trashImage}')" class="flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 py-2.5 rounded-lg text-xs font-bold transition-colors border border-red-100">🗑️ 垃圾處理</button>` : ''}
+                    </div>
+                    ${h.trashNote ? `<div class="text-xs text-gray-500 bg-gray-50 p-2 rounded mb-3 border border-gray-100 leading-relaxed">💡 ${h.trashNote}</div>` : ''}
+                    `;
                 }
-                return `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4 relative overflow-hidden"><div class="flex justify-between items-start mb-2"><div class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded mb-2 inline-block">${h.date}</div><div class="${h.breakfast ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'} text-xs font-bold px-2 py-1 rounded">${h.breakfast ? '✅ 有早餐' : '❌ 無早餐'}</div></div><h3 class="text-lg font-bold text-gray-800 mb-3 leading-snug whitespace-pre-line">${h.name}</h3><div class="bg-gray-50 rounded-lg p-3 text-sm space-y-2 border border-gray-100 mb-3"><div class="flex justify-between"><span class="text-gray-500">入住/退房</span><span class="font-bold text-gray-700">${h.checkIn} / ${h.checkOut}</span></div><div class="flex justify-between"><span class="text-gray-500">訂房來源</span><span class="font-bold text-blue-600">${h.source}</span></div><div class="flex justify-between border-t border-gray-200 pt-2 mt-1"><span class="text-gray-500">價格</span><span class="font-black text-lg text-gray-800">NT$${h.price.toLocaleString()}</span></div></div>${h.important ? `<div class="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-2 text-sm font-bold mb-3 rounded-r">🔑 ${h.note}</div>` : ''}${extraSection}<div class="flex gap-3">${voucherBtn}<a href="${h.url}" target="_blank" class="flex-1 block text-center bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 rounded-xl text-sm font-bold transition-colors border border-purple-100">📍 查看地圖</a></div></div>`;
-            }).join('');
+
+                return `
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4 relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded mb-2 inline-block">${h.date}</div>
+                        <div class="${h.breakfast ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'} text-xs font-bold px-2 py-1 rounded">
+                            ${h.breakfast ? '✅ 有早餐' : '❌ 無早餐'}
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold text-gray-800 mb-3 leading-snug whitespace-pre-line">${h.name}</h3>
+                    
+                    <div class="bg-gray-50 rounded-lg p-3 text-sm space-y-2 border border-gray-100 mb-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">入住/退房</span>
+                            <span class="font-bold text-gray-700">${h.checkIn} / ${h.checkOut}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">訂房來源</span>
+                            <span class="font-bold text-blue-600">${h.source}</span>
+                        </div>
+                        <div class="flex justify-between border-t border-gray-200 pt-2 mt-1">
+                            <span class="text-gray-500">價格</span>
+                            <span class="font-black text-lg text-gray-800">NT$${h.price.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    ${h.important ? `<div class="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-2 text-sm font-bold mb-3 rounded-r">🔑 ${h.note}</div>` : ''}
+
+                    ${extraSection}
+
+                    <div class="flex gap-3 h-12"> ${voucherBtn}
+                        <div class="flex-1">
+                            <a href="${h.url}" target="_blank" class="flex items-center justify-center w-full h-full bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold transition-colors border border-purple-100">
+                                📍 查看地圖
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
         }
+
         function renderMustBuy() { const images = ["pic_aeon.jpg", "pic_food.jpg", "pic_iias.jpg", "pic_parco.jpg", "pic_souvenir.jpg"]; const html = images.map(img => `<div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4"><img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';"></div>`).join(''); document.getElementById('mustbuy-list').innerHTML = html; }
         function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
         function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
@@ -448,9 +501,10 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
+                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
-                    <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative group touch-manipulation">
-                        <div>
+                    <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
+                        <div class="flex-1">
                             <div class="font-bold text-gray-800 text-sm">${bill.item}</div>
                             <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
                                 <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${payerLabel}</span>
@@ -458,12 +512,12 @@
                             </div>
                             ${bill.note ? `<div class="text-xs text-gray-400 mt-1">${bill.note}</div>` : ''}
                         </div>
-                        <div class="text-right flex flex-col items-end">
+                        <div class="text-right flex flex-col items-end z-10">
                             <div class="font-bold text-cyan-700 text-lg">${displayAmt}</div>
                             <div class="text-[10px] text-gray-400">${displaySubText}</div>
                             <div class="flex gap-3 mt-2">
-                                <button onclick="event.stopPropagation(); editExpense(${index})" class="text-xs text-blue-500 font-bold px-3 py-2 active:bg-blue-50 rounded bg-transparent border border-blue-100">修改</button>
-                                <button onclick="event.stopPropagation(); deleteExpense(${bill.rowIndex})" class="text-xs text-red-400 font-bold px-3 py-2 active:bg-red-50 rounded bg-transparent border border-red-100">刪除</button>
+                                <button onclick="editExpense(${index})" class="text-xs text-blue-500 font-bold px-3 py-2 active:bg-blue-50 rounded bg-white border border-blue-100 shadow-sm relative z-20">修改</button>
+                                <button onclick="deleteExpense(${bill.rowIndex})" class="text-xs text-red-400 font-bold px-3 py-2 active:bg-red-50 rounded bg-white border border-red-100 shadow-sm relative z-20">刪除</button>
                             </div>
                         </div>
                     </div>`;
