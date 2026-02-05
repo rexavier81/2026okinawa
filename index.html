@@ -38,6 +38,10 @@
         
         /* 解決 iOS 點擊延遲與選取問題 */
         .touch-manipulation { touch-action: manipulation; }
+
+        /* 天氣膠囊動畫 */
+        .weather-capsule { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col overflow-hidden max-w-md mx-auto bg-gray-50 shadow-2xl relative">
@@ -153,6 +157,8 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
         let ALL_EXPENSES = [];
+        // ★★★ 天氣資料全域變數 ★★★
+        let WEATHER_DATA = {};
 
         // ★★★ 班機與住宿資料 ★★★
         const DATA = {
@@ -166,7 +172,6 @@
                 { date: "2/9 - 2/10 (1晚)", name: "名護Resonex Nago飯店\n(Hotel Resonex Nago)", breakfast: true, price: 4129, source: "Agoda", checkIn: "15:00", checkOut: "11:00", url: "https://maps.app.goo.gl/xTf8vqdv3FGSJwth7", note: "", voucher: "hotel_resonex.pdf" },
                 { date: "2/10 - 2/15 (5晚)", name: "刻の宿 那覇 by サンレストリゾート\n(TOKI NO YADO NAHA)", breakfast: false, price: 10962, source: "ikyu.com", checkIn: "15:00-22:00", checkOut: "11:00", url: "https://maps.app.goo.gl/EenGmCNZVDMrvn3o6", note: "入住代碼 733562", important: true, qrImage: "入住QRCODE.png", trashImage: "員工停車場垃圾桶位置.png", trashNote: "當房間垃圾桶滿了，請丟至員工停車場入口旁的垃圾處理區 (點擊按鈕看地圖)。" }
             ],
-            // ★★★ 修正後的圖片順序 ★★★
             shopping: [
                 { name: "沖繩伴手禮", desc: "各式各樣的沖繩限定紀念品", highlight: "必買清單" }, 
                 { name: "沖繩美食", desc: "不能錯過的在地美味", highlight: "美食地圖" },
@@ -174,7 +179,6 @@
                 { name: "PARCO CITY", desc: "臨海大型商場，品牌眾多", highlight: "時尚潮流" },
                 { name: "iias 沖繩豐崎", desc: "靠近機場，最後衝刺好去處", highlight: "休閒娛樂" }
             ],
-            // ★★★ 行程資料 (更新 MapCode) ★★★
             activities: [
                 { dayId: 1, time: "11:00", title: "🚗 開車去停車場", desc: "<a href='https://maps.app.goo.gl/DAcNG4NwXqRsg7qTA' target='_blank'>Times 大園高鐵北路二段停車場</a> (停車1天100元，轉捷運領航站)", type: "transport" },
                 { dayId: 1, time: "11:30", title: "🛫 辦理登機手續", desc: "桃園機場第一航廈 (領航站-機場第一航廈站)", type: "transport" },
@@ -185,10 +189,9 @@
                 { dayId: 1, time: "19:40", title: "🛒 晚餐、超市採買", desc: "<a href='https://maps.app.goo.gl/3St2Kjgai1WesYdv8' target='_blank'>永旺 那霸店 (Aeon Naha)</a> 晚餐、隨意逛逛", type: "shopping" },
                 { dayId: 1, time: "21:00", title: "🏨 住宿：那霸小祿站前ys旅館", desc: "退房時間為12:00", type: "hotel" },
                 
-                // ★★★ Day 2 開始加入 MapCode ★★★
                 { dayId: 2, time: "10:00", title: "🍔 早午餐：A&W 漢堡", desc: "<a href='https://www.google.com/maps/search/?api=1&query=A%26W+Naha+Kanagusuku' target='_blank'>A&W Naha Kanagusuku</a> 或 <a href='https://www.google.com/maps/search/?api=1&query=Aeon+Naha' target='_blank'>Aeon Naha</a> (經典 Root Beer)", type: "food" },
                 { dayId: 2, time: "12:00", title: "🚆 前往租車行", desc: "單軌：<a href='https://maps.app.goo.gl/1JoXTvGk3KzBkYby9' target='_blank'>赤嶺站 (北口)</a> 搭乘接駁車<br><b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank' class='text-blue-600 underline'>單軌赤嶺站 12:30 接駁方法</a></b>", type: "transport" },
-                { dayId: 2, time: "12:30", title: "🚗 取車 (大榮租車)", desc: "大榮租車<br>車款：Toyota Yaris<br>費用：NT$8,400 (現場支付/未含保險)<br>單號：N0209-0215RC4-08<br>訂購人：徐啟翔 / 0918-563-811<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>", type: "transport", tag: "租車", forceOpen: true, mapcode: "33 002 782*33" }, // 大榮租車那霸機場店
+                { dayId: 2, time: "12:30", title: "🚗 取車 (大榮租車)", desc: "大榮租車<br>車款：Toyota Yaris<br>費用：NT$8,400 (現場支付/未含保險)<br>單號：N0209-0215RC4-08<br>訂購人：徐啟翔 / 0918-563-811<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>", type: "transport", tag: "租車", forceOpen: true, mapcode: "33 002 782*33" }, 
                 { dayId: 2, time: "13:40", title: "🦞 午餐：海鮮吃爆", desc: "<a href='https://maps.app.goo.gl/VHzgnj1RH9PrVduw8' target='_blank'>系滿魚市場</a> (推薦生魚片、焗烤龍蝦) 車程約5分", type: "food", mapcode: "232 484 136*78" },
                 { dayId: 2, time: "15:50", title: "🌊 萬座毛", desc: "<a href='https://maps.app.goo.gl/1qQWKJXqCXNiG3hL8' target='_blank'>萬座毛 (象鼻岩景觀)</a> 車程約80分", type: "activity", mapcode: "206 312 039*17" },
                 { dayId: 2, time: "17:00", title: "🎫 買票 & 休息", desc: "<a href='https://maps.app.goo.gl/MPncpEnoHprksy1h7' target='_blank'>許田休息站</a> (車程約30分)<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 買水族館門票</span>、<a href='https://www.facebook.com/share/r/183t8dtLbg/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>吃炸物</a>", type: "activity", mapcode: "206 476 706*66" },
@@ -196,15 +199,13 @@
                 { dayId: 2, time: "18:30", title: "🥩 晚餐：燒肉五苑", desc: "<a href='https://maps.app.goo.gl/zvE1ahjbgmokVTaY6' target='_blank'>燒肉五苑名護店</a> (已預約 18:30 2位，可順逛隔壁<a href='https://maps.app.goo.gl/PchKk1p2wReoJpsu8' target='_blank'>漫畫倉庫</a>)", type: "food", important: true, menuImage: "燒肉五苑名護店菜單.jpg", mapcode: "206 626 507*82" }, 
                 { dayId: 2, time: "20:40", title: "🏨 住宿：名護 Resonex Nago", desc: "隔天有飯店早餐", type: "hotel" },
                 
-                // ★★★ Day 3 ★★★
                 { dayId: 3, time: "08:30", title: "🥣 早餐", desc: "ホテルリゾネックス名護 (飯店早餐)", type: "food" },
-                { dayId: 3, time: "10:00", title: "🦈 美麗海水族館", desc: "<a href='https://maps.app.goo.gl/dbvaQEXwrBiSA7ST9' target='_blank'>美麗海水族館 (黑潮之海)</a> 車程約25分", type: "activity", important: true, mapcode: "553 075 797*77" }, // P7停車場
+                { dayId: 3, time: "10:00", title: "🦈 美麗海水族館", desc: "<a href='https://maps.app.goo.gl/dbvaQEXwrBiSA7ST9' target='_blank'>美麗海水族館 (黑潮之海)</a> 車程約25分", type: "activity", important: true, mapcode: "553 075 797*77" },
                 { dayId: 3, time: "14:10", title: "🍽️ 午餐：海景餐廳", desc: "<a href='https://maps.app.goo.gl/sSYDqNWzvZ7HDcFXA' target='_blank'>L LOTA (古宇利島)</a> 車程約35分", type: "food", mapcode: "485 692 291*82" },
-                { dayId: 3, time: "15:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity", mapcode: "485 693 485*11" }, // 海洋塔
+                { dayId: 3, time: "15:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity", mapcode: "485 693 485*11" },
                 { dayId: 3, time: "18:00", title: "☕ 晚餐 / 下午茶", desc: "<a href='https://maps.app.goo.gl/MDAAH3BqAyj3VXZE7' target='_blank'>BANTA CAFE</a> (看夜景) <a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>FB介紹</a> (回程較遠，預抓1.5hr)", type: "food", mapcode: "33 882 546*47" },
-                { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "<a href='https://maps.app.goo.gl/EenGmCNZVDMrvn3o6' target='_blank'>刻の宿 那覇</a> (停車：<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>) 入住代碼：733562、買隔天早餐", type: "hotel", mapcode: "33 128 356*55" }, // 樋川立體停車場
+                { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "<a href='https://maps.app.goo.gl/EenGmCNZVDMrvn3o6' target='_blank'>刻の宿 那覇</a> (停車：<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>) 入住代碼：733562、買隔天早餐", type: "hotel", mapcode: "33 128 356*55" },
 
-                // ★★★ Day 4 ★★★
                 { dayId: 4, time: "09:00", title: "🥣 早餐", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a>", type: "food" },
                 { dayId: 4, time: "09:50", title: "🏰 古蹟巡禮", desc: "<a href='https://maps.app.goo.gl/DztRTHkY4sjzMtUJ8' target='_blank'>首里城公園</a> (車程約20分)", type: "activity", mapcode: "33 161 526*66" },
                 { dayId: 4, time: "11:50", title: "🍽️ 午餐", desc: "<a href='https://maps.app.goo.gl/QqgEhdrVPWhsaL936' target='_blank'>永旺城 南城大里</a> (車程約30分)", type: "food", mapcode: "232 559 133*82" },
@@ -214,15 +215,13 @@
                 { dayId: 4, time: "19:05", title: "🍛 晚餐：咖哩飯", desc: "<a href='https://maps.app.goo.gl/GxUUMn6ff7XAX2KR8' target='_blank'>CoCo Ichibanya Round 1 南風原店</a>", type: "food", mapcode: "33 071 832*22" },
                 { dayId: 4, time: "20:30", title: "🏨 返回住宿", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a> (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel" },
 
-                // ★★★ Day 5 ★★★
                 { dayId: 5, time: "08:30", title: "🍜 早餐：沖繩麵", desc: "<a href='https://maps.app.goo.gl/zbk64W2Ut8ctUWN39' target='_blank'>STAND EIBUN</a> (步行4分鐘。必點：亞瑟麵 Arthur Soba、咖哩麵)", type: "food", mapcode: "33 157 236*58" },
-                { dayId: 5, time: "10:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity", mapcode: "499 576 274*33" }, // 海中道路
+                { dayId: 5, time: "10:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity", mapcode: "499 576 274*33" }, 
                 { dayId: 5, time: "12:10", title: "🐙 點心：章魚燒", desc: "<a href='https://maps.app.goo.gl/fPvsVg6RrdH3idhZ8' target='_blank'>沖縄イイダコ屋太陽</a> <a href='https://www.facebook.com/reel/1540297270440381' target='_blank' class='text-blue-600 underline'>FB連結介紹</a>", type: "food", mapcode: "499 635 240*36" },
                 { dayId: 5, time: "13:00", title: "🛍️ 午餐 & 逛街", desc: "<a href='https://maps.app.goo.gl/zy6sQ5hfQgL2LMkc6' target='_blank'>永旺夢樂城來客夢 Rycom</a> (Porter在SAC'S BAR Resort)", type: "shopping", mapcode: "33 530 406*45" },
-                { dayId: 5, time: "17:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity", mapcode: "33 525 593*52" }, // 北谷公園停車場
+                { dayId: 5, time: "17:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity", mapcode: "33 525 593*52" },
                 { dayId: 5, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel" },
 
-                // ★★★ Day 6 ★★★
                 { dayId: 6, time: "09:30", title: "🌸 賞櫻", desc: "<a href='https://maps.app.goo.gl/M8S9cDXHb62GqHJ28' target='_blank'>與儀公園</a> (步行 6 分鐘)", type: "activity", mapcode: "33 128 662*63" },
                 { dayId: 6, time: "10:15", title: "🐟 早餐：海鮮", desc: "<a href='https://maps.app.goo.gl/Z2Hd63ESntQ4dNAn8' target='_blank'>泊港漁市場</a> (車程約15分)", type: "food", mapcode: "33 216 115*55" },
                 { dayId: 6, time: "11:30", title: "⛩️ 參拜", desc: "<a href='https://maps.app.goo.gl/K91cPBSJCRj8BWYE7' target='_blank'>波上宮</a> (停附近付費停車場)", type: "activity", mapcode: "33 185 023*28" },
@@ -233,13 +232,11 @@
                 { dayId: 6, time: "21:00", title: "🍜 晚餐：拉麵", desc: "<a href='https://maps.app.goo.gl/cp5a9u7DcSpHjWYBA' target='_blank'>烈火ラーメン暖暮</a> (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food", mapcode: "33 157 622*11" },
                 { dayId: 7, time: "09:00", title: "🥣 早餐：市場巡禮", desc: "<a href='https://maps.app.goo.gl/AYwfA4LNNigJvAV78' target='_blank'>牧志公設市場</a> (步行 10 分鐘)", type: "food", mapcode: "33 157 264*54" },
                 
-                // ★★★ Day 7 ★★★
                 { dayId: 7, time: "10:40", title: "✈️ 看飛機/海景", desc: "<a href='https://maps.app.goo.gl/KF5KNjECB1zjpcqo9' target='_blank'>瀨長島 Umikaji Terrace</a>", type: "activity", mapcode: "33 002 602*22" },
-                { dayId: 7, time: "12:00", title: "🛍️ Outlet 購物 & 午餐", desc: "<a href='https://maps.app.goo.gl/53Hpyq3h2Xz1HZ7d6' target='_blank'>Ashibinaa Outlet</a> (iias 沖繩豐崎)<br>逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：<a href='https://maps.app.goo.gl/JYRLNqQSZE9YqGxQ8' target='_blank'>沖繩菜園 Karakara</a> <a href='https://www.facebook.com/reel/1424317575868459' target='_blank' class='text-blue-600 underline'>FB介紹</a>", type: "shopping", mapcode: "232 544 452*22" }, // Outlet
-                { dayId: 7, time: "17:45", title: "🌃 國際通", desc: "車先停回<a href='https://maps.app.goo.gl/pKdmCGuYChxP3R8R8' target='_blank'>停車場</a>。<br>晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>沖縄料理居酒屋 ぶった</a>", type: "activity", mapcode: "33 157 435*30" }, // 停車場
+                { dayId: 7, time: "12:00", title: "🛍️ Outlet 購物 & 午餐", desc: "<a href='https://maps.app.goo.gl/53Hpyq3h2Xz1HZ7d6' target='_blank'>Ashibinaa Outlet</a> (iias 沖繩豐崎)<br>逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：<a href='https://maps.app.goo.gl/JYRLNqQSZE9YqGxQ8' target='_blank'>沖繩菜園 Karakara</a> <a href='https://www.facebook.com/reel/1424317575868459' target='_blank' class='text-blue-600 underline'>FB介紹</a>", type: "shopping", mapcode: "232 544 452*22" }, 
+                { dayId: 7, time: "17:45", title: "🌃 國際通", desc: "車先停回<a href='https://maps.app.goo.gl/pKdmCGuYChxP3R8R8' target='_blank'>停車場</a>。<br>晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>沖縄料理居酒屋 ぶった</a>", type: "activity", mapcode: "33 157 435*30" }, 
                 { dayId: 7, time: "21:00", title: "🏨 返回住宿", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a> (收行李) (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel" },
                 
-                // ★★★ Day 8 ★★★
                 { dayId: 8, time: "07:30", title: "🥣 早餐 / 退房", desc: "刻の宿 那覇 (檢查行李)", type: "food" },
                 { dayId: 8, time: "08:00", title: "🚗 前往大榮租車", desc: "<a href='https://maps.app.goo.gl/pd7XDm9EWGM1LQvx7' target='_blank'>大榮租車</a> (加油 & 還車)", type: "transport", mapcode: "33 002 782*33" },
                 { dayId: 8, time: "09:30", title: "🛫 辦理登機手續", desc: "那霸機場國際線航廈 (搭乘接駁車)", type: "transport" },
@@ -254,6 +251,7 @@
         let AVG_RATE = 0.22; // 平均匯率 (預設)
 
         window.addEventListener('DOMContentLoaded', () => {
+            fetchWeather(); // ★★★ 初始化時抓取天氣 ★★★
             renderDaySelector();
             renderItinerary(currentDayId);
             renderFlights();
@@ -264,6 +262,48 @@
             document.getElementById('ex-date').valueAsDate = new Date();
             document.getElementById('acc-custom-rate').value = AVG_RATE;
         });
+
+        // ★★★ 抓取 Open-Meteo 天氣預報 (Naha) ★★★
+        async function fetchWeather() {
+            try {
+                // 沖繩那霸座標
+                const lat = 26.2124;
+                const lon = 127.6809;
+                // 查詢 2026-02-08 ~ 2026-02-15
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=2026-02-08&end_date=2026-02-15`;
+                
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                // 整理數據：將 Day 1~8 對應到 API 回傳的 index 0~7
+                if (data.daily) {
+                    for (let i = 0; i < data.daily.time.length; i++) {
+                        // Day 1 對應 index 0
+                        WEATHER_DATA[i + 1] = {
+                            min: Math.round(data.daily.temperature_2m_min[i]),
+                            max: Math.round(data.daily.temperature_2m_max[i]),
+                            rain: data.daily.precipitation_probability_max[i],
+                            code: data.daily.weather_code[i]
+                        };
+                    }
+                    // 資料抓完後重新渲染一次行程表頭
+                    renderItinerary(currentDayId);
+                }
+            } catch (err) {
+                console.error("天氣抓取失敗", err);
+                // 失敗就算了，不影響主功能
+            }
+        }
+
+        // 天氣代碼轉圖示 helper
+        function getWeatherIcon(code) {
+            if (code <= 1) return '☀️'; // 晴天
+            if (code <= 3) return '⛅'; // 多雲
+            if (code <= 48) return '🌫️'; // 霧
+            if (code <= 67) return '🌧️'; // 雨
+            if (code <= 82) return '⛈️'; // 強雨
+            return '🌦️'; // 其他
+        }
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -300,7 +340,29 @@
             const list = document.getElementById('itinerary-list');
             const dayData = DATA.days.find(d => d.day === dayId);
             const items = DATA.activities.filter(a => a.dayId === dayId);
-            let html = `<div class="mb-4 px-1"><h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2><p class="text-sm text-gray-500 mt-1">${dayData.date}</p></div>`;
+            
+            // ★★★ 產生天氣 HTML ★★★
+            let weatherHtml = '';
+            const w = WEATHER_DATA[dayId];
+            if (w) {
+                const icon = getWeatherIcon(w.code);
+                const rainClass = w.rain > 50 ? 'text-blue-600 font-bold' : 'text-gray-500';
+                weatherHtml = `
+                    <div class="weather-capsule ml-3 inline-flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 shadow-sm">
+                        <span class="text-lg">${icon}</span>
+                        <span class="text-xs font-bold text-gray-700">${w.min}°-${w.max}°C</span>
+                        <span class="text-xs ${rainClass}">☔ ${w.rain}%</span>
+                    </div>
+                `;
+            }
+
+            let html = `<div class="mb-4 px-1 flex items-center flex-wrap">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2>
+                                <p class="text-sm text-gray-500 mt-1">${dayData.date}</p>
+                            </div>
+                            ${weatherHtml} </div>`;
+
             if (items.length === 0) html += `<div class="p-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">本日無特定行程</div>`;
             else {
                 html += items.map((item, index) => {
@@ -308,10 +370,9 @@
                     const typeColor = getTypeColor(item.type);
                     const typeIcon = getTypeIcon(item.type);
                     
-                    // 新增菜單按鈕
                     let menuBtn = item.menuImage ? `<button onclick="event.stopPropagation(); showImageModal('${item.menuImage}')" class="mt-2 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-orange-100 transition-colors w-fit">📖 查看菜單</button>` : '';
 
-                    // ★★★ 新增 MapCode 儀表板樣式 ★★★
+                    // ★★★ MapCode 儀表板樣式 ★★★
                     let mapCodeBlock = item.mapcode ? `
                     <div class="mt-3 bg-slate-800 rounded-lg p-2 flex items-center gap-3 border border-slate-700 shadow-sm" onclick="event.stopPropagation()">
                         <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-lg">🚗</div>
@@ -421,19 +482,13 @@
             `}).join('');
         }
 
-        // ★★★ 修正後的 renderMustBuy (依序渲染) ★★★
         function renderMustBuy() {
-            // 定義正確的圖片順序
             const images = ["pic_souvenir.jpg", "pic_food.jpg", "pic_aeon.jpg", "pic_parco.jpg", "pic_iias.jpg"];
-            
-            // 這裡我假設 DATA.shopping 也有對應的資料，但如果沒有，我們就單純渲染圖片
-            // 為了保持簡單，我們直接用 images 陣列來產生 HTML
             const html = images.map(img => `
                 <div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4">
                     <img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';">
                 </div>
             `).join('');
-            
             document.getElementById('mustbuy-list').innerHTML = html;
         }
 
@@ -708,6 +763,7 @@
         let CASH_AVG_RATE = 0.22; 
         let CREDIT_CARD_RATE = 0.225;
 
+        // ★★★ 核心邏輯：根據付款人自動切換匯率 ★★★
         function updateRateInputLogic() {
             const currency = document.getElementById('acc-currency').value;
             const payer = document.getElementById('acc-payer').value;
@@ -716,16 +772,16 @@
 
             if (currency === 'JPY') {
                 rateArea.classList.remove('hidden');
+                // 公費 = 用現金 = 平均匯率
                 if (payer.includes('公費')) {
                     rateInput.value = CASH_AVG_RATE.toFixed(4);
                     rateInput.disabled = true;
                     rateInput.classList.add('text-gray-400');
                     rateInput.classList.remove('text-cyan-600');
                 } else {
-                    if(rateInput.disabled || rateInput.value == 1) { 
-                         rateInput.value = CREDIT_CARD_RATE.toFixed(4);
-                    }
-                    rateInput.disabled = false;
+                    // 個人 = 刷卡 = 信用卡即時匯率 (含1.5%)
+                    rateInput.value = CREDIT_CARD_RATE.toFixed(4);
+                    rateInput.disabled = false; // 允許微調
                     rateInput.classList.remove('text-gray-400');
                     rateInput.classList.add('text-cyan-600');
                 }
@@ -737,110 +793,59 @@
 
         async function submitExpense(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit-acc');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '處理中...';
-
+            const btn = document.getElementById('btn-submit-acc'); const originalText = btn.innerHTML; btn.disabled = true; btn.innerHTML = '處理中...';
             const currency = document.getElementById('acc-currency').value;
             let rateToSend = document.getElementById('acc-custom-rate').value || CASH_AVG_RATE;
-            if (currency === 'TWD') {
-                rateToSend = 1;
-            }
+            if (currency === 'TWD') rateToSend = 1;
 
-            const payload = {
-                action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense',
-                row: document.getElementById('edit-row-id').value,
-                date: document.getElementById('acc-date').value,
-                payer: document.getElementById('acc-payer').value,
-                item: document.getElementById('acc-item').value,
-                currency: currency,
-                amount: document.getElementById('acc-amount').value,
-                rate: rateToSend, 
-                note: document.getElementById('acc-note').value
-            };
-
-            try {
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert('✅ 記帳成功！');
-                resetFormState();
-                fetchData();
-            } catch (err) {
-                alert("❌ 連線失敗");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
+            const payload = { action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense', row: document.getElementById('edit-row-id').value, date: document.getElementById('acc-date').value, payer: document.getElementById('acc-payer').value, item: document.getElementById('acc-item').value, currency: currency, amount: document.getElementById('acc-amount').value, rate: rateToSend, note: document.getElementById('acc-note').value };
+            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); alert('✅ 記帳成功！'); resetFormState(); fetchData(); } catch (err) { alert("❌ 連線失敗"); } finally { btn.disabled = false; btn.innerHTML = originalText; }
         }
 
         async function fetchData() {
-            const listDiv = document.getElementById('expense-list');
-            const totalEl = document.getElementById('total-expense');
-            const loadingMsg = document.getElementById('loading-msg');
-            loadingMsg.classList.remove('hidden');
-            listDiv.style.opacity = '0.5';
-
+            const listDiv = document.getElementById('expense-list'); const loadingMsg = document.getElementById('loading-msg'); loadingMsg.classList.remove('hidden'); listDiv.style.opacity = '0.5';
             try {
-                const res = await fetch(GAS_URL);
-                const data = await res.json();
-                
-                if (data.error) {
-                    listDiv.innerHTML = `<div class="text-center text-red-400 py-4 text-sm">後端錯誤: ${data.error}</div>`;
-                    return;
-                }
+                const res = await fetch(GAS_URL); const data = await res.json();
+                if (data.error) { listDiv.innerHTML = `後端錯誤: ${data.error}`; return; }
 
+                // ★★★ 接收即時刷卡匯率 ★★★
                 if (data.creditCardRate && parseFloat(data.creditCardRate) > 0) {
                     CREDIT_CARD_RATE = parseFloat(data.creditCardRate);
                 }
 
-                let totalTWD = 0, totalJPY = 0;
-                let exchangeHistoryHtml = '';
-                
+                // ★★★ 計算現金平均匯率 (只從換匯紀錄算) ★★★
+                let totalTWD = 0, totalJPY = 0; let exchangeHistoryHtml = '';
                 if (data.exchanges && data.exchanges.length > 0) {
-                    data.exchanges.forEach(ex => {
-                        totalTWD += parseInt(ex.twd);
-                        totalJPY += parseInt(ex.jpy);
-                        exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
-                    });
-                    
-                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
+                    data.exchanges.forEach(ex => { totalTWD += parseInt(ex.twd); totalJPY += parseInt(ex.jpy); exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`; });
+                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); // 更新公款現金匯率
                 }
                 
+                // ★★★ 更新 UI：公款只顯示現金匯率 (不再被變數覆蓋) ★★★
                 document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
                 
+                // 更新計算機：顯示刷卡匯率
                 document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
-                let totalSpentTWD = 0;
-                let spentPublicJPY = 0;
-                let xiangPaid = 0, yanPaid = 0;
-                let extraDebt_YanOwesXiang = 0; 
-                let html = '';
-
+                let totalSpentTWD = 0, spentPublicJPY = 0, xiangPaid = 0, yanPaid = 0, extraDebt_YanOwesXiang = 0; let html = '';
+                
                 // ★★★ 關鍵：儲存所有資料到全域變數，供按鈕使用 ★★★
                 ALL_EXPENSES = data.expenses;
 
                 data.expenses.forEach((bill, index) => {
-                    let twd = 0;
-                    let displaySubText = '';
-
+                    let twd = 0; let displaySubText = '';
                     if (bill.currency === 'JPY') {
+                        // 使用每筆消費記錄當下的匯率
                         const appliedRate = bill.rate ? parseFloat(bill.rate) : CASH_AVG_RATE;
                         twd = Math.round(bill.amount * appliedRate);
                         displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
                         if (String(bill.payer).startsWith('公費')) spentPublicJPY += parseInt(bill.amount);
-                    } else {
-                        twd = parseInt(bill.amount);
-                    }
+                    } else { twd = parseInt(bill.amount); }
 
                     if (bill.payer === '公費' || bill.payer.includes('共同')) {} 
                     else if (bill.payer === '公費-翔') extraDebt_YanOwesXiang -= (twd / 2); 
                     else if (bill.payer === '公費-彥') extraDebt_YanOwesXiang += (twd / 2);
-                    else {
-                        totalSpentTWD += twd;
-                        if (bill.payer.includes('翔')) xiangPaid += twd;
-                        if (bill.payer.includes('彥')) yanPaid += twd;
-                    }
+                    else { totalSpentTWD += twd; if (bill.payer.includes('翔')) xiangPaid += twd; if (bill.payer.includes('彥')) yanPaid += twd; }
 
                     const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
                     let payerLabel = bill.payer.split(' ')[0];
@@ -848,6 +853,7 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
+                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
                     <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
                         <div class="flex-1">
@@ -881,18 +887,13 @@
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            const text = document.getElementById('settlement-text');
-            const baseDiff = (xiang - yan) / 2;
-            const finalDiff = baseDiff + extraDebt;
-            const absVal = Math.round(Math.abs(finalDiff));
-            
-            if (absVal === 0) text.innerText = "🎉 平衡";
-            else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
-            else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            const text = document.getElementById('settlement-text'); const baseDiff = (xiang - yan) / 2; const finalDiff = baseDiff + extraDebt; const absVal = Math.round(Math.abs(finalDiff));
+            if (absVal === 0) text.innerText = "🎉 平衡"; else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`; else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
         }
 
+        // ★★★ 修改：改為接收 Index，去全域陣列找資料 ★★★
         function editExpense(index) { 
-            const data = ALL_EXPENSES[index]; 
+            const data = ALL_EXPENSES[index]; // 從全域變數抓資料，絕對安全
             if (!data) return;
 
             document.getElementById('edit-row-id').value = data.rowIndex; 
