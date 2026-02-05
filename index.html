@@ -106,14 +106,16 @@
         </div>
     </main>
 
-    <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group">
-        <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 pointer-events-none translate-y-10">
-            <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span><div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗺️</span></div></button>
-            <button onclick="toggleTaxCalc(); toggleFab();" class="flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span><div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🛍️</span></div></button>
-            <button onclick="toggleTranslate(); toggleFab();" class="flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">翻譯機</span><div class="bg-violet-600 hover:bg-violet-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗣️</span></div></button>
-            <button onclick="toggleCalc(); toggleFab();" class="flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">匯率計算</span><div class="bg-pink-500 hover:bg-pink-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div></button>
+    <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 pointer-events-none">
+        <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 translate-y-10">
+            <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span><div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗺️</span></div></button>
+            <button onclick="toggleTaxCalc(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span><div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🛍️</span></div></button>
+            <button onclick="toggleTranslate(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">翻譯機</span><div class="bg-violet-600 hover:bg-violet-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗣️</span></div></button>
+            <button onclick="toggleCalc(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">匯率計算</span><div class="bg-pink-500 hover:bg-pink-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div></button>
         </div>
-        <button id="fab-main" onclick="toggleFab()" class="bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50"><span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span></button>
+        <button id="fab-main" onclick="toggleFab()" class="pointer-events-auto bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50">
+            <span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span>
+        </button>
     </div>
 
     <div id="universal-image-modal" class="fixed inset-0 z-[95] flex items-center justify-center px-4 modal hidden-modal"><div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeImageModal()"></div><div class="relative z-10 w-full max-w-4xl h-full flex items-center justify-center p-4"><img id="modal-image-src" src="" alt="預覽圖片" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl"><button onclick="closeImageModal()" class="absolute top-6 right-6 bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold">✕</button></div></div>
@@ -152,7 +154,6 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 全域變數：儲存所有帳目 (解決手機無法點擊的關鍵) ★★★
         let ALL_EXPENSES = [];
 
         // ★★★ 班機與住宿資料 ★★★
@@ -506,7 +507,6 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
-                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
                     <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
                         <div class="flex-1">
