@@ -99,15 +99,33 @@
         </div>
     </main>
 
-    <div class="fixed bottom-24 right-5 z-40 flex flex-col gap-3">
-        <button onclick="toggleTaxCalc()" class="bg-orange-500 hover:bg-orange-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border-2 border-white">
-            <span class="text-2xl">🛍️</span>
-        </button>
-        <button onclick="toggleTranslate()" class="bg-violet-600 hover:bg-violet-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border-2 border-white">
-            <span class="text-2xl">🗣️</span>
-        </button>
-        <button onclick="toggleCalc()" class="bg-pink-500 hover:bg-pink-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 border-2 border-white">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+    <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group">
+        <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 pointer-events-none translate-y-10">
+            
+            <button onclick="toggleTaxCalc(); toggleFab();" class="flex items-center gap-2 group/item">
+                <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span>
+                <div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+                    <span class="text-xl">🛍️</span>
+                </div>
+            </button>
+
+            <button onclick="toggleTranslate(); toggleFab();" class="flex items-center gap-2 group/item">
+                <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">翻譯機</span>
+                <div class="bg-violet-600 hover:bg-violet-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+                    <span class="text-xl">🗣️</span>
+                </div>
+            </button>
+
+            <button onclick="toggleCalc(); toggleFab();" class="flex items-center gap-2 group/item">
+                <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">匯率計算</span>
+                <div class="bg-pink-500 hover:bg-pink-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                </div>
+            </button>
+        </div>
+
+        <button id="fab-main" onclick="toggleFab()" class="bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50">
+            <span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span>
         </button>
     </div>
 
@@ -315,8 +333,6 @@
             renderItinerary(currentDayId);
             renderFlights();
             renderHotels();
-            
-            // ★★★ 新增：渲染必買圖片 ★★★
             renderMustBuy();
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
@@ -417,6 +433,27 @@
         function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
         function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
+
+        // --- 收納式按鈕 (FAB) 邏輯 ---
+        let isFabOpen = false;
+        function toggleFab() {
+            isFabOpen = !isFabOpen;
+            const menu = document.getElementById('fab-menu');
+            const icon = document.getElementById('fab-icon');
+            const mainBtn = document.getElementById('fab-main');
+
+            if (isFabOpen) {
+                menu.classList.remove('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10');
+                icon.innerText = '✕'; // 變成叉叉
+                icon.classList.add('rotate-90');
+                mainBtn.classList.replace('bg-gray-800', 'bg-red-500'); // 變成紅色
+            } else {
+                menu.classList.add('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10');
+                icon.innerText = '🛠️'; // 變回工具箱
+                icon.classList.remove('rotate-90');
+                mainBtn.classList.replace('bg-red-500', 'bg-gray-800'); // 變回深灰色
+            }
+        }
 
         // --- 翻譯機邏輯 ---
         function toggleTranslate() {
@@ -661,7 +698,6 @@
                     rateInput.classList.add('text-cyan-600');
                 }
             } else {
-                // ★★★ 修正點：如果是台幣，隱藏匯率欄位，並強制設為 1 ★★★
                 rateArea.classList.add('hidden');
                 rateInput.value = 1;
             }
@@ -674,7 +710,6 @@
             btn.disabled = true;
             btn.innerHTML = '處理中...';
 
-            // ★★★ 修正點：送出前再次確認，如果是台幣，匯率強制為 1 ★★★
             const currency = document.getElementById('acc-currency').value;
             let rateToSend = document.getElementById('acc-custom-rate').value || AVG_RATE;
             if (currency === 'TWD') {
