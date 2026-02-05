@@ -92,7 +92,7 @@
                     <h2 class="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wider">🇯🇵 公款日幣餘額</h2>
                     <div class="text-2xl font-black text-blue-800 tracking-tight">¥<span id="public-balance">0</span></div>
                     <div class="text-[10px] text-gray-400 mt-1 flex gap-2 items-center">
-                        <span id="avg-rate-label">現金匯率: <span id="avg-rate-display">--</span></span>
+                        <span>現金匯率: <span id="avg-rate-display" class="font-bold text-gray-600">--</span></span>
                         <span class="text-blue-400 font-medium">(約 NT$<span id="public-balance-twd">0</span>)</span>
                     </div>
                 </div>
@@ -225,7 +225,7 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 班機與住宿資料更新 (加入圖片與QR Code) ★★★
+        // ★★★ 班機與住宿資料 ★★★
         const DATA = {
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [
@@ -268,8 +268,8 @@
                     url: "https://maps.app.goo.gl/EenGmCNZVDMrvn3o6",
                     note: "入住代碼 733562",
                     important: true,
-                    qrImage: "入住QRCODE.png", // 新增QR
-                    trashImage: "員工停車場垃圾桶位置.png", // 新增垃圾地圖
+                    qrImage: "入住QRCODE.png", 
+                    trashImage: "員工停車場垃圾桶位置.png", 
                     trashNote: "當房間垃圾桶滿了，請丟至員工停車場入口旁的垃圾處理區 (點擊按鈕看地圖)。"
                 }
             ],
@@ -347,7 +347,8 @@
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
             document.getElementById('ex-date').valueAsDate = new Date();
-            document.getElementById('acc-custom-rate').value = AVG_RATE;
+            // 預設匯率顯示現金
+            document.getElementById('acc-custom-rate').value = CASH_AVG_RATE;
         });
 
         function switchTab(tabName) {
@@ -363,22 +364,14 @@
             if(tabName === 'accounting') fetchData();
         }
 
-        // --- 行程相關功能 ---
-        function selectDay(dayId) {
-            currentDayId = dayId;
-            renderDaySelector();
-            renderItinerary(dayId);
-            document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        // --- 行程相關功能 (省略重複部分) ---
+        function selectDay(dayId) { currentDayId = dayId; renderDaySelector(); renderItinerary(dayId); document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' }); }
         function renderDaySelector() {
             const container = document.getElementById('day-selector');
             container.innerHTML = DATA.days.map(d => {
                 const isActive = d.day === currentDayId;
                 const activeClass = isActive ? 'bg-cyan-600 text-white shadow-md transform scale-105' : 'bg-white text-gray-500 border border-gray-100';
-                return `<button onclick="selectDay(${d.day})" class="flex-none flex flex-col items-center justify-center min-w-[3.8rem] py-2 rounded-xl transition-all duration-200 ${activeClass}">
-                        <span class="text-[10px] font-medium opacity-90">Day ${d.day}</span>
-                        <span class="text-sm font-bold">${d.date.split('(')[0]}</span>
-                    </button>`;
+                return `<button onclick="selectDay(${d.day})" class="flex-none flex flex-col items-center justify-center min-w-[3.8rem] py-2 rounded-xl transition-all duration-200 ${activeClass}"><span class="text-[10px] font-medium opacity-90">Day ${d.day}</span><span class="text-sm font-bold">${d.date.split('(')[0]}</span></button>`;
             }).join('');
         }
         function renderItinerary(dayId) {
@@ -387,60 +380,17 @@
             const items = DATA.activities.filter(a => a.dayId === dayId);
             let html = `<div class="mb-4 px-1"><h2 class="text-2xl font-bold text-gray-800">${dayData.title}</h2><p class="text-sm text-gray-500 mt-1">${dayData.date}</p></div>`;
             if (items.length === 0) html += `<div class="p-8 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">本日無特定行程</div>`;
-            else {
-                html += items.map((item, index) => {
-                    const isLast = index === items.length - 1;
-                    const typeColor = getTypeColor(item.type);
-                    const typeIcon = getTypeIcon(item.type);
-                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}</div></div></div></div>`;
-                }).join('');
-            }
-            list.innerHTML = html;
+            else { html += items.map((item, index) => { const isLast = index === items.length - 1; const typeColor = getTypeColor(item.type); const typeIcon = getTypeIcon(item.type); return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}</div></div></div></div>`; }).join(''); } list.innerHTML = html;
         }
+        function renderFlights() { document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `<div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4"><div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div><div class="flex justify-between items-center mb-4 mt-2"><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.from}</div></div><div class="flex-1 flex flex-col items-center px-4"><div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div><div class="w-full h-[1px] bg-gray-300"></div></div><div class="text-center"><div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div><div class="text-xs text-gray-500 mt-1">${f.to}</div></div></div><div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100 mb-3">${f.note}</div><div class="grid grid-cols-1 gap-2">${f.links.map(link => `<a href="${link.url}" target="_blank" class="block text-center bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-600 py-2 rounded-lg text-xs font-bold transition-colors">${link.label}</a>`).join('')}</div></div>`).join(''); }
         
-        // ★★★ 班機卡片渲染 ★★★
-        function renderFlights() {
-            document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4">
-                    <div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-lg font-bold">${f.type}</div>
-                    
-                    <div class="flex justify-between items-center mb-4 mt-2">
-                        <div class="text-center">
-                            <div class="text-3xl font-black text-gray-800">${f.time.split('-')[0].trim()}</div>
-                            <div class="text-xs text-gray-500 mt-1">${f.from}</div>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center px-4">
-                            <div class="text-xs text-blue-600 font-bold mb-1">${f.airline}</div>
-                            <div class="w-full h-[1px] bg-gray-300"></div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-black text-gray-800">${f.time.split('-')[1].trim()}</div>
-                            <div class="text-xs text-gray-500 mt-1">${f.to}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100 mb-3">${f.note}</div>
-                    
-                    <div class="grid grid-cols-1 gap-2">
-                        ${f.links.map(link => `
-                            <a href="${link.url}" target="_blank" class="block text-center bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-600 py-2 rounded-lg text-xs font-bold transition-colors">
-                                ${link.label}
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ★★★ 住宿卡片渲染 (新增QR Code與垃圾按鈕) ★★★
+        // ★★★ 住宿卡片渲染 (恢復完整邏輯) ★★★
         function renderHotels() {
             document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => {
-                // 憑證按鈕 (前兩間)
                 const voucherBtn = h.voucher 
                     ? `<a href="${h.voucher}" target="_blank" class="flex-1 block text-center bg-teal-50 hover:bg-teal-100 text-teal-700 py-3 rounded-xl text-sm font-bold transition-colors border border-teal-100">📄 查看憑證</a>` 
                     : '';
 
-                // 額外功能區 (第三間)
                 let extraSection = '';
                 if (h.qrImage || h.trashImage) {
                     extraSection = `
@@ -492,272 +442,71 @@
             `}).join('');
         }
 
-        function renderMustBuy() {
-            const images = ["pic_aeon.jpg", "pic_food.jpg", "pic_iias.jpg", "pic_parco.jpg", "pic_souvenir.jpg"];
-            const html = images.map(img => `<div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4"><img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';"></div>`).join('');
-            document.getElementById('mustbuy-list').innerHTML = html;
-        }
+        function renderMustBuy() { const images = ["pic_aeon.jpg", "pic_food.jpg", "pic_iias.jpg", "pic_parco.jpg", "pic_souvenir.jpg"]; const html = images.map(img => `<div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4"><img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';"></div>`).join(''); document.getElementById('mustbuy-list').innerHTML = html; }
         function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
         function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
 
-        // --- 收納式按鈕 (FAB) 邏輯 ---
+        // --- 小工具邏輯 ---
         let isFabOpen = false;
-        function toggleFab() {
-            isFabOpen = !isFabOpen;
-            const menu = document.getElementById('fab-menu');
-            const icon = document.getElementById('fab-icon');
-            const mainBtn = document.getElementById('fab-main');
+        function toggleFab() { isFabOpen = !isFabOpen; const menu = document.getElementById('fab-menu'); const icon = document.getElementById('fab-icon'); const mainBtn = document.getElementById('fab-main'); if (isFabOpen) { menu.classList.remove('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10'); icon.innerText = '✕'; icon.classList.add('rotate-90'); mainBtn.classList.replace('bg-gray-800', 'bg-red-500'); } else { menu.classList.add('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10'); icon.innerText = '🛠️'; icon.classList.remove('rotate-90'); mainBtn.classList.replace('bg-red-500', 'bg-gray-800'); } }
+        function toggleMap() { const modal = document.getElementById('map-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
+        // ★★★ 通用圖片燈箱邏輯 ★★★
+        function showImageModal(src) { const modal = document.getElementById('universal-image-modal'); const img = document.getElementById('modal-image-src'); img.src = src; modal.classList.remove('hidden-modal'); modal.classList.add('show-modal'); }
+        function closeImageModal() { const modal = document.getElementById('universal-image-modal'); modal.classList.add('hidden-modal'); modal.classList.remove('show-modal'); }
 
-            if (isFabOpen) {
-                menu.classList.remove('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10');
-                icon.innerText = '✕'; // 變成叉叉
-                icon.classList.add('rotate-90');
-                mainBtn.classList.replace('bg-gray-800', 'bg-red-500'); // 變成紅色
-            } else {
-                menu.classList.add('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10');
-                icon.innerText = '🛠️'; // 變回工具箱
-                icon.classList.remove('rotate-90');
-                mainBtn.classList.replace('bg-red-500', 'bg-gray-800'); // 變回深灰色
-            }
-        }
-
-        // --- 通用圖片燈箱邏輯 (取代原本的 toggleMap) ---
-        function showImageModal(src) {
-            const modal = document.getElementById('universal-image-modal');
-            const img = document.getElementById('modal-image-src');
-            img.src = src;
-            modal.classList.remove('hidden-modal');
-            modal.classList.add('show-modal');
-        }
-
-        function closeImageModal() {
-            const modal = document.getElementById('universal-image-modal');
-            modal.classList.add('hidden-modal');
-            modal.classList.remove('show-modal');
-        }
-
-        // --- 翻譯機邏輯 ---
-        function toggleTranslate() {
-            const modal = document.getElementById('translate-modal');
-            modal.classList.toggle('hidden-modal');
-            modal.classList.toggle('show-modal');
-        }
-
-        // 語音辨識 (Web Speech API)
+        function toggleTranslate() { const modal = document.getElementById('translate-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
+        
         function startDictation() {
             if ('webkitSpeechRecognition' in window) {
                 const recognition = new webkitSpeechRecognition();
-                recognition.lang = 'zh-TW'; // 辨識中文
-                recognition.continuous = false;
-                recognition.interimResults = false;
-
-                const btnMic = document.getElementById('btn-mic');
-                btnMic.innerHTML = '<div class="recording-pulse w-4 h-4 bg-red-500 rounded-full"></div> 聽寫中...';
-                
-                recognition.onresult = function(event) {
-                    const text = event.results[0][0].transcript;
-                    document.getElementById('trans-input').value = text;
-                    btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話';
-                };
-
-                recognition.onerror = function(event) {
-                    alert('語音辨識錯誤，請手動輸入');
-                    btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話';
-                };
-
-                recognition.onend = function() {
-                    btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話';
-                };
-
+                recognition.lang = 'zh-TW'; recognition.continuous = false; recognition.interimResults = false;
+                const btnMic = document.getElementById('btn-mic'); btnMic.innerHTML = '<div class="recording-pulse w-4 h-4 bg-red-500 rounded-full"></div> 聽寫中...';
+                recognition.onresult = function(event) { document.getElementById('trans-input').value = event.results[0][0].transcript; btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話'; };
+                recognition.onerror = function() { alert('語音辨識錯誤'); btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話'; };
                 recognition.start();
-            } else {
-                alert('您的瀏覽器不支援語音辨識');
-            }
+            } else { alert('您的瀏覽器不支援'); }
         }
-
-        // 呼叫 GAS 進行翻譯 (修正為接收中英雙語)
         async function doTranslate() {
-            const text = document.getElementById('trans-input').value;
-            if (!text) return;
-
-            const btn = document.getElementById('btn-trans-go');
-            const resultArea = document.getElementById('trans-result');
-            const resultAreaEn = document.getElementById('trans-result-en');
-            
-            btn.disabled = true;
-            btn.innerText = "翻譯中...";
-            resultArea.innerText = "...";
-            resultAreaEn.innerText = "";
-
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'translate', text: text })
-                });
-                const data = await res.json();
-                
-                if (data.result === 'success') {
-                    resultArea.innerText = data.text; // 日文
-                    resultAreaEn.innerText = data.textEn; // 英文
-                } else {
-                    const errorMsg = data.msg || data.error || "未知錯誤";
-                    resultArea.innerText = "失敗: " + errorMsg;
-                }
-            } catch (err) {
-                console.error(err);
-                resultArea.innerText = "連線錯誤: " + err.message;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "翻譯成日文";
-            }
+            const text = document.getElementById('trans-input').value; if (!text) return;
+            const btn = document.getElementById('btn-trans-go'); const resultArea = document.getElementById('trans-result'); const resultAreaEn = document.getElementById('trans-result-en');
+            btn.disabled = true; btn.innerText = "翻譯中..."; resultArea.innerText = "..."; resultAreaEn.innerText = "";
+            try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'translate', text: text }) }); const data = await res.json(); if (data.result === 'success') { resultArea.innerText = data.text; resultAreaEn.innerText = data.textEn; } else { resultArea.innerText = "失敗"; } } catch (err) { resultArea.innerText = "錯誤"; } finally { btn.disabled = false; btn.innerText = "翻譯成日文"; }
         }
+        function speakResult() { const text = document.getElementById('trans-result').innerText; if (!text || text === '...') return; const utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'ja-JP'; window.speechSynthesis.speak(utterance); }
 
-        // 朗讀日文
-        function speakResult() {
-            const text = document.getElementById('trans-result').innerText;
-            if (!text || text === '...') return;
-            
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ja-JP';
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // --- 免稅計算機邏輯 (清單模式) ---
-        function toggleTaxCalc() {
-            const modal = document.getElementById('tax-modal');
-            modal.classList.toggle('hidden-modal');
-            modal.classList.toggle('show-modal');
-        }
-
-        let taxList = [];
-        const TAX_TARGET = 5500; // 免稅門檻 (含稅)
-
+        function toggleTaxCalc() { const modal = document.getElementById('tax-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
+        let taxList = []; const TAX_TARGET = 5500;
         function addTaxItem() {
-            const nameInput = document.getElementById('tax-item-name');
-            const priceInput = document.getElementById('tax-item-price');
-            const price = parseFloat(priceInput.value);
-
-            if (!price || price <= 0) {
-                alert("請輸入有效的金額！");
-                return;
-            }
-
-            taxList.push({
-                name: nameInput.value.trim() || '未命名商品',
-                price: price
-            });
-
-            nameInput.value = '';
-            priceInput.value = '';
-            nameInput.focus();
-            
-            renderTaxList();
+            const nameInput = document.getElementById('tax-item-name'); const priceInput = document.getElementById('tax-item-price'); const price = parseFloat(priceInput.value);
+            if (!price || price <= 0) { alert("請輸入有效的金額！"); return; }
+            taxList.push({ name: nameInput.value.trim() || '未命名商品', price: price });
+            nameInput.value = ''; priceInput.value = ''; nameInput.focus(); renderTaxList();
         }
-
-        function removeTaxItem(index) {
-            taxList.splice(index, 1);
-            renderTaxList();
-        }
-
+        function removeTaxItem(index) { taxList.splice(index, 1); renderTaxList(); }
         function renderTaxList() {
-            const container = document.getElementById('tax-list');
-            const totalDisplay = document.getElementById('tax-total-display');
-            const progress = document.getElementById('tax-progress');
-            const status = document.getElementById('tax-status');
-            const refund = document.getElementById('tax-refund');
-
-            let total = 0;
-            let html = '';
-
-            taxList.forEach((item, index) => {
-                total += item.price;
-                html += `
-                    <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-2 rounded-lg">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-gray-700 truncate">${item.name}</p>
-                            <p class="text-xs text-gray-400">¥${item.price.toLocaleString()}</p>
-                        </div>
-                        <button onclick="removeTaxItem(${index})" class="text-gray-400 hover:text-red-500 p-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html || '<div class="text-center text-gray-300 text-xs py-4">清單是空的</div>';
-            totalDisplay.innerText = total.toLocaleString();
-
-            // 更新進度條
-            const percent = Math.min((total / TAX_TARGET) * 100, 100);
-            progress.style.width = percent + '%';
-
-            if (total >= TAX_TARGET) {
-                progress.classList.remove('bg-orange-400');
-                progress.classList.add('bg-green-500');
-                status.innerHTML = `🎉 已達免稅門檻！`;
-                status.classList.replace('text-gray-400', 'text-green-600');
-                status.classList.remove('text-gray-700');
-                
-                const estimatedRefund = Math.floor(total / 1.1 * 0.1);
-                refund.innerText = `預計退稅約 ¥${estimatedRefund.toLocaleString()}`;
-            } else {
-                progress.classList.add('bg-orange-400');
-                progress.classList.remove('bg-green-500');
-                const diff = TAX_TARGET - total;
-                status.innerHTML = `還差 <span class="text-red-500">¥${diff.toLocaleString()}</span> 達標`;
-                status.classList.replace('text-green-600', 'text-gray-400');
-                status.classList.add('text-gray-700');
-                refund.innerText = '';
-            }
+            const container = document.getElementById('tax-list'); const totalDisplay = document.getElementById('tax-total-display'); const progress = document.getElementById('tax-progress'); const status = document.getElementById('tax-status'); const refund = document.getElementById('tax-refund');
+            let total = 0; let html = '';
+            taxList.forEach((item, index) => { total += item.price; html += `<div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-2 rounded-lg"><div class="flex-1 min-w-0"><p class="text-sm font-bold text-gray-700 truncate">${item.name}</p><p class="text-xs text-gray-400">¥${item.price.toLocaleString()}</p></div><button onclick="removeTaxItem(${index})" class="text-gray-400 hover:text-red-500 p-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>`; });
+            container.innerHTML = html || '<div class="text-center text-gray-300 text-xs py-4">清單是空的</div>'; totalDisplay.innerText = total.toLocaleString();
+            const percent = Math.min((total / TAX_TARGET) * 100, 100); progress.style.width = percent + '%';
+            if (total >= TAX_TARGET) { progress.classList.remove('bg-orange-400'); progress.classList.add('bg-green-500'); status.innerHTML = `🎉 已達免稅門檻！`; status.classList.replace('text-gray-400', 'text-green-600'); const estimatedRefund = Math.floor(total / 1.1 * 0.1); refund.innerText = `預計退稅約 ¥${estimatedRefund.toLocaleString()}`; } else { progress.classList.add('bg-orange-400'); progress.classList.remove('bg-green-500'); const diff = TAX_TARGET - total; status.innerHTML = `還差 <span class="text-red-500">¥${diff.toLocaleString()}</span> 達標`; status.classList.replace('text-green-600', 'text-gray-400'); refund.innerText = ''; }
         }
+        document.getElementById('tax-item-price').addEventListener('keypress', function (e) { if (e.key === 'Enter') addTaxItem(); });
 
-        // 綁定 Enter 鍵快速加入
-        document.getElementById('tax-item-price').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') addTaxItem();
-        });
-
-        // --- 記帳與換匯邏輯 (不變) ---
-        function toggleExchangeModal() {
-            const modal = document.getElementById('exchange-modal');
-            modal.classList.toggle('hidden-modal');
-            modal.classList.toggle('show-modal');
-        }
-
-        function toggleSettlement() {
-            const content = document.getElementById('settlement-content');
-            const arrow = document.getElementById('arrow-settlement');
-            content.classList.toggle('open');
-            arrow.classList.toggle('rotate');
-        }
-
+        // --- 記帳與換匯邏輯 ---
+        function toggleExchangeModal() { const modal = document.getElementById('exchange-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
+        function toggleSettlement() { const content = document.getElementById('settlement-content'); const arrow = document.getElementById('arrow-settlement'); content.classList.toggle('open'); arrow.classList.toggle('rotate'); }
+        
         async function submitExchange() {
-            const btn = document.getElementById('btn-submit-ex');
-            const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = "處理中...";
-
-            const payload = {
-                action: 'add_exchange',
-                date: document.getElementById('ex-date').value,
-                who: document.getElementById('ex-who').value,
-                twd: document.getElementById('ex-twd').value,
-                jpy: document.getElementById('ex-jpy').value
-            };
-
-            try {
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert("✅ 換匯紀錄成功！");
-                toggleExchangeModal();
-                fetchData();
-            } catch (err) {
-                alert("❌ 連線失敗");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = originalText;
-            }
+            const btn = document.getElementById('btn-submit-ex'); btn.innerText = "處理中..."; btn.disabled = true;
+            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'add_exchange', date: document.getElementById('ex-date').value, who: document.getElementById('ex-who').value, twd: document.getElementById('ex-twd').value, jpy: document.getElementById('ex-jpy').value }) }); alert("✅ 換匯紀錄成功！"); toggleExchangeModal(); fetchData(); } catch (err) { alert("❌ 連線失敗"); } finally { btn.disabled = false; btn.innerText = "確認新增"; }
         }
 
+        let CASH_AVG_RATE = 0.22; 
+        let CREDIT_CARD_RATE = 0.225;
+
+        // ★★★ 核心邏輯：根據付款人自動切換匯率 ★★★
         function updateRateInputLogic() {
             const currency = document.getElementById('acc-currency').value;
             const payer = document.getElementById('acc-payer').value;
@@ -766,16 +515,16 @@
 
             if (currency === 'JPY') {
                 rateArea.classList.remove('hidden');
+                // 公費 = 用現金 = 平均匯率
                 if (payer.includes('公費')) {
-                    rateInput.value = AVG_RATE.toFixed(4);
+                    rateInput.value = CASH_AVG_RATE.toFixed(4);
                     rateInput.disabled = true;
                     rateInput.classList.add('text-gray-400');
                     rateInput.classList.remove('text-cyan-600');
                 } else {
-                    if(rateInput.disabled || rateInput.value == 1) { // 如果之前被重設為1，現在切回日幣要改回匯率
-                         rateInput.value = AVG_RATE.toFixed(4);
-                    }
-                    rateInput.disabled = false;
+                    // 個人 = 刷卡 = 信用卡即時匯率 (含1.5%)
+                    rateInput.value = CREDIT_CARD_RATE.toFixed(4);
+                    rateInput.disabled = false; // 允許微調
                     rateInput.classList.remove('text-gray-400');
                     rateInput.classList.add('text-cyan-600');
                 }
@@ -787,194 +536,85 @@
 
         async function submitExpense(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit-acc');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '處理中...';
-
+            const btn = document.getElementById('btn-submit-acc'); const originalText = btn.innerHTML; btn.disabled = true; btn.innerHTML = '處理中...';
             const currency = document.getElementById('acc-currency').value;
-            let rateToSend = document.getElementById('acc-custom-rate').value || AVG_RATE;
-            if (currency === 'TWD') {
-                rateToSend = 1;
-            }
+            let rateToSend = document.getElementById('acc-custom-rate').value || CASH_AVG_RATE;
+            if (currency === 'TWD') rateToSend = 1;
 
-            const payload = {
-                action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense',
-                row: document.getElementById('edit-row-id').value,
-                date: document.getElementById('acc-date').value,
-                payer: document.getElementById('acc-payer').value,
-                item: document.getElementById('acc-item').value,
-                currency: currency,
-                amount: document.getElementById('acc-amount').value,
-                rate: rateToSend, 
-                note: document.getElementById('acc-note').value
-            };
-
-            try {
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-                alert('✅ 記帳成功！');
-                resetFormState();
-                fetchData();
-            } catch (err) {
-                alert("❌ 連線失敗");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
+            const payload = { action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense', row: document.getElementById('edit-row-id').value, date: document.getElementById('acc-date').value, payer: document.getElementById('acc-payer').value, item: document.getElementById('acc-item').value, currency: currency, amount: document.getElementById('acc-amount').value, rate: rateToSend, note: document.getElementById('acc-note').value };
+            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); alert('✅ 記帳成功！'); resetFormState(); fetchData(); } catch (err) { alert("❌ 連線失敗"); } finally { btn.disabled = false; btn.innerHTML = originalText; }
         }
 
         async function fetchData() {
-            const listDiv = document.getElementById('expense-list');
-            const totalEl = document.getElementById('total-expense');
-            const loadingMsg = document.getElementById('loading-msg');
-            loadingMsg.classList.remove('hidden');
-            listDiv.style.opacity = '0.5';
-
+            const listDiv = document.getElementById('expense-list'); const loadingMsg = document.getElementById('loading-msg'); loadingMsg.classList.remove('hidden'); listDiv.style.opacity = '0.5';
             try {
-                const res = await fetch(GAS_URL);
-                const data = await res.json();
-                
-                if (data.error) {
-                    listDiv.innerHTML = `<div class="text-center text-red-400 py-4 text-sm">後端錯誤: ${data.error}</div>`;
-                    return;
+                const res = await fetch(GAS_URL); const data = await res.json();
+                if (data.error) { listDiv.innerHTML = `後端錯誤: ${data.error}`; return; }
+
+                // ★★★ 接收即時刷卡匯率 ★★★
+                if (data.creditCardRate && parseFloat(data.creditCardRate) > 0) {
+                    CREDIT_CARD_RATE = parseFloat(data.creditCardRate);
                 }
 
-                if (data.liveRate && parseFloat(data.liveRate) > 0) {
-                    AVG_RATE = parseFloat(data.liveRate);
-                }
-
-                let totalTWD = 0, totalJPY = 0;
-                let exchangeHistoryHtml = '';
-                
+                // ★★★ 計算現金平均匯率 (只從換匯紀錄算) ★★★
+                let totalTWD = 0, totalJPY = 0; let exchangeHistoryHtml = '';
                 if (data.exchanges && data.exchanges.length > 0) {
-                    data.exchanges.forEach(ex => {
-                        totalTWD += parseInt(ex.twd);
-                        totalJPY += parseInt(ex.jpy);
-                        exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
-                    });
-                    
-                    if (totalJPY > 0) AVG_RATE = (totalTWD / totalJPY); 
+                    data.exchanges.forEach(ex => { totalTWD += parseInt(ex.twd); totalJPY += parseInt(ex.jpy); exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`; });
+                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); // 更新公款現金匯率
                 }
                 
-                document.getElementById('avg-rate-display').innerText = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
+                // ★★★ 更新 UI：公款只顯示現金匯率 (不再被變數覆蓋) ★★★
+                document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
                 
-                document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4);
+                // 更新計算機：顯示刷卡匯率
+                document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
-                let totalSpentTWD = 0;
-                let spentPublicJPY = 0;
-                let xiangPaid = 0, yanPaid = 0;
-                let extraDebt_YanOwesXiang = 0; 
-                let html = '';
-
+                let totalSpentTWD = 0, spentPublicJPY = 0, xiangPaid = 0, yanPaid = 0, extraDebt_YanOwesXiang = 0; let html = '';
                 data.expenses.forEach(bill => {
-                    let twd = 0;
-                    let displaySubText = '';
-
+                    let twd = 0; let displaySubText = '';
                     if (bill.currency === 'JPY') {
-                        const appliedRate = bill.rate ? parseFloat(bill.rate) : AVG_RATE;
+                        // 使用每筆消費記錄當下的匯率
+                        const appliedRate = bill.rate ? parseFloat(bill.rate) : CASH_AVG_RATE;
                         twd = Math.round(bill.amount * appliedRate);
                         displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
                         if (String(bill.payer).startsWith('公費')) spentPublicJPY += parseInt(bill.amount);
-                    } else {
-                        twd = parseInt(bill.amount);
-                    }
+                    } else { twd = parseInt(bill.amount); }
 
                     if (bill.payer === '公費' || bill.payer.includes('共同')) {} 
                     else if (bill.payer === '公費-翔') extraDebt_YanOwesXiang -= (twd / 2); 
                     else if (bill.payer === '公費-彥') extraDebt_YanOwesXiang += (twd / 2);
-                    else {
-                        totalSpentTWD += twd;
-                        if (bill.payer.includes('翔')) xiangPaid += twd;
-                        if (bill.payer.includes('彥')) yanPaid += twd;
-                    }
+                    else { totalSpentTWD += twd; if (bill.payer.includes('翔')) xiangPaid += twd; if (bill.payer.includes('彥')) yanPaid += twd; }
 
                     const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
                     const rowData = JSON.stringify(bill).replace(/"/g, '"');
                     let payerLabel = bill.payer.split(' ')[0];
-                    if(bill.payer === '公費-翔') payerLabel = '公費(翔)';
-                    if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
-
                     html += `<div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative group"><div><div class="font-bold text-gray-800 text-sm">${bill.item}</div><div class="text-xs text-gray-500 mt-1 flex items-center gap-2"><span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${payerLabel}</span><span class="opacity-75">${bill.date}</span></div>${bill.note ? `<div class="text-xs text-gray-400 mt-1">${bill.note}</div>` : ''}</div><div class="text-right flex flex-col items-end"><div class="font-bold text-cyan-700 text-lg">${displayAmt}</div><div class="text-[10px] text-gray-400">${displaySubText}</div><div class="flex gap-2 mt-1"><button onclick='editExpense(${rowData})' class="text-xs text-blue-400">修改</button><button onclick="deleteExpense(${bill.rowIndex})" class="text-xs text-red-300">刪除</button></div></div></div>`;
                 });
 
                 document.getElementById('expense-list').innerHTML = html || '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
                 document.getElementById('total-expense').innerText = totalSpentTWD.toLocaleString();
-                
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
-                document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * AVG_RATE).toLocaleString();
-
+                // 公款換算台幣：使用現金匯率
+                document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * CASH_AVG_RATE).toLocaleString();
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
                 updateRateInputLogic(); 
-
-            } catch (err) {
-                listDiv.innerHTML = '<div class="text-center text-red-400 py-4 text-sm">讀取失敗：' + err.message + '</div>';
-            } finally {
-                loadingMsg.classList.add('hidden');
-                listDiv.style.opacity = '1';
-            }
+            } catch (err) { listDiv.innerHTML = '讀取失敗'; } finally { loadingMsg.classList.add('hidden'); listDiv.style.opacity = '1'; }
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            const text = document.getElementById('settlement-text');
-            const baseDiff = (xiang - yan) / 2;
-            const finalDiff = baseDiff + extraDebt;
-            const absVal = Math.round(Math.abs(finalDiff));
-            
-            if (absVal === 0) text.innerText = "🎉 平衡";
-            else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
-            else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            const text = document.getElementById('settlement-text'); const baseDiff = (xiang - yan) / 2; const finalDiff = baseDiff + extraDebt; const absVal = Math.round(Math.abs(finalDiff));
+            if (absVal === 0) text.innerText = "🎉 平衡"; else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`; else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
         }
-
-        function editExpense(data) {
-            document.getElementById('edit-row-id').value = data.rowIndex;
-            document.getElementById('acc-date').value = data.date;
-            document.getElementById('acc-payer').value = data.payer;
-            document.getElementById('acc-item').value = data.item;
-            document.getElementById('acc-currency').value = data.currency;
-            document.getElementById('acc-amount').value = data.amount;
-            document.getElementById('acc-note').value = data.note;
-            document.getElementById('acc-custom-rate').value = data.rate || AVG_RATE;
-            document.getElementById('form-title').innerText = "✏️ 修改帳目";
-            document.getElementById('btn-submit-acc').innerText = "確認更新";
-            document.getElementById('btn-submit-acc').classList.replace('bg-cyan-600', 'bg-blue-600');
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-            updateRateInputLogic(); 
-            document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        async function deleteExpense(rowIndex) {
-            if (!confirm('確定刪除？')) return;
-            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_expense', row: rowIndex }) }); alert('🗑️ 已刪除'); fetchData(); } catch (e) { alert('失敗'); }
-        }
-        function resetFormState() {
-            document.getElementById('account-form').reset();
-            document.getElementById('edit-row-id').value = '';
-            document.getElementById('acc-date').valueAsDate = new Date();
-            document.getElementById('form-title').innerText = "💸 新增消費";
-            document.getElementById('btn-submit-acc').innerText = "記帳";
-            document.getElementById('btn-submit-acc').classList.replace('bg-blue-600', 'bg-cyan-600');
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
-            updateRateInputLogic();
-        }
+        function editExpense(data) { document.getElementById('edit-row-id').value = data.rowIndex; document.getElementById('acc-date').value = data.date; document.getElementById('acc-payer').value = data.payer; document.getElementById('acc-item').value = data.item; document.getElementById('acc-currency').value = data.currency; document.getElementById('acc-amount').value = data.amount; document.getElementById('acc-note').value = data.note; document.getElementById('acc-custom-rate').value = data.rate || CASH_AVG_RATE; document.getElementById('form-title').innerText = "✏️ 修改帳目"; document.getElementById('btn-submit-acc').innerText = "確認更新"; document.getElementById('btn-submit-acc').classList.replace('bg-cyan-600', 'bg-blue-600'); document.getElementById('btn-cancel-edit').classList.remove('hidden'); updateRateInputLogic(); document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function deleteExpense(rowIndex) { if (!confirm('確定刪除？')) return; try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_expense', row: rowIndex }) }); alert('🗑️ 已刪除'); fetchData(); } catch (e) { alert('失敗'); } }
+        function resetFormState() { document.getElementById('account-form').reset(); document.getElementById('edit-row-id').value = ''; document.getElementById('acc-date').valueAsDate = new Date(); document.getElementById('form-title').innerText = "💸 新增消費"; document.getElementById('btn-submit-acc').innerText = "記帳"; document.getElementById('btn-submit-acc').classList.replace('bg-blue-600', 'bg-cyan-600'); document.getElementById('btn-cancel-edit').classList.add('hidden'); updateRateInputLogic(); }
         
-        const jpyInput = document.getElementById('input-jpy');
-        const twdInput = document.getElementById('input-twd');
-        function toggleCalc() {
-            const modal = document.getElementById('calc-modal');
-            modal.classList.toggle('hidden-modal');
-            modal.classList.toggle('show-modal');
-        }
-        jpyInput.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            if (!isNaN(val)) twdInput.value = Math.round(val * AVG_RATE);
-            else twdInput.value = '';
-        });
-        twdInput.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            if (!isNaN(val)) jpyInput.value = Math.round(val / AVG_RATE);
-            else jpyInput.value = '';
-        });
+        const jpyInput = document.getElementById('input-jpy'); const twdInput = document.getElementById('input-twd');
+        function toggleCalc() { const modal = document.getElementById('calc-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
+        jpyInput.addEventListener('input', (e) => { const val = parseFloat(e.target.value); if (!isNaN(val)) twdInput.value = Math.round(val * CREDIT_CARD_RATE); else twdInput.value = ''; });
+        twdInput.addEventListener('input', (e) => { const val = parseFloat(e.target.value); if (!isNaN(val)) jpyInput.value = Math.round(val / CREDIT_CARD_RATE); else jpyInput.value = ''; });
     </script>
 </body>
 </html>
