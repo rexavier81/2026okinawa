@@ -109,7 +109,7 @@
 
     <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group">
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 pointer-events-none translate-y-10">
-            <button onclick="toggleMap(); toggleFab();" class="flex items-center gap-2 group/item">
+            <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="flex items-center gap-2 group/item">
                 <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span>
                 <div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
                     <span class="text-xl">🗺️</span>
@@ -139,7 +139,13 @@
         </button>
     </div>
 
-    <div id="map-modal" class="fixed inset-0 z-[95] flex items-center justify-center px-4 modal hidden-modal"><div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleMap()"></div><div class="relative z-10 w-full max-w-4xl h-full flex items-center justify-center p-4"><img src="沖繩單軌電車地圖.jpg" alt="沖繩單軌電車地圖" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl"><button onclick="toggleMap()" class="absolute top-6 right-6 bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold">✕</button></div></div>
+    <div id="universal-image-modal" class="fixed inset-0 z-[95] flex items-center justify-center px-4 modal hidden-modal">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeImageModal()"></div>
+        <div class="relative z-10 w-full max-w-4xl h-full flex items-center justify-center p-4">
+            <img id="modal-image-src" src="" alt="預覽圖片" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            <button onclick="closeImageModal()" class="absolute top-6 right-6 bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold">✕</button>
+        </div>
+    </div>
 
     <div id="tax-modal" class="fixed inset-0 z-[90] flex items-center justify-center px-4 modal hidden-modal">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="toggleTaxCalc()"></div>
@@ -219,14 +225,13 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 班機與住宿資料更新 ★★★
+        // ★★★ 班機與住宿資料更新 (加入圖片與QR Code) ★★★
         const DATA = {
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [
                 { type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:10", from: "桃園 T1", to: "那霸", note: "託運15公斤、飛行時間為1小時25分鐘、機型為空中巴士 A320 (中型)、無餐點", links: [ { label: "🔴 查看即時動態 [報到櫃台、登機門、行李轉盤]", url: "https://tw.trip.com/actualtime/detail?flightNo=VZ568&departCity=TPE&arriveCity=OKA&date=2026-02-08&origin=230&curr=TWD&locale=zh-TW" } ] },
                 { type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", note: "託運23公斤、飛行時間為1小時40分鐘、經濟艙空中巴士 A350 XWB (大型)、有餐點", links: [ { label: "🔴 查看即時動態 [報到櫃台、登機門、行李轉盤]", url: "https://tw.trip.com/actualtime/detail?flightNo=CI121&departCity=OKA&arriveCity=TPE&date=2026-02-15&locale=zh-TW&curr=TWD" }, { label: "🌐 華航網路報到", url: "https://calec.china-airlines.com/eCheckin/eCheckin_home.aspx?country=tw&locale=zh" } ] }
             ],
-            // ★★★ 住宿資料 (依照圖片更新) ★★★
             hotels: [
                 { 
                     date: "2/8 - 2/9 (1晚)", 
@@ -237,7 +242,8 @@
                     checkIn: "12:00", 
                     checkOut: "12:00", 
                     url: "https://maps.app.goo.gl/v8zTRvvWASqXXVPv5",
-                    note: ""
+                    note: "",
+                    voucher: "hotel_ys.pdf"
                 },
                 { 
                     date: "2/9 - 2/10 (1晚)", 
@@ -248,7 +254,8 @@
                     checkIn: "15:00", 
                     checkOut: "11:00", 
                     url: "https://maps.app.goo.gl/xTf8vqdv3FGSJwth7",
-                    note: ""
+                    note: "",
+                    voucher: "hotel_resonex.pdf"
                 },
                 { 
                     date: "2/10 - 2/15 (5晚)", 
@@ -260,7 +267,10 @@
                     checkOut: "11:00", 
                     url: "https://maps.app.goo.gl/EenGmCNZVDMrvn3o6",
                     note: "入住代碼 733562",
-                    important: true
+                    important: true,
+                    qrImage: "入住QRCODE.png", // 新增QR
+                    trashImage: "員工停車場垃圾桶位置.png", // 新增垃圾地圖
+                    trashNote: "當房間垃圾桶滿了，請丟至員工停車場入口旁的垃圾處理區 (點擊按鈕看地圖)。"
                 }
             ],
             shopping: [ { name: "紅芋塔 (Beni Imo Tart)", desc: "沖繩最經典伴手禮，御菓子御殿必買。", highlight: "經典必買" }, { name: "金楚糕 (Chinsuko)", desc: "琉球傳統餅乾，口感酥脆，鹽味最受歡迎。", highlight: "傳統點心" }, { name: "沖繩蝦餅", desc: "辣味蝦餅，非常涮嘴，適合當下酒菜。", highlight: "人氣零食" }, { name: "Fukugiya 年輪蛋糕", desc: "國際通名店，蜂蜜和黑糖口味都很棒。", highlight: "排隊美食" } ],
@@ -333,8 +343,6 @@
             renderItinerary(currentDayId);
             renderFlights();
             renderHotels();
-            
-            // ★★★ 新增：渲染必買圖片 ★★★
             renderMustBuy();
             
             document.getElementById('acc-date').valueAsDate = new Date("2026-02-08");
@@ -390,7 +398,7 @@
             list.innerHTML = html;
         }
         
-        // ★★★ 班機卡片渲染 (包含動態按鈕) ★★★
+        // ★★★ 班機卡片渲染 ★★★
         function renderFlights() {
             document.getElementById('view-flights').innerHTML = DATA.flights.map(f => `
                 <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative overflow-hidden mb-4">
@@ -424,9 +432,27 @@
             `).join('');
         }
 
-        // ★★★ 住宿卡片渲染 (全新設計) ★★★
+        // ★★★ 住宿卡片渲染 (新增QR Code與垃圾按鈕) ★★★
         function renderHotels() {
-            document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => `
+            document.getElementById('view-hotels').innerHTML = DATA.hotels.map(h => {
+                // 憑證按鈕 (前兩間)
+                const voucherBtn = h.voucher 
+                    ? `<a href="${h.voucher}" target="_blank" class="flex-1 block text-center bg-teal-50 hover:bg-teal-100 text-teal-700 py-3 rounded-xl text-sm font-bold transition-colors border border-teal-100">📄 查看憑證</a>` 
+                    : '';
+
+                // 額外功能區 (第三間)
+                let extraSection = '';
+                if (h.qrImage || h.trashImage) {
+                    extraSection = `
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        ${h.qrImage ? `<button onclick="showImageModal('${h.qrImage}')" class="flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg text-xs font-bold transition-colors border border-gray-200">📱 入住 QR Code</button>` : ''}
+                        ${h.trashImage ? `<button onclick="showImageModal('${h.trashImage}')" class="flex items-center justify-center gap-1 bg-red-50 hover:bg-red-100 text-red-700 py-2.5 rounded-lg text-xs font-bold transition-colors border border-red-100">🗑️ 垃圾處理</button>` : ''}
+                    </div>
+                    ${h.trashNote ? `<div class="text-xs text-gray-500 bg-gray-50 p-2 rounded mb-3 border border-gray-100 leading-relaxed">💡 ${h.trashNote}</div>` : ''}
+                    `;
+                }
+
+                return `
                 <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-4 relative overflow-hidden">
                     <div class="flex justify-between items-start mb-2">
                         <div class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded mb-2 inline-block">${h.date}</div>
@@ -454,11 +480,16 @@
 
                     ${h.important ? `<div class="bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 p-2 text-sm font-bold mb-3 rounded-r">🔑 ${h.note}</div>` : ''}
 
-                    <a href="${h.url}" target="_blank" class="block text-center bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 rounded-xl text-sm font-bold transition-colors border border-purple-100">
-                        📍 查看地圖
-                    </a>
+                    ${extraSection}
+
+                    <div class="flex gap-3">
+                        ${voucherBtn}
+                        <a href="${h.url}" target="_blank" class="flex-1 block text-center bg-purple-50 hover:bg-purple-100 text-purple-700 py-3 rounded-xl text-sm font-bold transition-colors border border-purple-100">
+                            📍 查看地圖
+                        </a>
+                    </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderMustBuy() {
@@ -491,11 +522,19 @@
             }
         }
 
-        // --- 單軌地圖邏輯 (新增) ---
-        function toggleMap() {
-            const modal = document.getElementById('map-modal');
-            modal.classList.toggle('hidden-modal');
-            modal.classList.toggle('show-modal');
+        // --- 通用圖片燈箱邏輯 (取代原本的 toggleMap) ---
+        function showImageModal(src) {
+            const modal = document.getElementById('universal-image-modal');
+            const img = document.getElementById('modal-image-src');
+            img.src = src;
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('show-modal');
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('universal-image-modal');
+            modal.classList.add('hidden-modal');
+            modal.classList.remove('show-modal');
         }
 
         // --- 翻譯機邏輯 ---
@@ -813,9 +852,11 @@
                         totalJPY += parseInt(ex.jpy);
                         exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
                     });
+                    
+                    if (totalJPY > 0) AVG_RATE = (totalTWD / totalJPY); 
                 }
                 
-                document.getElementById('avg-rate-display').innerHTML = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
+                document.getElementById('avg-rate-display').innerText = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
                 
                 document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
