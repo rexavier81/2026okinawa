@@ -106,16 +106,14 @@
         </div>
     </main>
 
-    <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 pointer-events-none">
+    <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group pointer-events-none">
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 translate-y-10">
             <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span><div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗺️</span></div></button>
             <button onclick="toggleTaxCalc(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span><div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🛍️</span></div></button>
             <button onclick="toggleTranslate(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">翻譯機</span><div class="bg-violet-600 hover:bg-violet-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗣️</span></div></button>
             <button onclick="toggleCalc(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">匯率計算</span><div class="bg-pink-500 hover:bg-pink-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div></button>
         </div>
-        <button id="fab-main" onclick="toggleFab()" class="pointer-events-auto bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50">
-            <span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span>
-        </button>
+        <button id="fab-main" onclick="toggleFab()" class="pointer-events-auto bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50"><span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span></button>
     </div>
 
     <div id="universal-image-modal" class="fixed inset-0 z-[95] flex items-center justify-center px-4 modal hidden-modal"><div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeImageModal()"></div><div class="relative z-10 w-full max-w-4xl h-full flex items-center justify-center p-4"><img id="modal-image-src" src="" alt="預覽圖片" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl"><button onclick="closeImageModal()" class="absolute top-6 right-6 bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors text-xl font-bold">✕</button></div></div>
@@ -189,13 +187,13 @@
                 { dayId: 2, time: "20:40", title: "🏨 住宿：名護 Resonex Nago", desc: "隔天有飯店早餐", type: "hotel" },
                 { dayId: 3, time: "08:30", title: "🥣 早餐", desc: "ホテルリゾネックス名護 (飯店早餐)", type: "food" },
                 { dayId: 3, time: "10:00", title: "🦈 美麗海水族館", desc: "<a href='https://maps.app.goo.gl/dbvaQEXwrBiSA7ST9' target='_blank'>美麗海水族館 (黑潮之海)</a> 車程約25分", type: "activity", important: true },
-                { dayId: 3, time: "14:10", title: "🍽️ 午餐：海景餐廳", desc: "L LOTA (古宇利島) 車程約35分", type: "food" },
+                { dayId: 3, time: "14:10", title: "🍽️ 午餐：海景餐廳", desc: "<a href='https://maps.app.goo.gl/sSYDqNWzvZ7HDcFXA' target='_blank'>L LOTA (古宇利島)</a> 車程約35分", type: "food" },
                 { dayId: 3, time: "15:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity" },
                 { dayId: 3, time: "18:00", title: "☕ 晚餐 / 下午茶", desc: "<a href='https://maps.app.goo.gl/MDAAH3BqAyj3VXZE7' target='_blank'>BANTA CAFE</a> (看夜景) <a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>FB介紹</a> (回程較遠，預抓1.5hr)", type: "food" },
-                { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "刻の宿 那覇 (停車：<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>) 入住代碼：733562、買隔天早餐", type: "hotel" },
+                { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "<a href='https://maps.app.goo.gl/EenGmCNZVDMrvn3o6' target='_blank'>刻の宿 那覇</a> (停車：<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>) 入住代碼：733562、買隔天早餐", type: "hotel" },
                 { dayId: 4, time: "09:00", title: "🥣 早餐", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a>", type: "food" },
                 { dayId: 4, time: "09:50", title: "🏰 古蹟巡禮", desc: "<a href='https://maps.app.goo.gl/DztRTHkY4sjzMtUJ8' target='_blank'>首里城公園</a> (車程約20分)", type: "activity" },
-                { dayId: 4, time: "11:50", title: "🍽️ 午餐", desc: "永旺城 南城大里 (車程約30分)", type: "food" },
+                { dayId: 4, time: "11:50", title: "🍽️ 午餐", desc: "<a href='https://maps.app.goo.gl/QqgEhdrVPWhsaL936' target='_blank'>永旺城 南城大里</a> (車程約30分)", type: "food" },
                 { dayId: 4, time: "13:00", title: "👹 沖繩世界文化王國", desc: "<a href='https://maps.app.goo.gl/tmqeh6zTEGffPFcs5' target='_blank'>沖繩世界停車場</a> (玉泉洞、王國村；14:30 太鼓舞秀、波伯蛇園)", type: "activity" },
                 { dayId: 4, time: "16:00", title: "🛒 好市多採購", desc: "<a href='https://maps.app.goo.gl/giC5VC7dKfwGsGzCA' target='_blank'>Costco 沖繩南城倉庫店</a> (買草莓！)", type: "shopping" },
                 { dayId: 4, time: "17:50", title: "👕 機能服飾", desc: "<a href='https://maps.app.goo.gl/FXV6h1UZdMyiwVYw6' target='_blank'>WORKMAN Yaese</a>", type: "shopping" },
@@ -205,7 +203,7 @@
                 { dayId: 5, time: "10:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity" },
                 { dayId: 5, time: "12:10", title: "🐙 點心：章魚燒", desc: "<a href='https://maps.app.goo.gl/fPvsVg6RrdH3idhZ8' target='_blank'>沖縄イイダコ屋太陽</a> <a href='https://www.facebook.com/reel/1540297270440381' target='_blank' class='text-blue-600 underline'>FB連結介紹</a>", type: "food" },
                 { dayId: 5, time: "13:00", title: "🛍️ 午餐 & 逛街", desc: "<a href='https://maps.app.goo.gl/zy6sQ5hfQgL2LMkc6' target='_blank'>永旺夢樂城來客夢 Rycom</a> (Porter在SAC'S BAR Resort)", type: "shopping" },
-                { dayId: 5, time: "17:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：北谷町營或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity" },
+                { dayId: 5, time: "17:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity" },
                 { dayId: 5, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel" },
                 { dayId: 6, time: "09:30", title: "🌸 賞櫻", desc: "<a href='https://maps.app.goo.gl/M8S9cDXHb62GqHJ28' target='_blank'>與儀公園</a> (步行 6 分鐘)", type: "activity" },
                 { dayId: 6, time: "10:15", title: "🐟 早餐：海鮮", desc: "<a href='https://maps.app.goo.gl/Z2Hd63ESntQ4dNAn8' target='_blank'>泊港漁市場</a> (車程約15分)", type: "food" },
@@ -507,6 +505,7 @@
                     if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
 
                     // ★★★ 手機版按鈕優化：加大感應區 + 使用 Index 查找資料 ★★★
+                    // 修復：移除 group 和不必要的樣式，提升 Z-index
                     html += `
                     <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
                         <div class="flex-1">
