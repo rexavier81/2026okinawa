@@ -87,7 +87,14 @@
                 </form>
             </div>
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 flex justify-between items-center shadow-sm">
-                <div><h2 class="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wider">🇯🇵 公款日幣餘額</h2><div class="text-2xl font-black text-blue-800 tracking-tight">¥<span id="public-balance">0</span></div><div class="text-[10px] text-gray-400 mt-1 flex gap-2"><span>平均匯率: <span id="avg-rate-display">--</span></span><span class="text-blue-400 font-medium">(約 NT$<span id="public-balance-twd">0</span>)</span></div></div>
+                <div>
+                    <h2 class="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wider">🇯🇵 公款日幣餘額</h2>
+                    <div class="text-2xl font-black text-blue-800 tracking-tight">¥<span id="public-balance">0</span></div>
+                    <div class="text-[10px] text-gray-400 mt-1 flex gap-2 items-center">
+                        <span>匯率: <span id="avg-rate-display">--</span></span>
+                        <span class="text-blue-400 font-medium">(約 NT$<span id="public-balance-twd">0</span>)</span>
+                    </div>
+                </div>
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center"><span class="text-lg mb-0.5">💱</span><span>換匯</span></button>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
@@ -101,21 +108,18 @@
 
     <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group">
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 pointer-events-none translate-y-10">
-            
             <button onclick="toggleTaxCalc(); toggleFab();" class="flex items-center gap-2 group/item">
                 <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span>
                 <div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
                     <span class="text-xl">🛍️</span>
                 </div>
             </button>
-
             <button onclick="toggleTranslate(); toggleFab();" class="flex items-center gap-2 group/item">
                 <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">翻譯機</span>
                 <div class="bg-violet-600 hover:bg-violet-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
                     <span class="text-xl">🗣️</span>
                 </div>
             </button>
-
             <button onclick="toggleCalc(); toggleFab();" class="flex items-center gap-2 group/item">
                 <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">匯率計算</span>
                 <div class="bg-pink-500 hover:bg-pink-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
@@ -123,7 +127,6 @@
                 </div>
             </button>
         </div>
-
         <button id="fab-main" onclick="toggleFab()" class="bg-gray-800 hover:bg-gray-700 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 active:scale-95 border-2 border-white/20 z-50">
             <span id="fab-icon" class="text-2xl transition-transform duration-300">🛠️</span>
         </button>
@@ -136,7 +139,6 @@
                 <h3 class="font-bold text-lg flex items-center gap-2">🛍️ 免稅湊單神器</h3>
                 <button onclick="toggleTaxCalc()" class="text-white/80 hover:text-white">✕</button>
             </div>
-            
             <div class="p-4 space-y-4 flex-1 overflow-y-auto">
                 <div class="text-center sticky top-0 bg-white z-10 pb-2 border-b border-gray-100">
                     <p class="text-sm text-gray-500 mb-1">目標：含稅滿 5,500 日圓</p>
@@ -146,26 +148,16 @@
                         </div>
                     </div>
                     <div class="flex justify-between items-end px-2">
-                        <div class="text-left">
-                            <p class="text-xs text-gray-400">目前總計</p>
-                            <p class="text-2xl font-black text-gray-800">¥<span id="tax-total-display">0</span></p>
-                        </div>
-                        <div class="text-right">
-                            <p id="tax-status" class="text-sm font-bold text-gray-400">請加入商品</p>
-                            <p id="tax-refund" class="text-xs text-gray-500 h-4"></p>
-                        </div>
+                        <div class="text-left"><p class="text-xs text-gray-400">目前總計</p><p class="text-2xl font-black text-gray-800">¥<span id="tax-total-display">0</span></p></div>
+                        <div class="text-right"><p id="tax-status" class="text-sm font-bold text-gray-400">請加入商品</p><p id="tax-refund" class="text-xs text-gray-500 h-4"></p></div>
                     </div>
                 </div>
-
                 <div class="flex gap-2">
                     <input type="text" id="tax-item-name" placeholder="品項 (選填)" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
                     <input type="number" id="tax-item-price" placeholder="¥ 金額" class="w-24 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-orange-300">
                     <button onclick="addTaxItem()" class="bg-orange-500 text-white w-10 rounded-lg flex items-center justify-center font-bold text-xl shadow-sm active:scale-95">+</button>
                 </div>
-
-                <div id="tax-list" class="space-y-2 pb-4">
-                    <div class="text-center text-gray-300 text-xs py-4">清單是空的</div>
-                </div>
+                <div id="tax-list" class="space-y-2 pb-4"><div class="text-center text-gray-300 text-xs py-4">清單是空的</div></div>
             </div>
         </div>
     </div>
@@ -176,23 +168,14 @@
             <div class="bg-violet-600 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg flex items-center gap-2">🇯🇵 隨身翻譯</h3><button onclick="toggleTranslate()" class="text-white/80 hover:text-white">✕</button></div>
             <div class="p-6 flex flex-col items-center gap-4">
                 <textarea id="trans-input" rows="3" class="w-full border border-gray-200 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500" placeholder="輸入或說話 (中文)..."></textarea>
-                
                 <div class="flex w-full gap-2">
-                    <button id="btn-mic" onclick="startDictation()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
-                        <span class="text-xl">🎤</span> 說話
-                    </button>
-                    <button onclick="doTranslate()" id="btn-trans-go" class="flex-[2] bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-xl font-bold shadow-md transition-colors">
-                        翻譯成日文
-                    </button>
+                    <button id="btn-mic" onclick="startDictation()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"><span class="text-xl">🎤</span> 說話</button>
+                    <button onclick="doTranslate()" id="btn-trans-go" class="flex-[2] bg-violet-600 hover:bg-violet-700 text-white py-3 rounded-xl font-bold shadow-md transition-colors">翻譯成日文</button>
                 </div>
-
                 <div class="w-full bg-violet-50 rounded-xl p-4 border border-violet-100 relative min-h-[5rem]">
                     <p id="trans-result" class="text-xl font-bold text-violet-900 mb-1">...</p>
                     <p id="trans-result-en" class="text-sm text-gray-500 font-medium"></p>
-                    
-                    <button onclick="speakResult()" class="absolute bottom-2 right-2 text-violet-600 hover:bg-violet-100 p-2 rounded-full">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
-                    </button>
+                    <button onclick="speakResult()" class="absolute bottom-2 right-2 text-violet-600 hover:bg-violet-100 p-2 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg></button>
                 </div>
             </div>
         </div>
@@ -242,7 +225,7 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 班機資料 (Trip.com連結、網路報到連結、備註優化) ★★★
+        // ★★★ 班機資料 ★★★
         const DATA = {
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [
@@ -326,7 +309,7 @@
         // 核心邏輯
         // ==========================
         let currentDayId = 1;
-        let AVG_RATE = 0.22; // 平均匯率 (預設)
+        let AVG_RATE = 0.22; // 預設值，之後會被 API 覆蓋
 
         window.addEventListener('DOMContentLoaded', () => {
             renderDaySelector();
@@ -712,6 +695,7 @@
 
             const currency = document.getElementById('acc-currency').value;
             let rateToSend = document.getElementById('acc-custom-rate').value || AVG_RATE;
+            // 確保台幣匯率為 1
             if (currency === 'TWD') {
                 rateToSend = 1;
             }
@@ -757,6 +741,11 @@
                     return;
                 }
 
+                // ★★★ 關鍵修改：如果有即時匯率，就覆蓋掉 AVG_RATE ★★★
+                if (data.liveRate && parseFloat(data.liveRate) > 0) {
+                    AVG_RATE = parseFloat(data.liveRate);
+                }
+
                 let totalTWD = 0, totalJPY = 0;
                 let exchangeHistoryHtml = '';
                 
@@ -766,11 +755,13 @@
                         totalJPY += parseInt(ex.jpy);
                         exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
                     });
-                    
-                    if (totalJPY > 0) AVG_RATE = (totalTWD / totalJPY); 
+                    // 注意：這裡我們不再使用換匯紀錄來計算 AVG_RATE，因為已經被上面的 liveRate 覆蓋了
                 }
                 
-                document.getElementById('avg-rate-display').innerText = AVG_RATE.toFixed(4);
+                // 更新 UI 顯示，加上 LIVE 標籤
+                document.getElementById('avg-rate-display').innerHTML = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
+                
+                // 更新計算機的預設匯率
                 document.getElementById('display-rate').innerText = AVG_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
@@ -785,6 +776,7 @@
                     let displaySubText = '';
 
                     if (bill.currency === 'JPY') {
+                        // 使用每筆消費當下記錄的匯率，如果沒有就用現在的 AVG_RATE
                         const appliedRate = bill.rate ? parseFloat(bill.rate) : AVG_RATE;
                         twd = Math.round(bill.amount * appliedRate);
                         displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
@@ -816,6 +808,7 @@
                 
                 const currentBalance = totalJPY - spentPublicJPY;
                 document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
+                // 公款餘額換算台幣也改用即時匯率
                 document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * AVG_RATE).toLocaleString();
 
                 updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
