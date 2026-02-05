@@ -245,7 +245,8 @@
                 { dayId: 6, time: "14:50 - 19:30", title: "🛍️ 午餐+購物大戰", desc: "<a href='https://maps.app.goo.gl/hjxvWREbo3U2d4ky5' target='_blank'>PARCO CITY</a> (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping", mapcode: "33 339 031*14" },
                 { dayId: 6, time: "19:45 - 20:45", title: "👟 運動用品", desc: "<a href='https://maps.app.goo.gl/Tq8gR1DcAT4gxgX7A' target='_blank'>Sports Depo 天久店</a> (運動鞋)", type: "shopping", mapcode: "33 218 578*85" },
                 { dayId: 6, time: "21:00 - 22:00", title: "🍜 晚餐：拉麵", desc: "<a href='https://maps.app.goo.gl/cp5a9u7DcSpHjWYBA' target='_blank'>烈火ラーメン暖暮</a> (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food", mapcode: "33 157 622*11" },
-                { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, // ★★★ 新增 ★★★
+                // ★★★ Day 6 新增返回住宿 ★★★
+                { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 7, time: "09:00 - 10:10", title: "🥣 早餐：市場巡禮", desc: "<a href='https://maps.app.goo.gl/AYwfA4LNNigJvAV78' target='_blank'>牧志公設市場</a> (步行 10 分鐘)", type: "food", mapcode: "33 157 264*54" },
                 
@@ -280,35 +281,57 @@
             document.getElementById('acc-custom-rate').value = AVG_RATE;
         });
 
-        // ★★★ 抓取 Open-Meteo 天氣預報 (Naha) ★★★
+        // ★★★ 抓取 Open-Meteo 天氣預報 (Naha & Nago) ★★★
         async function fetchWeather() {
             try {
-                // 沖繩那霸座標
-                const lat = 26.2124;
-                const lon = 127.6809;
-                // 查詢 2026-02-08 ~ 2026-02-15
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=2026-02-08&end_date=2026-02-15`;
-                
-                const res = await fetch(url);
-                const data = await res.json();
-                
-                // 整理數據：將 Day 1~8 對應到 API 回傳的 index 0~7
-                if (data.daily) {
-                    for (let i = 0; i < data.daily.time.length; i++) {
-                        // Day 1 對應 index 0
+                // 1. 抓取那霸 (Naha) 天氣 (預設全行程)
+                const nahaUrl = `https://api.open-meteo.com/v1/forecast?latitude=26.2124&longitude=127.6809&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=2026-02-08&end_date=2026-02-15`;
+                const resNaha = await fetch(nahaUrl);
+                const dataNaha = await resNaha.json();
+
+                if (dataNaha.daily) {
+                    for (let i = 0; i < dataNaha.daily.time.length; i++) {
                         WEATHER_DATA[i + 1] = {
-                            min: Math.round(data.daily.temperature_2m_min[i]),
-                            max: Math.round(data.daily.temperature_2m_max[i]),
-                            rain: data.daily.precipitation_probability_max[i],
-                            code: data.daily.weather_code[i]
+                            min: Math.round(dataNaha.daily.temperature_2m_min[i]),
+                            max: Math.round(dataNaha.daily.temperature_2m_max[i]),
+                            rain: dataNaha.daily.precipitation_probability_max[i],
+                            code: dataNaha.daily.weather_code[i],
+                            loc: "那霸"
                         };
                     }
-                    // 資料抓完後重新渲染一次行程表頭
-                    renderItinerary(currentDayId);
                 }
+
+                // 2. 抓取名護 (Nago) 天氣 (針對 Day 2 & Day 3)
+                // 2/9 - 2/10
+                const nagoUrl = `https://api.open-meteo.com/v1/forecast?latitude=26.5915&longitude=127.9773&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia/Tokyo&start_date=2026-02-09&end_date=2026-02-10`;
+                const resNago = await fetch(nagoUrl);
+                const dataNago = await resNago.json();
+
+                if (dataNago.daily) {
+                    // Nago Day 1 (2/9) -> 覆寫 Global Day 2
+                    WEATHER_DATA[2] = {
+                        min: Math.round(dataNago.daily.temperature_2m_min[0]),
+                        max: Math.round(dataNago.daily.temperature_2m_max[0]),
+                        rain: dataNago.daily.precipitation_probability_max[0],
+                        code: dataNago.daily.weather_code[0],
+                        loc: "名護"
+                    };
+
+                    // Nago Day 2 (2/10) -> 覆寫 Global Day 3
+                    WEATHER_DATA[3] = {
+                        min: Math.round(dataNago.daily.temperature_2m_min[1]),
+                        max: Math.round(dataNago.daily.temperature_2m_max[1]),
+                        rain: dataNago.daily.precipitation_probability_max[1],
+                        code: dataNago.daily.weather_code[1],
+                        loc: "名護"
+                    };
+                }
+
+                // 3. 重新渲染
+                renderItinerary(currentDayId);
+
             } catch (err) {
                 console.error("天氣抓取失敗", err);
-                // 失敗就算了，不影響主功能
             }
         }
 
@@ -358,14 +381,16 @@
             const dayData = DATA.days.find(d => d.day === dayId);
             const items = DATA.activities.filter(a => a.dayId === dayId);
             
-            // ★★★ 產生天氣 HTML ★★★
+            // ★★★ 產生天氣 HTML (含地點標示) ★★★
             let weatherHtml = '';
             const w = WEATHER_DATA[dayId];
             if (w) {
                 const icon = getWeatherIcon(w.code);
                 const rainClass = w.rain > 50 ? 'text-blue-600 font-bold' : 'text-gray-500';
+                const locName = w.loc ? `📍${w.loc}` : ''; // 顯示地點
                 weatherHtml = `
                     <div class="weather-capsule ml-3 inline-flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 shadow-sm">
+                        <span class="text-xs font-bold text-blue-800 mr-1">${locName}</span>
                         <span class="text-lg">${icon}</span>
                         <span class="text-xs font-bold text-gray-700">${w.min}°-${w.max}°C</span>
                         <span class="text-xs ${rainClass}">☔ ${w.rain}%</span>
@@ -501,7 +526,8 @@
 
                     ${extraSection}
 
-                    <div class="flex gap-3 h-12"> ${voucherBtn}
+                    <div class="flex gap-3 h-12">
+                        ${voucherBtn}
                         <div class="flex-1">
                             <a href="${h.url}" target="_blank" class="flex items-center justify-center w-full h-full bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold transition-colors border border-purple-100">
                                 📍 查看地圖
@@ -512,65 +538,303 @@
             `}).join('');
         }
 
-        function renderMustBuy() { const images = ["pic_aeon.jpg", "pic_food.jpg", "pic_iias.jpg", "pic_parco.jpg", "pic_souvenir.jpg"]; const html = images.map(img => `<div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4"><img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';"></div>`).join(''); document.getElementById('mustbuy-list').innerHTML = html; }
+        // ★★★ 修正後的 renderMustBuy (依序渲染) ★★★
+        function renderMustBuy() {
+            // 定義正確的圖片順序
+            const images = ["pic_souvenir.jpg", "pic_food.jpg", "pic_aeon.jpg", "pic_parco.jpg", "pic_iias.jpg"];
+            
+            // 這裡我假設 DATA.shopping 也有對應的資料，但如果沒有，我們就單純渲染圖片
+            // 為了保持簡單，我們直接用 images 陣列來產生 HTML
+            const html = images.map(img => `
+                <div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4">
+                    <img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';">
+                </div>
+            `).join('');
+            
+            document.getElementById('mustbuy-list').innerHTML = html;
+        }
+
         function toggleDesc(el) { const desc = el.querySelector('.desc-text'); if(desc) desc.classList.toggle('expanded'); }
         function getTypeColor(type) { switch(type) { case 'transport': return '#06b6d4'; case 'flight': return '#2563eb'; case 'hotel': return '#a855f7'; case 'food': return '#f97316'; case 'shopping': return '#ec4899'; default: return '#10b981'; } }
         function getTypeIcon(type) { const icons = { transport: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>', flight: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>', hotel: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 100-4 2 2 0 000 4zm-6-4a2 2 0 110-4 2 2 0 010 4zm6-10a2 2 0 110-4 2 2 0 010 4zm-6 4a2 2 0 110-4 2 2 0 010 4z"></path></svg>', food: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>', shopping: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>' }; return icons[type] || icons.transport; }
 
         // --- 小工具邏輯 ---
         let isFabOpen = false;
-        function toggleFab() { isFabOpen = !isFabOpen; const menu = document.getElementById('fab-menu'); const icon = document.getElementById('fab-icon'); const mainBtn = document.getElementById('fab-main'); if (isFabOpen) { menu.classList.remove('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10'); icon.innerText = '✕'; icon.classList.add('rotate-90'); mainBtn.classList.replace('bg-gray-800', 'bg-red-500'); } else { menu.classList.add('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10'); icon.innerText = '🛠️'; icon.classList.remove('rotate-90'); mainBtn.classList.replace('bg-red-500', 'bg-gray-800'); } }
-        function toggleMap() { const modal = document.getElementById('map-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
-        // ★★★ 通用圖片燈箱邏輯 ★★★
-        function showImageModal(src) { const modal = document.getElementById('universal-image-modal'); const img = document.getElementById('modal-image-src'); img.src = src; modal.classList.remove('hidden-modal'); modal.classList.add('show-modal'); }
-        function closeImageModal() { const modal = document.getElementById('universal-image-modal'); modal.classList.add('hidden-modal'); modal.classList.remove('show-modal'); }
+        function toggleFab() {
+            isFabOpen = !isFabOpen;
+            const menu = document.getElementById('fab-menu');
+            const icon = document.getElementById('fab-icon');
+            const mainBtn = document.getElementById('fab-main');
 
-        function toggleTranslate() { const modal = document.getElementById('translate-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
-        
+            if (isFabOpen) {
+                menu.classList.remove('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10');
+                icon.innerText = '✕'; // 變成叉叉
+                icon.classList.add('rotate-90');
+                mainBtn.classList.replace('bg-gray-800', 'bg-red-500'); // 變成紅色
+            } else {
+                menu.classList.add('scale-0', 'opacity-0', 'pointer-events-none', 'translate-y-10');
+                icon.innerText = '🛠️'; // 變回工具箱
+                icon.classList.remove('rotate-90');
+                mainBtn.classList.replace('bg-red-500', 'bg-gray-800'); // 變回深灰色
+            }
+        }
+
+        // --- 單軌地圖邏輯 (新增) ---
+        function toggleMap() {
+            const modal = document.getElementById('map-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
+        }
+
+        // --- 通用圖片燈箱邏輯 ---
+        function showImageModal(src) {
+            const modal = document.getElementById('universal-image-modal');
+            const img = document.getElementById('modal-image-src');
+            img.src = src;
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('show-modal');
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('universal-image-modal');
+            modal.classList.add('hidden-modal');
+            modal.classList.remove('show-modal');
+        }
+
+        // ★★★ MapCode 巨型字卡邏輯 (新功能) ★★★
+        function showMapCodeModal(code) {
+            const modal = document.getElementById('mapcode-modal');
+            const display = document.getElementById('mapcode-display');
+            display.innerText = code;
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('show-modal');
+        }
+
+        function closeMapCodeModal() {
+            const modal = document.getElementById('mapcode-modal');
+            modal.classList.add('hidden-modal');
+            modal.classList.remove('show-modal');
+        }
+
+        // --- 翻譯機邏輯 ---
+        function toggleTranslate() {
+            const modal = document.getElementById('translate-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
+        }
+
+        // 語音辨識 (Web Speech API)
         function startDictation() {
             if ('webkitSpeechRecognition' in window) {
                 const recognition = new webkitSpeechRecognition();
-                recognition.lang = 'zh-TW'; recognition.continuous = false; recognition.interimResults = false;
-                const btnMic = document.getElementById('btn-mic'); btnMic.innerHTML = '<div class="recording-pulse w-4 h-4 bg-red-500 rounded-full"></div> 聽寫中...';
-                recognition.onresult = function(event) { document.getElementById('trans-input').value = event.results[0][0].transcript; btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話'; };
-                recognition.onerror = function() { alert('語音辨識錯誤'); btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話'; };
+                recognition.lang = 'zh-TW'; // 辨識中文
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                const btnMic = document.getElementById('btn-mic');
+                btnMic.innerHTML = '<div class="recording-pulse w-4 h-4 bg-red-500 rounded-full"></div> 聽寫中...';
+                
+                recognition.onresult = function(event) {
+                    const text = event.results[0][0].transcript;
+                    document.getElementById('trans-input').value = text;
+                    btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話';
+                };
+
+                recognition.onerror = function(event) {
+                    alert('語音辨識錯誤，請手動輸入');
+                    btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話';
+                };
+
+                recognition.onend = function() {
+                    btnMic.innerHTML = '<span class="text-xl">🎤</span> 說話';
+                };
+
                 recognition.start();
-            } else { alert('您的瀏覽器不支援'); }
+            } else {
+                alert('您的瀏覽器不支援語音辨識');
+            }
         }
+
+        // 呼叫 GAS 進行翻譯 (修正為接收中英雙語)
         async function doTranslate() {
-            const text = document.getElementById('trans-input').value; if (!text) return;
-            const btn = document.getElementById('btn-trans-go'); const resultArea = document.getElementById('trans-result'); const resultAreaEn = document.getElementById('trans-result-en');
-            btn.disabled = true; btn.innerText = "翻譯中..."; resultArea.innerText = "..."; resultAreaEn.innerText = "";
-            try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'translate', text: text }) }); const data = await res.json(); if (data.result === 'success') { resultArea.innerText = data.text; resultAreaEn.innerText = data.textEn; } else { resultArea.innerText = "失敗"; } } catch (err) { resultArea.innerText = "錯誤"; } finally { btn.disabled = false; btn.innerText = "翻譯成日文"; }
-        }
-        function speakResult() { const text = document.getElementById('trans-result').innerText; if (!text || text === '...') return; const utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'ja-JP'; window.speechSynthesis.speak(utterance); }
+            const text = document.getElementById('trans-input').value;
+            if (!text) return;
 
-        function toggleTaxCalc() { const modal = document.getElementById('tax-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
-        let taxList = []; const TAX_TARGET = 5500;
+            const btn = document.getElementById('btn-trans-go');
+            const resultArea = document.getElementById('trans-result');
+            const resultAreaEn = document.getElementById('trans-result-en');
+            
+            btn.disabled = true;
+            btn.innerText = "翻譯中...";
+            resultArea.innerText = "...";
+            resultAreaEn.innerText = "";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'translate', text: text })
+                });
+                const data = await res.json();
+                
+                if (data.result === 'success') {
+                    resultArea.innerText = data.text; // 日文
+                    resultAreaEn.innerText = data.textEn; // 英文
+                } else {
+                    const errorMsg = data.msg || data.error || "未知錯誤";
+                    resultArea.innerText = "失敗: " + errorMsg;
+                }
+            } catch (err) {
+                console.error(err);
+                resultArea.innerText = "連線錯誤: " + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "翻譯成日文";
+            }
+        }
+
+        // 朗讀日文
+        function speakResult() {
+            const text = document.getElementById('trans-result').innerText;
+            if (!text || text === '...') return;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- 免稅計算機邏輯 (清單模式) ---
+        function toggleTaxCalc() {
+            const modal = document.getElementById('tax-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
+        }
+
+        let taxList = [];
+        const TAX_TARGET = 5500; // 免稅門檻 (含稅)
+
         function addTaxItem() {
-            const nameInput = document.getElementById('tax-item-name'); const priceInput = document.getElementById('tax-item-price'); const price = parseFloat(priceInput.value);
-            if (!price || price <= 0) { alert("請輸入有效的金額！"); return; }
-            taxList.push({ name: nameInput.value.trim() || '未命名商品', price: price });
-            nameInput.value = ''; priceInput.value = ''; nameInput.focus(); renderTaxList();
-        }
-        function removeTaxItem(index) { taxList.splice(index, 1); renderTaxList(); }
-        function renderTaxList() {
-            const container = document.getElementById('tax-list'); const totalDisplay = document.getElementById('tax-total-display'); const progress = document.getElementById('tax-progress'); const status = document.getElementById('tax-status'); const refund = document.getElementById('tax-refund');
-            let total = 0; let html = '';
-            taxList.forEach((item, index) => { total += item.price; html += `<div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-2 rounded-lg"><div class="flex-1 min-w-0"><p class="text-sm font-bold text-gray-700 truncate">${item.name}</p><p class="text-xs text-gray-400">¥${item.price.toLocaleString()}</p></div><button onclick="removeTaxItem(${index})" class="text-gray-400 hover:text-red-500 p-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button></div>`; });
-            container.innerHTML = html || '<div class="text-center text-gray-300 text-xs py-4">清單是空的</div>'; totalDisplay.innerText = total.toLocaleString();
-            const percent = Math.min((total / TAX_TARGET) * 100, 100); progress.style.width = percent + '%';
-            if (total >= TAX_TARGET) { progress.classList.remove('bg-orange-400'); progress.classList.add('bg-green-500'); status.innerHTML = `🎉 已達免稅門檻！`; status.classList.replace('text-gray-400', 'text-green-600'); const estimatedRefund = Math.floor(total / 1.1 * 0.1); refund.innerText = `預計退稅約 ¥${estimatedRefund.toLocaleString()}`; } else { progress.classList.add('bg-orange-400'); progress.classList.remove('bg-green-500'); const diff = TAX_TARGET - total; status.innerHTML = `還差 <span class="text-red-500">¥${diff.toLocaleString()}</span> 達標`; status.classList.replace('text-green-600', 'text-gray-400'); refund.innerText = ''; }
-        }
-        document.getElementById('tax-item-price').addEventListener('keypress', function (e) { if (e.key === 'Enter') addTaxItem(); });
+            const nameInput = document.getElementById('tax-item-name');
+            const priceInput = document.getElementById('tax-item-price');
+            const price = parseFloat(priceInput.value);
 
-        // --- 記帳與換匯邏輯 ---
-        function toggleExchangeModal() { const modal = document.getElementById('exchange-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
-        function toggleSettlement() { const content = document.getElementById('settlement-content'); const arrow = document.getElementById('arrow-settlement'); content.classList.toggle('open'); arrow.classList.toggle('rotate'); }
-        
+            if (!price || price <= 0) {
+                alert("請輸入有效的金額！");
+                return;
+            }
+
+            taxList.push({
+                name: nameInput.value.trim() || '未命名商品',
+                price: price
+            });
+
+            nameInput.value = '';
+            priceInput.value = '';
+            nameInput.focus();
+            
+            renderTaxList();
+        }
+
+        function removeTaxItem(index) {
+            taxList.splice(index, 1);
+            renderTaxList();
+        }
+
+        function renderTaxList() {
+            const container = document.getElementById('tax-list');
+            const totalDisplay = document.getElementById('tax-total-display');
+            const progress = document.getElementById('tax-progress');
+            const status = document.getElementById('tax-status');
+            const refund = document.getElementById('tax-refund');
+
+            let total = 0;
+            let html = '';
+
+            taxList.forEach((item, index) => {
+                total += item.price;
+                html += `
+                    <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-2 rounded-lg">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-gray-700 truncate">${item.name}</p>
+                            <p class="text-xs text-gray-400">¥${item.price.toLocaleString()}</p>
+                        </div>
+                        <button onclick="removeTaxItem(${index})" class="text-gray-400 hover:text-red-500 p-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html || '<div class="text-center text-gray-300 text-xs py-4">清單是空的</div>';
+            totalDisplay.innerText = total.toLocaleString();
+
+            // 更新進度條
+            const percent = Math.min((total / TAX_TARGET) * 100, 100);
+            progress.style.width = percent + '%';
+
+            if (total >= TAX_TARGET) {
+                progress.classList.remove('bg-orange-400');
+                progress.classList.add('bg-green-500');
+                status.innerHTML = `🎉 已達免稅門檻！`;
+                status.classList.replace('text-gray-400', 'text-green-600');
+                status.classList.remove('text-gray-700');
+                
+                const estimatedRefund = Math.floor(total / 1.1 * 0.1);
+                refund.innerText = `預計退稅約 ¥${estimatedRefund.toLocaleString()}`;
+            } else {
+                progress.classList.add('bg-orange-400');
+                progress.classList.remove('bg-green-500');
+                const diff = TAX_TARGET - total;
+                status.innerHTML = `還差 <span class="text-red-500">¥${diff.toLocaleString()}</span> 達標`;
+                status.classList.replace('text-green-600', 'text-gray-400');
+                status.classList.add('text-gray-700');
+                refund.innerText = '';
+            }
+        }
+
+        // 綁定 Enter 鍵快速加入
+        document.getElementById('tax-item-price').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTaxItem();
+        });
+
+        // --- 記帳與換匯邏輯 (不變) ---
+        function toggleExchangeModal() {
+            const modal = document.getElementById('exchange-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
+        }
+
+        function toggleSettlement() {
+            const content = document.getElementById('settlement-content');
+            const arrow = document.getElementById('arrow-settlement');
+            content.classList.toggle('open');
+            arrow.classList.toggle('rotate');
+        }
+
         async function submitExchange() {
-            const btn = document.getElementById('btn-submit-ex'); btn.innerText = "處理中..."; btn.disabled = true;
-            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'add_exchange', date: document.getElementById('ex-date').value, who: document.getElementById('ex-who').value, twd: document.getElementById('ex-twd').value, jpy: document.getElementById('ex-jpy').value }) }); alert("✅ 換匯紀錄成功！"); toggleExchangeModal(); fetchData(); } catch (err) { alert("❌ 連線失敗"); } finally { btn.disabled = false; btn.innerText = "確認新增"; }
+            const btn = document.getElementById('btn-submit-ex');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "處理中...";
+
+            const payload = {
+                action: 'add_exchange',
+                date: document.getElementById('ex-date').value,
+                who: document.getElementById('ex-who').value,
+                twd: document.getElementById('ex-twd').value,
+                jpy: document.getElementById('ex-jpy').value
+            };
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert("✅ 換匯紀錄成功！");
+                toggleExchangeModal();
+                fetchData();
+            } catch (err) {
+                alert("❌ 連線失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         }
 
         let CASH_AVG_RATE = 0.22; 
@@ -606,59 +870,110 @@
 
         async function submitExpense(e) {
             e.preventDefault();
-            const btn = document.getElementById('btn-submit-acc'); const originalText = btn.innerHTML; btn.disabled = true; btn.innerHTML = '處理中...';
+            const btn = document.getElementById('btn-submit-acc');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '處理中...';
+
             const currency = document.getElementById('acc-currency').value;
             let rateToSend = document.getElementById('acc-custom-rate').value || CASH_AVG_RATE;
-            if (currency === 'TWD') rateToSend = 1;
+            if (currency === 'TWD') {
+                rateToSend = 1;
+            }
 
-            const payload = { action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense', row: document.getElementById('edit-row-id').value, date: document.getElementById('acc-date').value, payer: document.getElementById('acc-payer').value, item: document.getElementById('acc-item').value, currency: currency, amount: document.getElementById('acc-amount').value, rate: rateToSend, note: document.getElementById('acc-note').value };
-            try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) }); alert('✅ 記帳成功！'); resetFormState(); fetchData(); } catch (err) { alert("❌ 連線失敗"); } finally { btn.disabled = false; btn.innerHTML = originalText; }
+            const payload = {
+                action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense',
+                row: document.getElementById('edit-row-id').value,
+                date: document.getElementById('acc-date').value,
+                payer: document.getElementById('acc-payer').value,
+                item: document.getElementById('acc-item').value,
+                currency: currency,
+                amount: document.getElementById('acc-amount').value,
+                rate: rateToSend, 
+                note: document.getElementById('acc-note').value
+            };
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert('✅ 記帳成功！');
+                resetFormState();
+                fetchData();
+            } catch (err) {
+                alert("❌ 連線失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
 
         async function fetchData() {
-            const listDiv = document.getElementById('expense-list'); const loadingMsg = document.getElementById('loading-msg'); loadingMsg.classList.remove('hidden'); listDiv.style.opacity = '0.5';
-            try {
-                const res = await fetch(GAS_URL); const data = await res.json();
-                if (data.error) { listDiv.innerHTML = `後端錯誤: ${data.error}`; return; }
+            const listDiv = document.getElementById('expense-list');
+            const totalEl = document.getElementById('total-expense');
+            const loadingMsg = document.getElementById('loading-msg');
+            loadingMsg.classList.remove('hidden');
+            listDiv.style.opacity = '0.5';
 
-                // ★★★ 接收即時刷卡匯率 ★★★
+            try {
+                const res = await fetch(GAS_URL);
+                const data = await res.json();
+                
+                if (data.error) {
+                    listDiv.innerHTML = `<div class="text-center text-red-400 py-4 text-sm">後端錯誤: ${data.error}</div>`;
+                    return;
+                }
+
                 if (data.creditCardRate && parseFloat(data.creditCardRate) > 0) {
                     CREDIT_CARD_RATE = parseFloat(data.creditCardRate);
                 }
 
-                // ★★★ 計算現金平均匯率 (只從換匯紀錄算) ★★★
-                let totalTWD = 0, totalJPY = 0; let exchangeHistoryHtml = '';
+                let totalTWD = 0, totalJPY = 0;
+                let exchangeHistoryHtml = '';
+                
                 if (data.exchanges && data.exchanges.length > 0) {
-                    data.exchanges.forEach(ex => { totalTWD += parseInt(ex.twd); totalJPY += parseInt(ex.jpy); exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`; });
-                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); // 更新公款現金匯率
+                    data.exchanges.forEach(ex => {
+                        totalTWD += parseInt(ex.twd);
+                        totalJPY += parseInt(ex.jpy);
+                        exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
+                    });
+                    
+                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
                 }
                 
-                // ★★★ 更新 UI：公款只顯示現金匯率 (不再被變數覆蓋) ★★★
-                document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
+                document.getElementById('avg-rate-display').innerText = `${AVG_RATE.toFixed(4)} <span class='text-[10px] bg-red-100 text-red-600 px-1 rounded ml-1 font-bold'>LIVE</span>`;
                 
-                // 更新計算機：顯示刷卡匯率
                 document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
                 document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
 
-                let totalSpentTWD = 0, spentPublicJPY = 0, xiangPaid = 0, yanPaid = 0, extraDebt_YanOwesXiang = 0; let html = '';
-                
+                let totalSpentTWD = 0;
+                let spentPublicJPY = 0;
+                let xiangPaid = 0, yanPaid = 0;
+                let extraDebt_YanOwesXiang = 0; 
+                let html = '';
+
                 // ★★★ 關鍵：儲存所有資料到全域變數，供按鈕使用 ★★★
                 ALL_EXPENSES = data.expenses;
 
                 data.expenses.forEach((bill, index) => {
-                    let twd = 0; let displaySubText = '';
+                    let twd = 0;
+                    let displaySubText = '';
+
                     if (bill.currency === 'JPY') {
-                        // 使用每筆消費記錄當下的匯率
                         const appliedRate = bill.rate ? parseFloat(bill.rate) : CASH_AVG_RATE;
                         twd = Math.round(bill.amount * appliedRate);
                         displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
                         if (String(bill.payer).startsWith('公費')) spentPublicJPY += parseInt(bill.amount);
-                    } else { twd = parseInt(bill.amount); }
+                    } else {
+                        twd = parseInt(bill.amount);
+                    }
 
                     if (bill.payer === '公費' || bill.payer.includes('共同')) {} 
                     else if (bill.payer === '公費-翔') extraDebt_YanOwesXiang -= (twd / 2); 
                     else if (bill.payer === '公費-彥') extraDebt_YanOwesXiang += (twd / 2);
-                    else { totalSpentTWD += twd; if (bill.payer.includes('翔')) xiangPaid += twd; if (bill.payer.includes('彥')) yanPaid += twd; }
+                    else {
+                        totalSpentTWD += twd;
+                        if (bill.payer.includes('翔')) xiangPaid += twd;
+                        if (bill.payer.includes('彥')) yanPaid += twd;
+                    }
 
                     const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
                     let payerLabel = bill.payer.split(' ')[0];
@@ -700,13 +1015,18 @@
         }
 
         function updateSettlement(xiang, yan, extraDebt = 0) {
-            const text = document.getElementById('settlement-text'); const baseDiff = (xiang - yan) / 2; const finalDiff = baseDiff + extraDebt; const absVal = Math.round(Math.abs(finalDiff));
-            if (absVal === 0) text.innerText = "🎉 平衡"; else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`; else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            const text = document.getElementById('settlement-text');
+            const baseDiff = (xiang - yan) / 2;
+            const finalDiff = baseDiff + extraDebt;
+            const absVal = Math.round(Math.abs(finalDiff));
+            
+            if (absVal === 0) text.innerText = "🎉 平衡";
+            else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+            else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
         }
 
-        // ★★★ 修改：改為接收 Index，去全域陣列找資料 ★★★
         function editExpense(index) { 
-            const data = ALL_EXPENSES[index]; // 從全域變數抓資料，絕對安全
+            const data = ALL_EXPENSES[index]; 
             if (!data) return;
 
             document.getElementById('edit-row-id').value = data.rowIndex; 
