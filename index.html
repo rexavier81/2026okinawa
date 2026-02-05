@@ -110,6 +110,16 @@
         </div>
     </main>
 
+    <div id="mapcode-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 modal hidden-modal">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeMapCodeModal()"></div>
+        <div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 pointer-events-none">
+            <p class="text-gray-400 text-sm uppercase tracking-widest font-bold mb-6">MapCode (導航輸入)</p>
+            <div id="mapcode-display" class="text-white font-mono font-black text-5xl sm:text-6xl tracking-wider text-center break-all select-all drop-shadow-lg">
+                </div>
+            <p class="text-gray-500 text-xs mt-12 animate-pulse">點擊任意處關閉</p>
+        </div>
+    </div>
+
     <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group pointer-events-none">
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 translate-y-10">
             <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span><div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗺️</span></div></button>
@@ -230,7 +240,8 @@
                 { dayId: 6, time: "14:50", title: "🛍️ 午餐+購物大戰", desc: "<a href='https://maps.app.goo.gl/hjxvWREbo3U2d4ky5' target='_blank'>PARCO CITY</a> (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping", mapcode: "33 339 031*14" },
                 { dayId: 6, time: "19:45", title: "👟 運動用品", desc: "<a href='https://maps.app.goo.gl/Tq8gR1DcAT4gxgX7A' target='_blank'>Sports Depo 天久店</a> (運動鞋)", type: "shopping", mapcode: "33 218 578*85" },
                 { dayId: 6, time: "21:00", title: "🍜 晚餐：拉麵", desc: "<a href='https://maps.app.goo.gl/cp5a9u7DcSpHjWYBA' target='_blank'>烈火ラーメン暖暮</a> (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food", mapcode: "33 157 622*11" },
-                { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, // ★★★ 新增 ★★★
+                // ★★★ 補上 Day 6 返回住宿 ★★★
+                { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 7, time: "09:00", title: "🥣 早餐：市場巡禮", desc: "<a href='https://maps.app.goo.gl/AYwfA4LNNigJvAV78' target='_blank'>牧志公設市場</a> (步行 10 分鐘)", type: "food", mapcode: "33 157 264*54" },
                 
@@ -374,19 +385,12 @@
                     
                     let menuBtn = item.menuImage ? `<button onclick="event.stopPropagation(); showImageModal('${item.menuImage}')" class="mt-2 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-orange-100 transition-colors w-fit">📖 查看菜單</button>` : '';
 
-                    // ★★★ MapCode 儀表板樣式 ★★★
-                    let mapCodeBlock = item.mapcode ? `
-                    <div class="mt-3 bg-slate-800 rounded-lg p-2 flex items-center gap-3 border border-slate-700 shadow-sm" onclick="event.stopPropagation()">
-                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-lg">🚗</div>
-                        <div class="flex-1">
-                            <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">MapCode (導航輸入)</div>
-                            <div class="text-lg font-mono font-bold text-white tracking-widest leading-none">${item.mapcode}</div>
-                        </div>
-                    </div>` : '';
+                    // ★★★ MapCode 巨型字卡按鈕 ★★★
+                    let mapCodeBtn = item.mapcode ? `<button onclick="event.stopPropagation(); showMapCodeModal('${item.mapcode}')" class="mt-2 text-xs font-bold text-slate-200 bg-slate-700 border border-slate-600 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-slate-600 transition-colors w-fit shadow-sm">🚗 MapCode</button>` : '';
 
                     const expandedClass = item.forceOpen ? 'expanded' : '';
 
-                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text ${expandedClass} leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}${menuBtn}${mapCodeBlock}</div></div></div></div>`;
+                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)"><div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1"><span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span><div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text ${expandedClass} leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}<div class="flex gap-2">${menuBtn}${mapCodeBtn}</div></div></div></div></div>`;
                 }).join('');
             }
             list.innerHTML = html;
@@ -484,13 +488,19 @@
             `}).join('');
         }
 
+        // ★★★ 修正後的 renderMustBuy (依序渲染) ★★★
         function renderMustBuy() {
+            // 定義正確的圖片順序
             const images = ["pic_souvenir.jpg", "pic_food.jpg", "pic_aeon.jpg", "pic_parco.jpg", "pic_iias.jpg"];
+            
+            // 這裡我假設 DATA.shopping 也有對應的資料，但如果沒有，我們就單純渲染圖片
+            // 為了保持簡單，我們直接用 images 陣列來產生 HTML
             const html = images.map(img => `
                 <div class="rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4">
                     <img src="${img}" alt="必買推薦" class="w-full h-auto block" onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=圖片未找到';">
                 </div>
             `).join('');
+            
             document.getElementById('mustbuy-list').innerHTML = html;
         }
 
@@ -537,6 +547,21 @@
 
         function closeImageModal() {
             const modal = document.getElementById('universal-image-modal');
+            modal.classList.add('hidden-modal');
+            modal.classList.remove('show-modal');
+        }
+
+        // ★★★ MapCode 巨型字卡邏輯 (新功能) ★★★
+        function showMapCodeModal(code) {
+            const modal = document.getElementById('mapcode-modal');
+            const display = document.getElementById('mapcode-display');
+            display.innerText = code;
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('show-modal');
+        }
+
+        function closeMapCodeModal() {
+            const modal = document.getElementById('mapcode-modal');
             modal.classList.add('hidden-modal');
             modal.classList.remove('show-modal');
         }
