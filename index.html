@@ -56,6 +56,7 @@
         </div>
 
         <div id="view-flights" class="tab-content p-5 space-y-4"></div>
+        
         <div id="view-hotels" class="tab-content p-5 space-y-4"></div>
         
         <div id="view-mustbuy" class="tab-content p-5 space-y-4">
@@ -177,7 +178,7 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
-        // ★★★ 班機資料更新 (修正時間、備註、Trip.com連結) ★★★
+        // ★★★ 班機資料更新 (修正時間、備註、Trip.com連結、華航網報) ★★★
         const DATA = {
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [
@@ -185,14 +186,15 @@
                     type: "去程", date: "2/8 (日)", airline: "泰越捷 VZ568", time: "14:45 - 17:10", from: "桃園 T1", to: "那霸", 
                     note: "託運15公斤、飛行時間為1小時25分鐘、機型為空中巴士 A320 (中型)、無餐點",
                     links: [
-                        { label: "🔴 查看即時動態(報到櫃台、登機門、行李轉盤)", url: "https://tw.trip.com/actualtime/detail?flightNo=VZ568&departCity=TPE&arriveCity=OKA&date=2026-02-08&origin=230&curr=TWD&locale=zh-TW" }
+                        { label: "🔴 查看即時動態 [報到櫃台、登機門、行李轉盤]", url: "https://tw.trip.com/actualtime/detail?flightNo=VZ568&departCity=TPE&arriveCity=OKA&date=2026-02-08&origin=230&curr=TWD&locale=zh-TW" }
                     ]
                 },
                 { 
                     type: "回程", date: "2/15 (日)", airline: "華航 CI121", time: "11:55 - 12:35", from: "那霸", to: "桃園 T2", 
                     note: "託運23公斤、飛行時間為1小時40分鐘、經濟艙空中巴士 A350 XWB (大型)、有餐點",
                     links: [
-                        { label: "🔴 查看即時動態(報到櫃台、登機門、行李轉盤)", url: "https://tw.trip.com/actualtime/detail?flightNo=CI121&departCity=OKA&arriveCity=TPE&date=2026-02-15&locale=zh-TW&curr=TWD" }
+                        { label: "🔴 查看即時動態 [報到櫃台、登機門、行李轉盤]", url: "https://tw.trip.com/actualtime/detail?flightNo=CI121&departCity=OKA&arriveCity=TPE&date=2026-02-15&locale=zh-TW&curr=TWD" },
+                        { label: "🌐 華航網路報到", url: "https://calec.china-airlines.com/eCheckin/eCheckin_home.aspx?country=tw&locale=zh" }
                     ]
                 }
             ],
@@ -347,7 +349,7 @@
                     
                     <div class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800 border border-blue-100 mb-3">${f.note}</div>
                     
-                    <div class="grid grid-cols-1">
+                    <div class="grid grid-cols-1 gap-2">
                         ${f.links.map(link => `
                             <a href="${link.url}" target="_blank" class="block text-center bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-600 py-2 rounded-lg text-xs font-bold transition-colors">
                                 ${link.label}
