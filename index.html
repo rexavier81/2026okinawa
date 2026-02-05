@@ -224,6 +224,7 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwWDFDAIXgnW_CUIz0RDuMIgZC77rbzo3BwVy4FOVOXnsmoXBhzVEc3AZ-0AM3YPrSQ/exec";
 
+        // ★★★ 班機資料 (Trip.com連結、網路報到連結、備註優化) ★★★
         const DATA = {
             days: [ { day: 1, date: "2/8 (日)", title: "抵達 & 那霸" }, { day: 2, date: "2/9 (一)", title: "租車 & 名護" }, { day: 3, date: "2/10 (二)", title: "水族館 & 古宇利" }, { day: 4, date: "2/11 (三)", title: "南部 & 沖繩世界" }, { day: 5, date: "2/12 (四)", title: "中部 & 美國村" }, { day: 6, date: "2/13 (五)", title: "市區 & 購物" }, { day: 7, date: "2/14 (六)", title: "瀨長島 & 國際通" }, { day: 8, date: "2/15 (日)", title: "還車 & 返台" } ],
             flights: [
@@ -652,7 +653,7 @@
                     rateInput.classList.add('text-gray-400');
                     rateInput.classList.remove('text-cyan-600');
                 } else {
-                    if(rateInput.disabled || rateInput.value === '') {
+                    if(rateInput.disabled || rateInput.value == 1) { // 如果之前被重設為1，現在切回日幣要改回匯率
                          rateInput.value = AVG_RATE.toFixed(4);
                     }
                     rateInput.disabled = false;
@@ -660,7 +661,9 @@
                     rateInput.classList.add('text-cyan-600');
                 }
             } else {
+                // ★★★ 修正點：如果是台幣，隱藏匯率欄位，並強制設為 1 ★★★
                 rateArea.classList.add('hidden');
+                rateInput.value = 1;
             }
         }
 
@@ -671,15 +674,22 @@
             btn.disabled = true;
             btn.innerHTML = '處理中...';
 
+            // ★★★ 修正點：送出前再次確認，如果是台幣，匯率強制為 1 ★★★
+            const currency = document.getElementById('acc-currency').value;
+            let rateToSend = document.getElementById('acc-custom-rate').value || AVG_RATE;
+            if (currency === 'TWD') {
+                rateToSend = 1;
+            }
+
             const payload = {
                 action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense',
                 row: document.getElementById('edit-row-id').value,
                 date: document.getElementById('acc-date').value,
                 payer: document.getElementById('acc-payer').value,
                 item: document.getElementById('acc-item').value,
-                currency: document.getElementById('acc-currency').value,
+                currency: currency,
                 amount: document.getElementById('acc-amount').value,
-                rate: document.getElementById('acc-custom-rate').value || AVG_RATE, 
+                rate: rateToSend, 
                 note: document.getElementById('acc-note').value
             };
 
