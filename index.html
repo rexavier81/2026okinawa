@@ -106,14 +106,7 @@
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center"><span class="text-lg mb-0.5">💱</span><span>換匯</span></button>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
-                    <div class="flex gap-2">
-                        <button onclick="showStatsModal()" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full border border-indigo-200 flex items-center gap-1">📊 統計</button>
-                        <button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
-                        <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button>
-                    </div>
-                </div>
+                <div class="flex justify-between items-center mb-1"><p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p><div class="flex gap-2"><button onclick="showStatsModal()" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full border border-indigo-200 flex items-center gap-1">📊 統計</button><button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button></div></div>
                 <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3"><p class="text-3xl font-black text-cyan-700" id="total-expense">0</p></div>
                 <div id="settlement-content" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 mt-2"><p class="font-bold mb-1">💰 結算建議 (不含公費)：</p><p id="settlement-text">計算中...</p></div>
             </div>
@@ -132,37 +125,19 @@
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">私人代墊 (誰先付了錢)</h4>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                            <p class="text-xs text-blue-600 font-bold mb-1">翔 代墊</p>
-                            <p class="text-xl font-black text-blue-800">NT$<span id="stat-xiang-adv">0</span></p>
-                        </div>
-                        <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
-                            <p class="text-xs text-pink-600 font-bold mb-1">彥 代墊</p>
-                            <p class="text-xl font-black text-pink-800">NT$<span id="stat-yan-adv">0</span></p>
-                        </div>
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100"><p class="text-xs text-blue-600 font-bold mb-1">翔 代墊</p><p class="text-xl font-black text-blue-800">NT$<span id="stat-xiang-adv">0</span></p></div>
+                        <div class="bg-pink-50 p-3 rounded-xl border border-pink-100"><p class="text-xs text-pink-600 font-bold mb-1">彥 代墊</p><p class="text-xl font-black text-pink-800">NT$<span id="stat-yan-adv">0</span></p></div>
                     </div>
                 </div>
                 <hr class="border-gray-100">
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">公款總花費 (已支出)</h4>
                     <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-                        <div class="p-4 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
-                            <span class="font-bold text-gray-700">總計</span>
-                            <span class="text-2xl font-black text-gray-800">NT$<span id="stat-public-total">0</span></span>
-                        </div>
+                        <div class="p-4 bg-gray-100 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-gray-700">總計</span><span class="text-2xl font-black text-gray-800">NT$<span id="stat-public-total">0</span></span></div>
                         <div class="p-4 space-y-3">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">🤝 共同消費</span>
-                                <span class="font-bold text-gray-700">NT$<span id="stat-public-common">0</span></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">👦 幫翔付 (翔欠公款)</span>
-                                <span class="font-bold text-red-500">NT$<span id="stat-public-xiang">0</span></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">👧 幫彥付 (彥欠公款)</span>
-                                <span class="font-bold text-red-500">NT$<span id="stat-public-yan">0</span></span>
-                            </div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">🤝 共同消費</span><span class="font-bold text-gray-700">NT$<span id="stat-public-common">0</span></span></div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">👦 幫翔付 (翔欠公款)</span><span class="font-bold text-red-500">NT$<span id="stat-public-xiang">0</span></span></div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">👧 幫彥付 (彥欠公款)</span><span class="font-bold text-red-500">NT$<span id="stat-public-yan">0</span></span></div>
                         </div>
                     </div>
                 </div>
@@ -173,17 +148,9 @@
     <div id="ticket-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 modal hidden-modal">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeTicketModal()"></div>
         <div class="relative z-10 w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="bg-pink-500 p-4 text-white flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg">🎟️ 套票 QR Code</h3>
-                <button onclick="closeTicketModal()" class="text-white/80 hover:text-white">✕</button>
-            </div>
-            <div class="flex p-2 bg-gray-100 gap-2 shrink-0">
-                <button onclick="switchTicket('xiang')" id="btn-ticket-xiang" class="flex-1 py-2 rounded-lg font-bold text-sm bg-white text-pink-600 shadow-sm transition-all">👦 翔的票</button>
-                <button onclick="switchTicket('yan')" id="btn-ticket-yan" class="flex-1 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-white/50 transition-all">👧 彥的票</button>
-            </div>
-            <div class="flex-1 overflow-auto p-4 bg-black flex items-center justify-center">
-                <img id="ticket-image" src="" alt="票券QR" class="max-w-full max-h-full object-contain rounded">
-            </div>
+            <div class="bg-pink-500 p-4 text-white flex justify-between items-center shrink-0"><h3 class="font-bold text-lg">🎟️ 套票 QR Code</h3><button onclick="closeTicketModal()" class="text-white/80 hover:text-white">✕</button></div>
+            <div class="flex p-2 bg-gray-100 gap-2 shrink-0"><button onclick="switchTicket('xiang')" id="btn-ticket-xiang" class="flex-1 py-2 rounded-lg font-bold text-sm bg-white text-pink-600 shadow-sm transition-all">👦 翔的票</button><button onclick="switchTicket('yan')" id="btn-ticket-yan" class="flex-1 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-white/50 transition-all">👧 彥的票</button></div>
+            <div class="flex-1 overflow-auto p-4 bg-black flex items-center justify-center"><img id="ticket-image" src="" alt="票券QR" class="max-w-full max-h-full object-contain rounded"></div>
             <p class="text-center text-xs text-gray-500 py-2 bg-white shrink-0">請將螢幕亮度調到最亮以利掃描</p>
         </div>
     </div>
@@ -334,7 +301,8 @@
                 { dayId: 5, time: "12:10 - 12:40", title: "🐙 點心：章魚燒", desc: "<a href='https://maps.app.goo.gl/fPvsVg6RrdH3idhZ8' target='_blank'>沖縄イイダコ屋太陽</a> <a href='https://www.facebook.com/reel/1540297270440381' target='_blank' class='text-blue-600 underline'>FB連結介紹</a>", type: "food", mapcode: "499 635 240*36" },
                 // ★★★ 新增地圖按鈕 ★★★
                 { dayId: 5, time: "13:00 - 16:30", title: "🛍️ 午餐 & 逛街", desc: "<a href='https://maps.app.goo.gl/zy6sQ5hfQgL2LMkc6' target='_blank'>永旺夢樂城來客夢 Rycom</a> (Porter在SAC'S BAR Resort)", type: "shopping", mapcode: "33 530 406*45", map: "永旺夢樂城來客夢map.jpg" },
-                { dayId: 5, time: "17:00 - 20:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity", mapcode: "33 525 593*52", guide: "<ul><li><b>迷宮警告</b>：建築很像易迷路，認大地標 Depot Island 彩色建築。</li><li><b>日落點</b>：傍晚必去靠海的堤防步道 (Boardwalk)。</li><li><b>寶可夢</b>：到處有隱藏彩繪牆 (PokeGenic)，可尋寶。</li></ul>" },
+                // ★★★ 新增地圖按鈕 (美國村) ★★★
+                { dayId: 5, time: "17:00 - 20:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity", mapcode: "33 525 593*52", map: "美國村map.jpg", guide: "<ul><li><b>迷宮警告</b>：建築很像易迷路，認大地標 Depot Island 彩色建築。</li><li><b>日落點</b>：傍晚必去靠海的堤防步道 (Boardwalk)。</li><li><b>寶可夢</b>：到處有隱藏彩繪牆 (PokeGenic)，可尋寶。</li></ul>" },
                 { dayId: 5, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 6, time: "09:30 - 10:00", title: "🌸 賞櫻", desc: "<a href='https://maps.app.goo.gl/M8S9cDXHb62GqHJ28' target='_blank'>與儀公園</a> (步行 6 分鐘)", type: "activity", mapcode: "33 128 662*63" },
@@ -342,8 +310,8 @@
                 { dayId: 6, time: "11:30 - 12:30", title: "⛩️ 參拜", desc: "<a href='https://maps.app.goo.gl/K91cPBSJCRj8BWYE7' target='_blank'>波上宮</a> (停附近付費停車場)", type: "activity", mapcode: "33 185 023*28", guide: "<ul><li><b>拍照密技</b>：神社內拍不到懸崖全景。<b>請走到旁邊的「波之上橋」人行道回頭拍</b>，才是經典角度！</li><li><b>參拜</b>：二禮、二拍手、一禮。</li></ul>" },
                 { dayId: 6, time: "12:50 - 13:20", title: "🍩 甜點", desc: "<a href='https://maps.app.goo.gl/VwbkZ7LAVcP9Bnw38' target='_blank'>Cream D Omoromachi</a> (生甜甜圈) <a href='https://www.facebook.com/reel/845741431632238' target='_blank' class='text-blue-600 underline'>FB介紹</a>", type: "food", mapcode: "33 219 284*44" },
                 { dayId: 6, time: "13:40 - 14:40", title: "📸 拍照逛街", desc: "<a href='https://maps.app.goo.gl/yaNpUYjVEf5uJ6g9A' target='_blank'>港川外人住宅</a>", type: "activity", mapcode: "33 340 059*82", guide: "<ul><li><b>路名</b>：以美國州名命名 (Florida, Texas)。</li><li><b>必買</b>：18號屋 <b>oHacorte</b> 水果塔，下午易完售。</li></ul>" },
-                // ★★★ 新增地圖按鈕 (外部連結) ★★★
-                { dayId: 6, time: "14:50 - 19:30", title: "🛍️ 午餐+購物大戰", desc: "<a href='https://maps.app.goo.gl/hjxvWREbo3U2d4ky5' target='_blank'>PARCO CITY</a> (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping", mapcode: "33 339 031*14", mapUrl: "https://parcocity.j-server.com/LUCSPRCC/ns/tl.cgi/https://www.parcocity.jp/floorguide?SLANG=ja&TLANG=zhb&XMODE=0&XPARAM=s,&XCHARSET=UTF-8&XPORG=,&XJSID=0" },
+                // ★★★ 新增地圖按鈕 (外部連結 - 更新網址) ★★★
+                { dayId: 6, time: "14:50 - 19:30", title: "🛍️ 午餐+購物大戰", desc: "<a href='https://maps.app.goo.gl/hjxvWREbo3U2d4ky5' target='_blank'>PARCO CITY</a> (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping", mapcode: "33 339 031*14", mapUrl: "https://www.parcocity.jp/floorguide/" },
                 { dayId: 6, time: "19:45 - 20:45", title: "👟 運動用品", desc: "<a href='https://maps.app.goo.gl/Tq8gR1DcAT4gxgX7A' target='_blank'>Sports Depo 天久店</a> (運動鞋)", type: "shopping", mapcode: "33 218 578*85" },
                 { dayId: 6, time: "21:00 - 22:00", title: "🍜 晚餐：拉麵", desc: "<a href='https://maps.app.goo.gl/cp5a9u7DcSpHjWYBA' target='_blank'>烈火ラーメン暖暮</a> (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food", mapcode: "33 157 622*11" },
                 { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
@@ -1180,6 +1148,7 @@
                     if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
                 }
                 
+                // ★★★ 修正這裡：純文字顯示現金平均匯率，無 HTML 標籤 ★★★
                 document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
                 
                 document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
