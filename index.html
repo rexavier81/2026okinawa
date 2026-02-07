@@ -42,6 +42,10 @@
         /* 天氣膠囊動畫 */
         .weather-capsule { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 小導遊列表樣式 */
+        .guide-list li { margin-bottom: 0.5rem; list-style-type: disc; list-style-position: inside; }
+        .guide-list b { color: #0d9488; }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col overflow-hidden max-w-md mx-auto bg-gray-50 shadow-2xl relative">
@@ -121,37 +125,19 @@
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">私人代墊 (誰先付了錢)</h4>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                            <p class="text-xs text-blue-600 font-bold mb-1">翔 代墊</p>
-                            <p class="text-xl font-black text-blue-800">NT$<span id="stat-xiang-adv">0</span></p>
-                        </div>
-                        <div class="bg-pink-50 p-3 rounded-xl border border-pink-100">
-                            <p class="text-xs text-pink-600 font-bold mb-1">彥 代墊</p>
-                            <p class="text-xl font-black text-pink-800">NT$<span id="stat-yan-adv">0</span></p>
-                        </div>
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100"><p class="text-xs text-blue-600 font-bold mb-1">翔 代墊</p><p class="text-xl font-black text-blue-800">NT$<span id="stat-xiang-adv">0</span></p></div>
+                        <div class="bg-pink-50 p-3 rounded-xl border border-pink-100"><p class="text-xs text-pink-600 font-bold mb-1">彥 代墊</p><p class="text-xl font-black text-pink-800">NT$<span id="stat-yan-adv">0</span></p></div>
                     </div>
                 </div>
                 <hr class="border-gray-100">
                 <div>
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">公款總花費 (已支出)</h4>
                     <div class="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-                        <div class="p-4 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
-                            <span class="font-bold text-gray-700">總計</span>
-                            <span class="text-2xl font-black text-gray-800">NT$<span id="stat-public-total">0</span></span>
-                        </div>
+                        <div class="p-4 bg-gray-100 border-b border-gray-200 flex justify-between items-center"><span class="font-bold text-gray-700">總計</span><span class="text-2xl font-black text-gray-800">NT$<span id="stat-public-total">0</span></span></div>
                         <div class="p-4 space-y-3">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">🤝 共同消費</span>
-                                <span class="font-bold text-gray-700">NT$<span id="stat-public-common">0</span></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">👦 幫翔付 (翔欠公款)</span>
-                                <span class="font-bold text-red-500">NT$<span id="stat-public-xiang">0</span></span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">👧 幫彥付 (彥欠公款)</span>
-                                <span class="font-bold text-red-500">NT$<span id="stat-public-yan">0</span></span>
-                            </div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">🤝 共同消費</span><span class="font-bold text-gray-700">NT$<span id="stat-public-common">0</span></span></div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">👦 幫翔付 (翔欠公款)</span><span class="font-bold text-red-500">NT$<span id="stat-public-xiang">0</span></span></div>
+                            <div class="flex justify-between text-sm"><span class="text-gray-500">👧 幫彥付 (彥欠公款)</span><span class="font-bold text-red-500">NT$<span id="stat-public-yan">0</span></span></div>
                         </div>
                     </div>
                 </div>
@@ -162,20 +148,24 @@
     <div id="ticket-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 modal hidden-modal">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeTicketModal()"></div>
         <div class="relative z-10 w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-            <div class="bg-pink-500 p-4 text-white flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg">🎟️ 套票 QR Code</h3>
-                <button onclick="closeTicketModal()" class="text-white/80 hover:text-white">✕</button>
-            </div>
-            
-            <div class="flex p-2 bg-gray-100 gap-2 shrink-0">
-                <button onclick="switchTicket('xiang')" id="btn-ticket-xiang" class="flex-1 py-2 rounded-lg font-bold text-sm bg-white text-pink-600 shadow-sm transition-all">👦 翔的票</button>
-                <button onclick="switchTicket('yan')" id="btn-ticket-yan" class="flex-1 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-white/50 transition-all">👧 彥的票</button>
-            </div>
-
-            <div class="flex-1 overflow-auto p-4 bg-black flex items-center justify-center">
-                <img id="ticket-image" src="" alt="票券QR" class="max-w-full max-h-full object-contain rounded">
-            </div>
+            <div class="bg-pink-500 p-4 text-white flex justify-between items-center shrink-0"><h3 class="font-bold text-lg">🎟️ 套票 QR Code</h3><button onclick="closeTicketModal()" class="text-white/80 hover:text-white">✕</button></div>
+            <div class="flex p-2 bg-gray-100 gap-2 shrink-0"><button onclick="switchTicket('xiang')" id="btn-ticket-xiang" class="flex-1 py-2 rounded-lg font-bold text-sm bg-white text-pink-600 shadow-sm transition-all">👦 翔的票</button><button onclick="switchTicket('yan')" id="btn-ticket-yan" class="flex-1 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-white/50 transition-all">👧 彥的票</button></div>
+            <div class="flex-1 overflow-auto p-4 bg-black flex items-center justify-center"><img id="ticket-image" src="" alt="票券QR" class="max-w-full max-h-full object-contain rounded"></div>
             <p class="text-center text-xs text-gray-500 py-2 bg-white shrink-0">請將螢幕亮度調到最亮以利掃描</p>
+        </div>
+    </div>
+
+    <div id="guide-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 modal hidden-modal">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeGuideModal()"></div>
+        <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative z-10 flex flex-col max-h-[85vh]">
+            <div class="bg-teal-600 p-4 text-white flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2">ℹ️ 景點小導遊</h3>
+                <button onclick="closeGuideModal()" class="text-white/80 hover:text-white">✕</button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <h4 id="guide-title" class="text-xl font-black text-gray-800 mb-4 border-b border-gray-100 pb-2"></h4>
+                <div id="guide-content" class="guide-list text-sm text-gray-600 leading-relaxed space-y-2"></div>
+            </div>
         </div>
     </div>
 
@@ -183,8 +173,7 @@
         <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeMapCodeModal()"></div>
         <div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-4 pointer-events-none">
             <p class="text-gray-400 text-sm uppercase tracking-widest font-bold mb-6">MapCode (導航輸入)</p>
-            <div id="mapcode-display" class="text-white font-mono font-black text-5xl sm:text-6xl tracking-wider text-center break-all select-all drop-shadow-lg">
-                </div>
+            <div id="mapcode-display" class="text-white font-mono font-black text-5xl sm:text-6xl tracking-wider text-center break-all select-all drop-shadow-lg"></div>
             <p class="text-gray-500 text-xs mt-12 animate-pulse">點擊任意處關閉</p>
         </div>
     </div>
@@ -193,9 +182,7 @@
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 translate-y-10">
             <a href="https://www.vjw.digital.go.jp/main/#/vjwpco001" target="_blank" class="pointer-events-auto flex items-center gap-2 group/item">
                 <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">VJW 入境</span>
-                <div class="bg-sky-500 hover:bg-sky-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
-                    <span class="text-xl">🇯🇵</span>
-                </div>
+                <div class="bg-sky-500 hover:bg-sky-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🇯🇵</span></div>
             </a>
             
             <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span><div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗺️</span></div></button>
@@ -281,28 +268,24 @@
                 { dayId: 2, time: "12:00 - 12:30", title: "🚆 前往租車行", desc: "單軌：<a href='https://maps.app.goo.gl/1JoXTvGk3KzBkYby9' target='_blank'>赤嶺站 (北口)</a> 搭乘接駁車<br><b>📹 <a href='https://www.youtube.com/watch?v=tDy2CliwKS4' target='_blank' class='text-blue-600 underline'>單軌赤嶺站 12:30 接駁方法</a></b>", type: "transport" },
                 { dayId: 2, time: "12:30 - 13:30", title: "🚗 取車 (大榮租車)", desc: "大榮租車<br>車款：Toyota Yaris<br>費用：NT$8,400 (現場支付/未含保險)<br>單號：N0209-0215RC4-08<br>訂購人：徐啟翔 / 0918-563-811<br><span style='color:#e74c3c; font-weight:bold;'>⚠️ 記得告知：2/15(日) 09:30 要搭接駁去機場</span>", type: "transport", tag: "租車", forceOpen: true, mapcode: "33 002 782*33" }, 
                 { dayId: 2, time: "13:40 - 14:30", title: "🦞 午餐：海鮮吃爆", desc: "<a href='https://maps.app.goo.gl/VHzgnj1RH9PrVduw8' target='_blank'>系滿魚市場</a> (推薦生魚片、焗烤龍蝦) 車程約5分", type: "food", mapcode: "232 484 136*78" },
-                { dayId: 2, time: "15:50 - 16:30", title: "🌊 萬座毛", desc: "<a href='https://maps.app.goo.gl/1qQWKJXqCXNiG3hL8' target='_blank'>萬座毛 (象鼻岩景觀)</a> 車程約80分", type: "activity", mapcode: "206 312 039*17" },
-                // ★★★ 修正 Day 2 許田休息站 ★★★
+                { dayId: 2, time: "15:50 - 16:30", title: "🌊 萬座毛", desc: "<a href='https://maps.app.goo.gl/1qQWKJXqCXNiG3hL8' target='_blank'>萬座毛 (象鼻岩景觀)</a> 車程約80分", type: "activity", mapcode: "206 312 039*17", guide: "<ul><li><b>最佳拍攝點</b>：沿著步道走到最底端，才能拍到最標準的「象鼻」全貌。</li><li><b>冷知識</b>：「萬座毛」意思是「能容納萬人坐下的草原」。</li><li><b>注意</b>：風非常大，帽子請抓好；下午夕陽最美，但也最逆光，早上順光海水最藍。</li></ul>" },
                 { dayId: 2, time: "17:00 - 17:30", title: "🎫 許田休息站", desc: "吃炸物、休息 (車程約30分)", type: "activity", mapcode: "206 476 706*66" },
                 { dayId: 2, time: "17:55 - 18:15", title: "🏨 飯店 Check-in", desc: "<a href='https://maps.app.goo.gl/nbq8cNbLN9xJVUA98' target='_blank'>ホテルリゾネックス名護</a> (私人海灘散步、夕陽很美)", type: "hotel", mapcode: "206 597 232*25" },
                 { dayId: 2, time: "18:30 - 20:30", title: "🥩 晚餐：燒肉五苑", desc: "<a href='https://maps.app.goo.gl/zvE1ahjbgmokVTaY6' target='_blank'>燒肉五苑名護店</a> (已預約 18:30 2位，可順逛隔壁<a href='https://maps.app.goo.gl/PchKk1p2wReoJpsu8' target='_blank'>漫畫倉庫</a>)", type: "food", important: true, menuImage: "燒肉五苑名護店菜單.jpg", mapcode: "206 626 507*82" }, 
                 { dayId: 2, time: "20:40", title: "🏨 住宿：名護 Resonex Nago", desc: "隔天有飯店早餐", type: "hotel" },
                 
                 { dayId: 3, time: "08:30 - 09:30", title: "🥣 早餐", desc: "ホテルリゾネックス名護 (飯店早餐)", type: "food" },
-                // ★★★ 新增套票按鈕 ★★★
-                { dayId: 3, time: "10:00 - 13:30", title: "🦈 美麗海水族館", desc: "<a href='https://maps.app.goo.gl/dbvaQEXwrBiSA7ST9' target='_blank'>美麗海水族館 (黑潮之海)</a> 車程約25分", type: "activity", important: true, mapcode: "553 075 797*77", tickets: true },
+                { dayId: 3, time: "10:00 - 13:30", title: "🦈 美麗海水族館", desc: "<a href='https://maps.app.goo.gl/dbvaQEXwrBiSA7ST9' target='_blank'>美麗海水族館 (黑潮之海)</a> 車程約25分", type: "activity", important: true, mapcode: "553 075 797*77", tickets: true, guide: "<ul><li><b>🐬 10:30 海豚秀</b>：進園先衝戶外劇場，背景是大海，免費看！</li><li><b>🐟 11:30 黑潮探險</b>：看完海豚進館，搭電梯上「水槽正上方」，俯瞰鯨鯊游過腳下（2/10有開放）。</li><li><b>🍽️ 午餐建議</b>：館內簡單吃，或去「Ocean Blue 咖啡廳」坐水槽旁發呆。</li><li><b>🛍️ 必買</b>：出口商店的鯨鯊湯匙、花園鰻襪子。</li></ul>" },
                 { dayId: 3, time: "14:10 - 15:00", title: "🍽️ 午餐：海景餐廳", desc: "<a href='https://maps.app.goo.gl/sSYDqNWzvZ7HDcFXA' target='_blank'>L LOTA (古宇利島)</a> 車程約35分", type: "food", mapcode: "485 692 291*82" },
-                // ★★★ 新增套票按鈕 ★★★
-                { dayId: 3, time: "15:00 - 16:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity", mapcode: "485 693 485*11", tickets: true },
+                { dayId: 3, time: "15:00 - 16:00", title: "🏝️ 古宇利島巡禮", desc: "<a href='https://www.google.com/maps/search/?api=1&query=心形岩' target='_blank'>心形岩</a>、<a href='https://www.google.com/maps/search/?api=1&query=古宇利海洋塔-停車場' target='_blank'>古宇利海洋塔-停車場</a> (沙灘、橋頭拍照)", type: "activity", mapcode: "485 693 485*11", tickets: true, guide: "<ul><li><b>心形岩</b>：通往沙灘的路<b>非常滑且陡</b>，穿拖鞋要小心。嵐拍廣告的地方。</li><li><b>古宇利大橋</b>：開車過橋時，副駕駛準備錄影，享受「行駛在海上」的感覺。</li></ul>" },
                 { dayId: 3, time: "16:00 - 16:30", title: "📷 沙灘/橋頭拍照", desc: "古宇利大橋", type: "activity" },
                 { dayId: 3, time: "18:00 - 19:00", title: "☕ 晚餐 / 下午茶", desc: "<a href='https://maps.app.goo.gl/MDAAH3BqAyj3VXZE7' target='_blank'>BANTA CAFE</a> (看夜景) <a href='https://www.facebook.com/share/r/1U1gyWhzTa/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>FB介紹</a> (回程較遠，預抓1.5hr)", type: "food", mapcode: "33 882 546*47" },
                 { dayId: 3, time: "20:20", title: "🏨 飯店 Check-in", desc: "<a href='https://maps.app.goo.gl/EenGmCNZVDMrvn3o6' target='_blank'>刻の宿 那覇</a> (停車：<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>) 入住代碼：733562、買隔天早餐", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 4, time: "09:00 - 09:30", title: "🥣 早餐", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a>", type: "food" },
-                { dayId: 4, time: "09:50 - 11:30", title: "🏰 古蹟巡禮", desc: "<a href='https://maps.app.goo.gl/DztRTHkY4sjzMtUJ8' target='_blank'>首里城公園</a> (車程約20分)", type: "activity", mapcode: "33 161 526*66" },
+                { dayId: 4, time: "09:50 - 11:30", title: "🏰 古蹟巡禮", desc: "<a href='https://maps.app.goo.gl/DztRTHkY4sjzMtUJ8' target='_blank'>首里城公園</a> (車程約20分)", type: "activity", mapcode: "33 161 526*66", guide: "<ul><li><b>打卡熱點</b>：<b>守禮門</b>（日幣2000圓圖案）。</li><li><b>見學路線</b>：正殿重建中，可參觀職人修復過程，極具教育意義。</li><li><b>西之台</b>：制高點可俯瞰那霸市區。</li></ul>" },
                 { dayId: 4, time: "11:50 - 12:50", title: "🍽️ 午餐", desc: "<a href='https://maps.app.goo.gl/QqgEhdrVPWhsaL936' target='_blank'>永旺城 南城大里</a> (車程約30分)", type: "food", mapcode: "232 559 133*82" },
-                // ★★★ 新增套票按鈕 ★★★
-                { dayId: 4, time: "13:00 - 14:20", title: "👹 沖繩世界文化王國", desc: "<a href='https://maps.app.goo.gl/tmqeh6zTEGffPFcs5' target='_blank'>沖繩世界停車場</a> (玉泉洞、王國村；14:30 太鼓舞秀、波伯蛇園)", type: "activity", mapcode: "232 495 330*25", tickets: true },
+                { dayId: 4, time: "13:00 - 14:20", title: "👹 沖繩世界文化王國", desc: "<a href='https://maps.app.goo.gl/tmqeh6zTEGffPFcs5' target='_blank'>沖繩世界停車場</a> (玉泉洞、王國村；14:30 太鼓舞秀、波伯蛇園)", type: "activity", mapcode: "232 495 330*25", tickets: true, guide: "<ul><li><b>玉泉洞</b>：全長5公里，<b>全年恆溫潮濕</b>，地板滑請小心。必看「黃金之盃」。</li><li><b>太鼓舞</b>：氣氛震撼，最後會邀觀眾一起跳，放開去玩！</li><li><b>波伯蛇園</b>：可付費體驗大蟒蛇掛脖子合照。</li></ul>" },
                 { dayId: 4, time: "14:30 - 15:00", title: "🥁 太鼓舞秀", desc: "EISA太鼓舞", type: "activity" },
                 { dayId: 4, time: "15:00 - 15:30", title: "🐍 波伯蛇園", desc: "紀念品店、參觀", type: "activity" },
                 { dayId: 4, time: "16:00 - 17:30", title: "🛒 好市多採購", desc: "<a href='https://maps.app.goo.gl/giC5VC7dKfwGsGzCA' target='_blank'>Costco 沖繩南城倉庫店</a> (買草莓！)", type: "shopping", mapcode: "232 557 289*44" },
@@ -311,17 +294,17 @@
                 { dayId: 4, time: "20:30", title: "🏨 返回住宿", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a> (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 5, time: "08:30 - 09:30", title: "🍜 早餐：沖繩麵", desc: "<a href='https://maps.app.goo.gl/zbk64W2Ut8ctUWN39' target='_blank'>STAND EIBUN</a> (步行4分鐘。必點：亞瑟麵 Arthur Soba、咖哩麵)", type: "food", mapcode: "33 157 236*58" },
-                { dayId: 5, time: "10:40 - 11:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity", mapcode: "499 576 274*33" }, 
+                { dayId: 5, time: "10:40 - 11:40", title: "🚗 絕景兜風", desc: "<a href='https://maps.app.goo.gl/8Pzgtt32syLyKvKq5' target='_blank'>海中道路</a> & <a href='https://maps.app.goo.gl/kD8ek67V7KxdL1q96' target='_blank'>果報懸崖</a> (參觀 <a href='https://maps.app.goo.gl/BXLSAdsQ2nfprgZj9' target='_blank'>命御庭製鹽工廠</a>)", type: "activity", mapcode: "499 576 274*33", guide: "<ul><li><b>絕景</b>：號稱「沖繩最藍的海」，必上展望台。</li><li><b>必吃</b>：製鹽工廠<b>雪鹽冰淇淋</b>，記得灑上各種口味的鹽（辣椒、可可...）。</li></ul>" }, 
                 { dayId: 5, time: "12:10 - 12:40", title: "🐙 點心：章魚燒", desc: "<a href='https://maps.app.goo.gl/fPvsVg6RrdH3idhZ8' target='_blank'>沖縄イイダコ屋太陽</a> <a href='https://www.facebook.com/reel/1540297270440381' target='_blank' class='text-blue-600 underline'>FB連結介紹</a>", type: "food", mapcode: "499 635 240*36" },
                 { dayId: 5, time: "13:00 - 16:30", title: "🛍️ 午餐 & 逛街", desc: "<a href='https://maps.app.goo.gl/zy6sQ5hfQgL2LMkc6' target='_blank'>永旺夢樂城來客夢 Rycom</a> (Porter在SAC'S BAR Resort)", type: "shopping", mapcode: "33 530 406*45" },
-                { dayId: 5, time: "17:00 - 20:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity", mapcode: "33 525 593*52" },
+                { dayId: 5, time: "17:00 - 20:00", title: "🇺🇸 美國村 & 晚餐", desc: "美國村 American Village (停車：<a href='https://maps.app.goo.gl/VPmW5M6dGsJgMtYq8' target='_blank'>北谷公園駐車場</a>或 <a href='https://maps.app.goo.gl/Rj1LsEiXJLvg5hHo9' target='_blank'>Depot Island</a>。吃：Taco Rice Cafe, 豬肉蛋飯糰)", type: "activity", mapcode: "33 525 593*52", guide: "<ul><li><b>迷宮警告</b>：建築很像易迷路，認大地標 Depot Island 彩色建築。</li><li><b>日落點</b>：傍晚必去靠海的堤防步道 (Boardwalk)。</li><li><b>寶可夢</b>：到處有隱藏彩繪牆 (PokeGenic)，可尋寶。</li></ul>" },
                 { dayId: 5, time: "21:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 6, time: "09:30 - 10:00", title: "🌸 賞櫻", desc: "<a href='https://maps.app.goo.gl/M8S9cDXHb62GqHJ28' target='_blank'>與儀公園</a> (步行 6 分鐘)", type: "activity", mapcode: "33 128 662*63" },
                 { dayId: 6, time: "10:15 - 11:15", title: "🐟 早餐：海鮮", desc: "<a href='https://maps.app.goo.gl/Z2Hd63ESntQ4dNAn8' target='_blank'>泊港漁市場</a> (車程約15分)", type: "food", mapcode: "33 216 115*55" },
-                { dayId: 6, time: "11:30 - 12:30", title: "⛩️ 參拜", desc: "<a href='https://maps.app.goo.gl/K91cPBSJCRj8BWYE7' target='_blank'>波上宮</a> (停附近付費停車場)", type: "activity", mapcode: "33 185 023*28" },
+                { dayId: 6, time: "11:30 - 12:30", title: "⛩️ 參拜", desc: "<a href='https://maps.app.goo.gl/K91cPBSJCRj8BWYE7' target='_blank'>波上宮</a> (停附近付費停車場)", type: "activity", mapcode: "33 185 023*28", guide: "<ul><li><b>拍照密技</b>：神社內拍不到懸崖全景。<b>請走到旁邊的「波之上橋」人行道回頭拍</b>，才是經典角度！</li><li><b>參拜</b>：二禮、二拍手、一禮。</li></ul>" },
                 { dayId: 6, time: "12:50 - 13:20", title: "🍩 甜點", desc: "<a href='https://maps.app.goo.gl/VwbkZ7LAVcP9Bnw38' target='_blank'>Cream D Omoromachi</a> (生甜甜圈) <a href='https://www.facebook.com/reel/845741431632238' target='_blank' class='text-blue-600 underline'>FB介紹</a>", type: "food", mapcode: "33 219 284*44" },
-                { dayId: 6, time: "13:40 - 14:40", title: "📸 拍照逛街", desc: "<a href='https://maps.app.goo.gl/yaNpUYjVEf5uJ6g9A' target='_blank'>港川外人住宅</a>", type: "activity", mapcode: "33 340 059*82" },
+                { dayId: 6, time: "13:40 - 14:40", title: "📸 拍照逛街", desc: "<a href='https://maps.app.goo.gl/yaNpUYjVEf5uJ6g9A' target='_blank'>港川外人住宅</a>", type: "activity", mapcode: "33 340 059*82", guide: "<ul><li><b>路名</b>：以美國州名命名 (Florida, Texas)。</li><li><b>必買</b>：18號屋 <b>oHacorte</b> 水果塔，下午易完售。</li></ul>" },
                 { dayId: 6, time: "14:50 - 19:30", title: "🛍️ 午餐+購物大戰", desc: "<a href='https://maps.app.goo.gl/hjxvWREbo3U2d4ky5' target='_blank'>PARCO CITY</a> (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping", mapcode: "33 339 031*14" },
                 { dayId: 6, time: "19:45 - 20:45", title: "👟 運動用品", desc: "<a href='https://maps.app.goo.gl/Tq8gR1DcAT4gxgX7A' target='_blank'>Sports Depo 天久店</a> (運動鞋)", type: "shopping", mapcode: "33 218 578*85" },
                 { dayId: 6, time: "21:00 - 22:00", title: "🍜 晚餐：拉麵", desc: "<a href='https://maps.app.goo.gl/cp5a9u7DcSpHjWYBA' target='_blank'>烈火ラーメン暖暮</a> (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food", mapcode: "33 157 622*11" },
@@ -329,7 +312,7 @@
 
                 { dayId: 7, time: "09:00 - 10:10", title: "🥣 早餐：市場巡禮", desc: "<a href='https://maps.app.goo.gl/AYwfA4LNNigJvAV78' target='_blank'>牧志公設市場</a> (步行 10 分鐘)", type: "food", mapcode: "33 157 264*54" },
                 
-                { dayId: 7, time: "10:40 - 11:40", title: "✈️ 看飛機/海景", desc: "<a href='https://maps.app.goo.gl/KF5KNjECB1zjpcqo9' target='_blank'>瀨長島 Umikaji Terrace</a>", type: "activity", mapcode: "33 002 602*22" },
+                { dayId: 7, time: "10:40 - 11:40", title: "✈️ 看飛機/海景", desc: "<a href='https://maps.app.goo.gl/KF5KNjECB1zjpcqo9' target='_blank'>瀨長島 Umikaji Terrace</a>", type: "activity", mapcode: "33 002 602*22", guide: "<ul><li><b>選位</b>：階梯狀商場，越上層風景越好。</li><li><b>飛機迷</b>：位於跑道尾端，可近距離感受戰機/客機起降震撼。</li></ul>" },
                 { dayId: 7, time: "12:00 - 13:40", title: "🛍️ Outlet 購物 & 午餐", desc: "<a href='https://maps.app.goo.gl/53Hpyq3h2Xz1HZ7d6' target='_blank'>Ashibinaa Outlet</a> (iias 沖繩豐崎)<br>逛：BEAMS, United Arrows, Porter (GRAN SAC'S)<br>午餐：<a href='https://maps.app.goo.gl/JYRLNqQSZE9YqGxQ8' target='_blank'>沖繩菜園 Karakara</a> <a href='https://www.facebook.com/reel/1424317575868459' target='_blank' class='text-blue-600 underline'>FB介紹</a>", type: "shopping", mapcode: "232 544 452*22" }, 
                 { dayId: 7, time: "17:45 - 20:30", title: "🌃 國際通", desc: "車先停回<a href='https://maps.app.goo.gl/pKdmCGuYChxP3R8R8' target='_blank'>停車場</a>。<br>晚餐：<a href='https://maps.app.goo.gl/yyxXqMyGrGqCKntVA' target='_blank'>阿古豬火鍋 (TRITON)</a> 或 <a href='https://www.facebook.com/share/r/17mmY4VG4P/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>沖縄料理居酒屋 ぶった</a>", type: "activity", mapcode: "33 128 661*23" }, 
                 { dayId: 7, time: "21:00", title: "🏨 返回住宿", desc: "<a href='https://maps.app.goo.gl/V5kaFqD58e2bE7Sv8' target='_blank'>刻の宿 那覇</a> (收行李) (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" },
@@ -498,6 +481,10 @@
                     let ticketBtn = item.tickets ? 
                     `<button onclick="event.stopPropagation(); showTicketModal()" class="mt-2 text-xs font-bold text-pink-600 bg-pink-50 border border-pink-200 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-pink-100 transition-colors w-fit shadow-sm">🎟️ 套票 QR</button>` : '';
 
+                    // ★★★ 小導遊按鈕 (Teal色) ★★★
+                    let guideBtn = item.guide ? 
+                    `<button onclick="event.stopPropagation(); showGuideModal('${item.title}', \`${item.guide}\`)" class="mt-2 text-xs font-bold text-teal-600 bg-teal-50 border border-teal-200 px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-teal-100 transition-colors w-fit shadow-sm">ℹ️ 小導遊</button>` : '';
+
                     // ★★★ MapCode 巨型字卡按鈕 (圓形懸浮設計) ★★★
                     let mapCodeBtn = item.mapcode ? 
                     `<button onclick="event.stopPropagation(); showMapCodeModal('${item.mapcode}')" 
@@ -524,7 +511,7 @@
                         timeDisplay = `<span class="text-sm font-black text-gray-700 tracking-tight">${item.time}</span>`;
                     }
 
-                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)">${mapCodeBtn}<div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1">${timeDisplay}<div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10 mt-1" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug pr-8">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text ${expandedClass} leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}<div class="flex gap-2 flex-wrap">${menuBtn}${ticketBtn}</div></div></div></div></div>`;
+                    return `<div class="relative pl-4">${!isLast ? '<div class="timeline-line"></div>' : ''}<div class="relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-5 ${item.important ? 'border-l-4 border-l-red-400' : ''}"><div class="p-4 flex gap-4" onclick="toggleDesc(this)">${mapCodeBtn}<div class="flex flex-col items-center gap-1 min-w-[3.5rem] pt-1">${timeDisplay}<div class="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md z-10 mt-1" style="background-color: ${typeColor}">${typeIcon}</div></div><div class="flex-1 min-w-0 pt-1"><h3 class="text-lg font-bold text-gray-800 leading-snug pr-8">${item.title}</h3><div class="mt-1 text-sm text-gray-600 desc-text ${expandedClass} leading-relaxed">${item.desc}</div>${item.tag ? `<span class="inline-block bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded mt-1 font-bold">${item.tag}</span>` : ''}<div class="flex gap-2 flex-wrap">${menuBtn}${ticketBtn}${guideBtn}</div></div></div></div></div>`;
                 }).join('');
             }
             list.innerHTML = html;
@@ -732,6 +719,21 @@
                 btnXiang.classList.remove('bg-white', 'text-pink-600', 'shadow-sm');
                 btnXiang.classList.add('text-gray-500', 'hover:bg-white/50');
             }
+        }
+
+        // ★★★ 小導遊 Modal 邏輯 (新功能) ★★★
+        function showGuideModal(title, content) {
+            const modal = document.getElementById('guide-modal');
+            document.getElementById('guide-title').innerText = title;
+            document.getElementById('guide-content').innerHTML = content;
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('show-modal');
+        }
+
+        function closeGuideModal() {
+            const modal = document.getElementById('guide-modal');
+            modal.classList.add('hidden-modal');
+            modal.classList.remove('show-modal');
         }
 
         // --- 翻譯機邏輯 ---
@@ -1115,7 +1117,6 @@
                     CREDIT_CARD_RATE = parseFloat(data.creditCardRate);
                 }
 
-                // ★★★ 計算現金平均匯率 (只從換匯紀錄算) ★★★
                 let totalTWD = 0, totalJPY = 0;
                 let exchangeHistoryHtml = '';
                 
@@ -1126,7 +1127,7 @@
                         exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
                     });
                     
-                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); // 更新公款現金匯率
+                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
                 }
                 
                 // ★★★ 修正這裡：純文字顯示現金平均匯率，無 HTML 標籤 ★★★
