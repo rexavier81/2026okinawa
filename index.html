@@ -102,7 +102,14 @@
                 <button onclick="toggleExchangeModal()" class="bg-white border border-blue-200 text-blue-600 text-xs px-3 py-2 rounded-lg font-bold shadow-sm active:scale-95 hover:bg-blue-50 transition-colors flex flex-col items-center"><span class="text-lg mb-0.5">💱</span><span>換匯</span></button>
             </div>
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
-                <div class="flex justify-between items-center mb-1"><p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p><div class="flex gap-2"><button onclick="showStatsModal()" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full border border-indigo-200 flex items-center gap-1">📊 統計</button><button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button><button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button></div></div>
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs text-gray-500 font-bold">總支出 (換算台幣)</p>
+                    <div class="flex gap-2">
+                        <button onclick="showStatsModal()" class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded-full border border-indigo-200 flex items-center gap-1">📊 統計</button>
+                        <button onclick="toggleSettlement()" class="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-1 rounded-full border border-orange-200 flex items-center gap-1">💰 結算 <svg id="arrow-settlement" class="w-3 h-3 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                        <button onclick="fetchData()" class="text-[10px] text-cyan-600 font-bold bg-cyan-50 px-2 py-1 rounded-full border border-cyan-200">↻ 更新</button>
+                    </div>
+                </div>
                 <div class="flex justify-between items-end border-b border-gray-100 pb-4 mb-3"><p class="text-3xl font-black text-cyan-700" id="total-expense">0</p></div>
                 <div id="settlement-content" class="bg-orange-50 border border-orange-100 p-3 rounded-lg text-sm text-orange-800 mt-2"><p class="font-bold mb-1">💰 結算建議 (不含公費)：</p><p id="settlement-text">計算中...</p></div>
             </div>
@@ -171,6 +178,13 @@
 
     <div class="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-3 group pointer-events-none">
         <div id="fab-menu" class="flex flex-col items-end gap-3 transition-all duration-300 transform origin-bottom scale-0 opacity-0 translate-y-10">
+            <a href="https://www.vjw.digital.go.jp/main/#/vjwpco001" target="_blank" class="pointer-events-auto flex items-center gap-2 group/item">
+                <span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">VJW 入境</span>
+                <div class="bg-sky-500 hover:bg-sky-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110">
+                    <span class="text-xl">🇯🇵</span>
+                </div>
+            </a>
+            
             <button onclick="showImageModal('沖繩單軌電車地圖.jpg'); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">單軌地圖</span><div class="bg-emerald-500 hover:bg-emerald-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗺️</span></div></button>
             <button onclick="toggleTaxCalc(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">免稅湊單</span><div class="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🛍️</span></div></button>
             <button onclick="toggleTranslate(); toggleFab();" class="pointer-events-auto flex items-center gap-2 group/item"><span class="bg-gray-800/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover/item:opacity-100 transition-opacity">翻譯機</span><div class="bg-violet-600 hover:bg-violet-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-transform hover:scale-110"><span class="text-xl">🗣️</span></div></button>
@@ -243,7 +257,7 @@
                 { dayId: 1, time: "11:00 - 11:30", title: "🚗 開車去停車場", desc: "<a href='https://maps.app.goo.gl/DAcNG4NwXqRsg7qTA' target='_blank'>Times 大園高鐵北路二段停車場</a> (停車1天100元，轉捷運領航站)", type: "transport" },
                 { dayId: 1, time: "11:30 - 14:45", title: "🛫 辦理登機手續", desc: "桃園機場第一航廈 (領航站-機場第一航廈站)<br><b>簡易午餐</b>", type: "transport" },
                 { dayId: 1, time: "14:45 - 17:10", title: "✈️ 飛機起飛", desc: "泰國越捷航空 VZ568，預計 17:05 抵達", type: "flight" },
-                { dayId: 1, time: "17:10 - 18:05", title: "🛬 出關、取行李", desc: "那霸機場 <a href='https://www.facebook.com/share/r/17zbjUwdwr/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>機場炸午餐肉FB介紹</a>", type: "activity" },
+                { dayId: 1, time: "17:10 - 18:05", title: "🛬 出關、取行李", desc: "那霸機場 <a href='https://www.facebook.com/share/r/17zbjUwdwr/?mibextid=wwXIfr' target='_blank' class='text-blue-600 underline'>機場炸午餐肉FB介紹</a><br><a href='https://www.vjw.digital.go.jp/main/#/vjwpco001' target='_blank' class='text-purple-600 font-bold underline mt-1 inline-block'>📱 VJW 入境通關 (填寫/截圖)</a>", type: "activity" },
                 { dayId: 1, time: "18:05 - 18:40", title: "🚆 單軌：入住飯店", desc: "前往 <a href='https://maps.app.goo.gl/vPCJDYhioHijR7476' target='_blank'>那霸小祿站前ys旅館</a> Check in", type: "transport" },
                 { dayId: 1, time: "18:40 - 19:40", title: "🍜 晚餐：琉球新麵 通堂", desc: "<a href='https://maps.app.goo.gl/JSpG8bYnT7qVM6oh6' target='_blank'>通堂 小祿本店</a> (男人麵/女人麵)", type: "food" },
                 { dayId: 1, time: "19:40 - 21:00", title: "🛒 晚餐、超市採買", desc: "<a href='https://maps.app.goo.gl/3St2Kjgai1WesYdv8' target='_blank'>永旺 那霸店 (Aeon Naha)</a> 晚餐、隨意逛逛", type: "shopping" },
@@ -294,7 +308,8 @@
                 { dayId: 6, time: "14:50 - 19:30", title: "🛍️ 午餐+購物大戰", desc: "<a href='https://maps.app.goo.gl/hjxvWREbo3U2d4ky5' target='_blank'>PARCO CITY</a> (敘敘苑3F、漢堡排2F、Porter 1F HANDS內、鳥玉)", type: "shopping", mapcode: "33 339 031*14" },
                 { dayId: 6, time: "19:45 - 20:45", title: "👟 運動用品", desc: "<a href='https://maps.app.goo.gl/Tq8gR1DcAT4gxgX7A' target='_blank'>Sports Depo 天久店</a> (運動鞋)", type: "shopping", mapcode: "33 218 578*85" },
                 { dayId: 6, time: "21:00 - 22:00", title: "🍜 晚餐：拉麵", desc: "<a href='https://maps.app.goo.gl/cp5a9u7DcSpHjWYBA' target='_blank'>烈火ラーメン暖暮</a> (在購物中心吃或開車回去吃拉麵 營業到2:00a.m.)", type: "food", mapcode: "33 157 622*11" },
-                { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, // ★★★ 新增 ★★★
+                // ★★★ Day 6 新增返回住宿 ★★★
+                { dayId: 6, time: "22:00", title: "🏨 返回住宿", desc: "刻の宿 那覇 (<a href='https://maps.app.goo.gl/wsbADdeUuLNcfMA27' target='_blank'>沖縄県樋川立体駐車場</a>)", type: "hotel", mapcode: "33 128 661*23" }, 
 
                 { dayId: 7, time: "09:00 - 10:10", title: "🥣 早餐：市場巡禮", desc: "<a href='https://maps.app.goo.gl/AYwfA4LNNigJvAV78' target='_blank'>牧志公設市場</a> (步行 10 分鐘)", type: "food", mapcode: "33 157 264*54" },
                 
@@ -1046,7 +1061,6 @@
                     CREDIT_CARD_RATE = parseFloat(data.creditCardRate);
                 }
 
-                // ★★★ 計算現金平均匯率 (只從換匯紀錄算) ★★★
                 let totalTWD = 0, totalJPY = 0;
                 let exchangeHistoryHtml = '';
                 
