@@ -941,4 +941,346 @@
                 progress.classList.add('bg-green-500');
                 status.innerHTML = `🎉 已達免稅門檻！`;
                 status.classList.replace('text-gray-400', 'text-green-600');
-                status.classList
+                status.classList.remove('text-gray-700');
+                
+                const estimatedRefund = Math.floor(total / 1.1 * 0.1);
+                refund.innerText = `預計退稅約 ¥${estimatedRefund.toLocaleString()}`;
+            } else {
+                progress.classList.add('bg-orange-400');
+                progress.classList.remove('bg-green-500');
+                const diff = TAX_TARGET - total;
+                status.innerHTML = `還差 <span class="text-red-500">¥${diff.toLocaleString()}</span> 達標`;
+                status.classList.replace('text-green-600', 'text-gray-400');
+                status.classList.add('text-gray-700');
+                refund.innerText = '';
+            }
+        }
+
+        // 綁定 Enter 鍵快速加入
+        document.getElementById('tax-item-price').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') addTaxItem();
+        });
+
+        // --- 記帳與換匯邏輯 (不變) ---
+        function toggleExchangeModal() {
+            const modal = document.getElementById('exchange-modal');
+            modal.classList.toggle('hidden-modal');
+            modal.classList.toggle('show-modal');
+        }
+
+        function toggleSettlement() {
+            const content = document.getElementById('settlement-content');
+            const arrow = document.getElementById('arrow-settlement');
+            content.classList.toggle('open');
+            arrow.classList.toggle('rotate');
+        }
+
+        // ★★★ 統計儀表板邏輯 (新功能) ★★★
+        function showStatsModal() {
+            const modal = document.getElementById('stats-modal');
+            const modalContent = modal.querySelector('.modal-content');
+
+            // 1. 初始化變數
+            let xiangAdvanced = 0; // 翔代墊總額
+            let yanAdvanced = 0;   // 彥代墊總額
+            
+            let publicTotal = 0;   // 公款總花費
+            let publicCommon = 0;  // 共同消費
+            let publicForXiang = 0; // 幫翔付
+            let publicForYan = 0;   // 幫彥付
+
+            // 2. 遍歷所有帳目進行計算
+            ALL_EXPENSES.forEach(expense => {
+                // 先統一換算成台幣金額
+                let amountTWD = 0;
+                if (expense.currency === 'JPY') {
+                    // 如果是日幣，乘上該筆紀錄的匯率 (如果沒有就用平均匯率)
+                    const rate = expense.rate ? parseFloat(expense.rate) : AVG_RATE;
+                    amountTWD = Math.round(parseInt(expense.amount) * rate);
+                } else {
+                    amountTWD = parseInt(expense.amount);
+                }
+
+                // 根據付款人分類
+                const payer = expense.payer;
+
+                // --- 私人代墊計算 ---
+                if (payer.includes('翔') && !payer.includes('公費')) {
+                    xiangAdvanced += amountTWD;
+                } else if (payer.includes('彥') && !payer.includes('公費')) {
+                    yanAdvanced += amountTWD;
+                }
+
+                // --- 公款花費計算 ---
+                if (payer.includes('公費')) {
+                    publicTotal += amountTWD; // 只要是公費支出都算總花費
+                    
+                    if (payer === '公費-翔') {
+                        publicForXiang += amountTWD;
+                    } else if (payer === '公費-彥') {
+                        publicForYan += amountTWD;
+                    } else {
+                        // 公費 (共同消費)
+                        publicCommon += amountTWD;
+                    }
+                }
+            });
+
+            // 3. 更新 UI
+            document.getElementById('stat-xiang-adv').innerText = xiangAdvanced.toLocaleString();
+            document.getElementById('stat-yan-adv').innerText = yanAdvanced.toLocaleString();
+            
+            document.getElementById('stat-public-total').innerText = publicTotal.toLocaleString();
+            document.getElementById('stat-public-common').innerText = publicCommon.toLocaleString();
+            document.getElementById('stat-public-xiang').innerText = publicForXiang.toLocaleString();
+            document.getElementById('stat-public-yan').innerText = publicForYan.toLocaleString();
+
+            // 4. 顯示 Modal
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('show-modal');
+        }
+
+        function closeStatsModal() {
+            const modal = document.getElementById('stats-modal');
+            modal.classList.add('hidden-modal');
+            modal.classList.remove('show-modal');
+        }
+
+        async function submitExchange() {
+            const btn = document.getElementById('btn-submit-ex');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "處理中...";
+
+            const payload = {
+                action: 'add_exchange',
+                date: document.getElementById('ex-date').value,
+                who: document.getElementById('ex-who').value,
+                twd: document.getElementById('ex-twd').value,
+                jpy: document.getElementById('ex-jpy').value
+            };
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert("✅ 換匯紀錄成功！");
+                toggleExchangeModal();
+                fetchData();
+            } catch (err) {
+                alert("❌ 連線失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        let CASH_AVG_RATE = 0.22; 
+        let CREDIT_CARD_RATE = 0.225;
+
+        // ★★★ 核心邏輯：根據付款人自動切換匯率 ★★★
+        function updateRateInputLogic() {
+            const currency = document.getElementById('acc-currency').value;
+            const payer = document.getElementById('acc-payer').value;
+            const rateArea = document.getElementById('rate-display-area');
+            const rateInput = document.getElementById('acc-custom-rate');
+
+            if (currency === 'JPY') {
+                rateArea.classList.remove('hidden');
+                // 公費 = 用現金 = 平均匯率
+                if (payer.includes('公費')) {
+                    rateInput.value = CASH_AVG_RATE.toFixed(4);
+                    rateInput.disabled = true;
+                    rateInput.classList.add('text-gray-400');
+                    rateInput.classList.remove('text-cyan-600');
+                } else {
+                    // 個人 = 刷卡 = 信用卡即時匯率 (含1.5%)
+                    rateInput.value = CREDIT_CARD_RATE.toFixed(4);
+                    rateInput.disabled = false; // 允許微調
+                    rateInput.classList.remove('text-gray-400');
+                    rateInput.classList.add('text-cyan-600');
+                }
+            } else {
+                rateArea.classList.add('hidden');
+                rateInput.value = 1;
+            }
+        }
+
+        async function submitExpense(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-acc');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '處理中...';
+
+            const currency = document.getElementById('acc-currency').value;
+            let rateToSend = document.getElementById('acc-custom-rate').value || CASH_AVG_RATE;
+            if (currency === 'TWD') {
+                rateToSend = 1;
+            }
+
+            const payload = {
+                action: document.getElementById('edit-row-id').value ? 'edit_expense' : 'add_expense',
+                row: document.getElementById('edit-row-id').value,
+                date: document.getElementById('acc-date').value,
+                payer: document.getElementById('acc-payer').value,
+                item: document.getElementById('acc-item').value,
+                currency: currency,
+                amount: document.getElementById('acc-amount').value,
+                rate: rateToSend, 
+                note: document.getElementById('acc-note').value
+            };
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+                alert('✅ 記帳成功！');
+                resetFormState();
+                fetchData();
+            } catch (err) {
+                alert("❌ 連線失敗");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function fetchData() {
+            const listDiv = document.getElementById('expense-list');
+            const totalEl = document.getElementById('total-expense');
+            const loadingMsg = document.getElementById('loading-msg');
+            loadingMsg.classList.remove('hidden');
+            listDiv.style.opacity = '0.5';
+
+            try {
+                const res = await fetch(GAS_URL);
+                const data = await res.json();
+                
+                if (data.error) {
+                    listDiv.innerHTML = `<div class="text-center text-red-400 py-4 text-sm">後端錯誤: ${data.error}</div>`;
+                    return;
+                }
+
+                if (data.creditCardRate && parseFloat(data.creditCardRate) > 0) {
+                    CREDIT_CARD_RATE = parseFloat(data.creditCardRate);
+                }
+
+                let totalTWD = 0, totalJPY = 0;
+                let exchangeHistoryHtml = '';
+                
+                if (data.exchanges && data.exchanges.length > 0) {
+                    data.exchanges.forEach(ex => {
+                        totalTWD += parseInt(ex.twd);
+                        totalJPY += parseInt(ex.jpy);
+                        exchangeHistoryHtml += `<div class="flex justify-between border-b border-gray-100 pb-1"><span>${ex.date} ${ex.who}</span><span>NT$${ex.twd} → ¥${ex.jpy}</span></div>`;
+                    });
+                    
+                    if (totalJPY > 0) CASH_AVG_RATE = (totalTWD / totalJPY); 
+                }
+                
+                document.getElementById('avg-rate-display').innerText = CASH_AVG_RATE.toFixed(4);
+                
+                document.getElementById('display-rate').innerText = CREDIT_CARD_RATE.toFixed(4);
+                document.getElementById('exchange-history').innerHTML = exchangeHistoryHtml || '<div class="text-gray-400">尚無紀錄</div>';
+
+                let totalSpentTWD = 0;
+                let spentPublicJPY = 0;
+                let xiangPaid = 0, yanPaid = 0;
+                let extraDebt_YanOwesXiang = 0; 
+                let html = '';
+
+                // ★★★ 關鍵：儲存所有資料到全域變數，供按鈕使用 ★★★
+                ALL_EXPENSES = data.expenses;
+
+                data.expenses.forEach((bill, index) => {
+                    let twd = 0;
+                    let displaySubText = '';
+
+                    if (bill.currency === 'JPY') {
+                        const appliedRate = bill.rate ? parseFloat(bill.rate) : CASH_AVG_RATE;
+                        twd = Math.round(bill.amount * appliedRate);
+                        displaySubText = `≈ NT$${twd} <span class="text-xs text-gray-300 ml-1">(匯率: ${appliedRate.toFixed(4)})</span>`;
+                        if (String(bill.payer).startsWith('公費')) spentPublicJPY += parseInt(bill.amount);
+                    } else {
+                        twd = parseInt(bill.amount);
+                    }
+
+                    if (bill.payer === '公費' || bill.payer.includes('共同')) {} 
+                    else if (bill.payer === '公費-翔') extraDebt_YanOwesXiang -= (twd / 2); 
+                    else if (bill.payer === '公費-彥') extraDebt_YanOwesXiang += (twd / 2);
+                    else {
+                        totalSpentTWD += twd;
+                        if (bill.payer.includes('翔')) xiangPaid += twd;
+                        if (bill.payer.includes('彥')) yanPaid += twd;
+                    }
+
+                    const displayAmt = (bill.currency === 'JPY') ? `¥${bill.amount}` : `$${bill.amount}`;
+                    let payerLabel = bill.payer.split(' ')[0];
+                    if(bill.payer === '公費-翔') payerLabel = '公費(翔)';
+                    if(bill.payer === '公費-彥') payerLabel = '公費(彥)';
+
+                    // ★★★ 消費明細：項目靠左 (text-left) ★★★
+                    html += `
+                    <div class="bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center relative z-0 mb-3">
+                        <div class="flex-1 text-left"> <div class="font-bold text-gray-800 text-sm">${bill.item}</div>
+                            <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                <span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${payerLabel}</span>
+                                <span class="opacity-75">${bill.date}</span>
+                            </div>
+                            ${bill.note ? `<div class="text-xs text-gray-400 mt-1">${bill.note}</div>` : ''}
+                        </div>
+                        <div class="text-right flex flex-col items-end z-10">
+                            <div class="font-bold text-cyan-700 text-lg">${displayAmt}</div>
+                            <div class="text-[10px] text-gray-400">${displaySubText}</div>
+                            <div class="flex gap-3 mt-2">
+                                <button onclick="editExpense(${index})" class="text-xs text-blue-500 font-bold px-3 py-2 active:bg-blue-50 rounded bg-white border border-blue-100 shadow-sm relative z-20">修改</button>
+                                <button onclick="deleteExpense(${bill.rowIndex})" class="text-xs text-red-400 font-bold px-3 py-2 active:bg-red-50 rounded bg-white border border-red-100 shadow-sm relative z-20">刪除</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                document.getElementById('expense-list').innerHTML = html || '<div class="text-center text-gray-400 py-4 text-sm">目前沒有帳目</div>';
+                document.getElementById('total-expense').innerText = totalSpentTWD.toLocaleString();
+                const currentBalance = totalJPY - spentPublicJPY;
+                document.getElementById('public-balance').innerText = currentBalance.toLocaleString();
+                // 公款換算台幣：使用現金匯率
+                document.getElementById('public-balance-twd').innerText = Math.round(currentBalance * CASH_AVG_RATE).toLocaleString();
+                updateSettlement(xiangPaid, yanPaid, extraDebt_YanOwesXiang);
+                updateRateInputLogic(); 
+            } catch (err) { listDiv.innerHTML = '讀取失敗'; } finally { loadingMsg.classList.add('hidden'); listDiv.style.opacity = '1'; }
+        }
+
+        function updateSettlement(xiang, yan, extraDebt = 0) {
+            const text = document.getElementById('settlement-text'); const baseDiff = (xiang - yan) / 2; const finalDiff = baseDiff + extraDebt; const absVal = Math.round(Math.abs(finalDiff));
+            if (absVal === 0) text.innerText = "🎉 平衡"; else if (finalDiff > 0) text.innerHTML = `彥 給 翔 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`; else text.innerHTML = `翔 給 彥 <span class="font-bold text-red-600">$${absVal.toLocaleString()}</span>`;
+        }
+
+        function editExpense(index) { 
+            const data = ALL_EXPENSES[index]; // 從全域變數抓資料，絕對安全
+            if (!data) return;
+
+            document.getElementById('edit-row-id').value = data.rowIndex; 
+            document.getElementById('acc-date').value = data.date; 
+            document.getElementById('acc-payer').value = data.payer; 
+            document.getElementById('acc-item').value = data.item; 
+            document.getElementById('acc-currency').value = data.currency; 
+            document.getElementById('acc-amount').value = data.amount; 
+            document.getElementById('acc-note').value = data.note; 
+            document.getElementById('acc-custom-rate').value = data.rate || CASH_AVG_RATE; 
+            
+            document.getElementById('form-title').innerText = "✏️ 修改帳目"; 
+            document.getElementById('btn-submit-acc').innerText = "確認更新"; 
+            document.getElementById('btn-submit-acc').classList.replace('bg-cyan-600', 'bg-blue-600'); 
+            document.getElementById('btn-cancel-edit').classList.remove('hidden'); 
+            updateRateInputLogic(); 
+            document.getElementById('app-container').scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        async function deleteExpense(rowIndex) { if (!confirm('確定刪除？')) return; try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_expense', row: rowIndex }) }); alert('🗑️ 已刪除'); fetchData(); } catch (e) { alert('失敗'); } }
+        function resetFormState() { document.getElementById('account-form').reset(); document.getElementById('edit-row-id').value = ''; document.getElementById('acc-date').valueAsDate = new Date(); document.getElementById('form-title').innerText = "💸 新增消費"; document.getElementById('btn-submit-acc').innerText = "記帳"; document.getElementById('btn-submit-acc').classList.replace('bg-blue-600', 'bg-cyan-600'); document.getElementById('btn-cancel-edit').classList.add('hidden'); updateRateInputLogic(); }
+        
+        const jpyInput = document.getElementById('input-jpy'); const twdInput = document.getElementById('input-twd');
+        function toggleCalc() { const modal = document.getElementById('calc-modal'); modal.classList.toggle('hidden-modal'); modal.classList.toggle('show-modal'); }
+        jpyInput.addEventListener('input', (e) => { const val = parseFloat(e.target.value); if (!isNaN(val)) twdInput.value = Math.round(val * CREDIT_CARD_RATE); else twdInput.value = ''; });
+        twdInput.addEventListener('input', (e) => { const val = parseFloat(e.target.value); if (!isNaN(val)) jpyInput.value = Math.round(val / CREDIT_CARD_RATE); else jpyInput.value = ''; });
+    </script>
+</body>
+</html>
